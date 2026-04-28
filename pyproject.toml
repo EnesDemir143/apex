@@ -21,6 +21,7 @@ dependencies = [
     "opentelemetry-sdk>=1.30.0",
     "pandas>=2.2.0",
     "pandas-market-calendars>=4.0.0",
+    "pgvector>=0.3.6",
     "plotly>=6.0.0",
     "pydantic>=2.13.3",
     "pydantic-settings>=2.8.0",
@@ -63,7 +64,7 @@ strict = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["asyncpg", "asyncpg.*", "yfinance", "yfinance.*"]
+module = ["asyncpg", "asyncpg.*", "yfinance", "yfinance.*", "pandas_market_calendars", "pandas_market_calendars.*", "pgvector", "pgvector.*"]
 ignore_missing_imports = true
 ignore_errors = true
 

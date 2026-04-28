@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -25,10 +25,20 @@ class Settings(BaseSettings):
     environment: str = Field(default="development", description="development | staging | production")
 
     # --- Database ---
-    database_url: str = "postgresql+asyncpg://apex:apex@localhost:5432/apex"
+    postgres_user: str = "apex"
+    postgres_password: SecretStr = SecretStr("apex")
+    postgres_host: str = "localhost"
+    postgres_port: int = 5432
+    postgres_db: str = "apex"
     db_pool_size: int = 5
     db_max_overflow: int = 10
     db_echo: bool = False
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def database_url(self) -> str:
+        pw = self.postgres_password.get_secret_value()
+        return f"postgresql+asyncpg://{self.postgres_user}:{pw}@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
 
     # --- Redis ---
     redis_url: str = "redis://localhost:6379/0"
@@ -45,6 +55,10 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.1
     llm_daily_budget_usd: float = 5.0
     llm_max_tokens: int = 4096
+
+    # --- Embeddings ---
+    embedding_model: str = "nomic-embed-text-v2"
+    embedding_dim: int = 768
 
     # --- LangSmith ---
     langchain_tracing: bool = True
