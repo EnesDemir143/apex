@@ -1,0 +1,46 @@
+# Version control
+.git
+.gitignore
+
+# Planning & docs (not needed in container)
+.planning
+.agents
+.claude
+.codebuddy
+.kiro
+plans
+graphify-out
+
+# Python
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.mypy_cache
+.ruff_cache
+.pytest_cache
+
+# Tests & notebooks (dev only)
+tests
+notebooks
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker (avoid recursive build context)
+docker-compose*.yml
+
+# Misc
+*.md
+!README.md
+scripts
+Makefile
+skills-lock.json
