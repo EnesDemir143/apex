@@ -260,3 +260,14 @@ docker/postgres/data/
 docker/redis/data/
 
 .planning/
+
+GEMINI.md
+
+.agents/
+.claude/
+.codebuddy/
+.kiro/
+
+skills-lock.json
+
+graphify-out/

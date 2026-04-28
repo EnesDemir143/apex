@@ -5,8 +5,9 @@ from __future__ import annotations
 import logging
 import sys
 import uuid
+from collections.abc import MutableMapping
 from contextvars import ContextVar
-from typing import Any
+from typing import Any, cast
 
 import structlog
 
@@ -31,10 +32,10 @@ def set_correlation_id(cid: str | None = None) -> str:
 
 
 def add_correlation_id(
-    logger: logging.Logger,  # noqa: ARG001
+    logger: Any,  # noqa: ARG001
     method_name: str,  # noqa: ARG001
-    event_dict: dict[str, Any],
-) -> dict[str, Any]:
+    event_dict: MutableMapping[str, Any],
+) -> MutableMapping[str, Any]:
     """Structlog processor that injects the correlation ID into every log entry."""
     event_dict["correlation_id"] = get_correlation_id()
     return event_dict
@@ -90,4 +91,4 @@ def get_logger(name: str) -> structlog.stdlib.BoundLogger:
     Args:
         name: Logger name, typically ``__name__`` of the calling module.
     """
-    return structlog.get_logger(name)
+    return cast(structlog.stdlib.BoundLogger, structlog.get_logger(name))

@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     llm_max_tokens: int = 4096
 
     # --- LangSmith ---
-    langchain_tracing_v2: bool = True
+    langchain_tracing: bool = True
     langchain_api_key: SecretStr = SecretStr("")
     langchain_project: str = "apex"
     langchain_endpoint: str = "https://api.smith.langchain.com"
