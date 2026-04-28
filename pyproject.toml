@@ -62,6 +62,11 @@ python_version = "3.13"
 strict = true
 plugins = ["pydantic.mypy"]
 
+[[tool.mypy.overrides]]
+module = ["asyncpg", "asyncpg.*", "yfinance", "yfinance.*"]
+ignore_missing_imports = true
+ignore_errors = true
+
 [tool.pydantic-mypy]
 init_forbid_extra = true
 init_typed = true
@@ -70,3 +75,6 @@ warn_required_dynamic_aliases = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+filterwarnings = [
+    "ignore::DeprecationWarning:testcontainers",
+]
