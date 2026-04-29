@@ -32,6 +32,7 @@ class LLMClient(ABC):
         system: str = "",
         temperature: float | None = None,
         max_tokens: int | None = None,
+        config: dict[str, Any] | None = None,
     ) -> LLMResponse:
         """Generate a response for the prompt."""
 
@@ -48,6 +49,7 @@ class OpenAIClient(LLMClient):
         system: str = "",
         temperature: float | None = None,
         max_tokens: int | None = None,
+        config: dict[str, Any] | None = None,
     ) -> LLMResponse:
         """Generate a response using ChatOpenAI."""
         llm = ChatOpenAI(  # type: ignore[call-arg]
@@ -61,7 +63,7 @@ class OpenAIClient(LLMClient):
             messages.append(SystemMessage(content=system))
         messages.append(HumanMessage(content=prompt))
 
-        response = await llm.ainvoke(messages)
+        response = await llm.ainvoke(messages, config=config)
         usage = getattr(response, "usage_metadata", None) or {}
         input_tokens = int(usage.get("input_tokens") or 0)
         output_tokens = int(usage.get("output_tokens") or 0)
@@ -86,9 +88,10 @@ class FakeLLMClient(LLMClient):
         system: str = "",
         temperature: float | None = None,
         max_tokens: int | None = None,
+        config: dict[str, Any] | None = None,
     ) -> LLMResponse:
         """Return a deterministic response without external calls."""
-        del prompt, system, temperature, max_tokens
+        del prompt, system, temperature, max_tokens, config
         return LLMResponse(content=self.response, model="fake", input_tokens=0, output_tokens=0)
 
 
