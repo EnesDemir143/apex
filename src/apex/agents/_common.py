@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from langchain_core.runnables import RunnableConfig
+
 from apex.agents.state import AgentState
 from apex.domain.value_objects import Signal
 from apex.services.llm_client import LLMResponse
@@ -26,7 +28,7 @@ def latest_value(values: Any) -> float | None:
     return None if value is None else float(value)
 
 
-def llm_trace_config(agent_name: str, ticker: str) -> dict[str, Any]:
+def llm_trace_config(agent_name: str, ticker: str) -> RunnableConfig:
     """Build LangSmith trace metadata for a single agent invocation."""
     return {"run_name": agent_name, "metadata": {"ticker": ticker, "agent": agent_name}}
 

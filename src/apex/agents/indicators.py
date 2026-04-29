@@ -6,7 +6,7 @@ from collections.abc import Iterable, Mapping
 from decimal import Decimal
 from typing import Any
 
-import pandas as pd
+import pandas as pd  # type: ignore[import-untyped]
 
 
 def calculate_rsi(prices: Iterable[float | int | Decimal] | pd.Series, period: int = 14) -> pd.Series:

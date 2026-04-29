@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
@@ -32,7 +33,7 @@ class LLMClient(ABC):
         system: str = "",
         temperature: float | None = None,
         max_tokens: int | None = None,
-        config: dict[str, Any] | None = None,
+        config: RunnableConfig | None = None,
     ) -> LLMResponse:
         """Generate a response for the prompt."""
 
@@ -49,7 +50,7 @@ class OpenAIClient(LLMClient):
         system: str = "",
         temperature: float | None = None,
         max_tokens: int | None = None,
-        config: dict[str, Any] | None = None,
+        config: RunnableConfig | None = None,
     ) -> LLMResponse:
         """Generate a response using ChatOpenAI."""
         llm = ChatOpenAI(  # type: ignore[call-arg]
@@ -88,7 +89,7 @@ class FakeLLMClient(LLMClient):
         system: str = "",
         temperature: float | None = None,
         max_tokens: int | None = None,
-        config: dict[str, Any] | None = None,
+        config: RunnableConfig | None = None,
     ) -> LLMResponse:
         """Return a deterministic response without external calls."""
         del prompt, system, temperature, max_tokens, config
