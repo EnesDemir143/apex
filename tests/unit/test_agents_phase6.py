@@ -143,6 +143,15 @@ def test_security_hooks_block_unknown_ticker_and_invalid_confidence() -> None:
     with pytest.raises(ValidationError):
         TradeDecisionInput(ticker="AAPL", signal=Signal.HOLD, confidence=1.2, reasoning="x", risk_score=0.1)
 
+    with pytest.raises(ValueError, match="confidence validation"):
+        post_analysis_hook(
+            {
+                "ticker": "AAPL",
+                "portfolio_decision": {"ticker": "AAPL", "signal": "BUY", "confidence": 0.4, "reasoning": "weak"},
+                "risk_assessment": {"risk_score": 0.2},
+            }
+        )
+
     state: AgentState = {
         "ticker": "AAPL",
         "portfolio_decision": {"ticker": "AAPL", "signal": "BUY", "confidence": 0.7, "reasoning": "valid"},

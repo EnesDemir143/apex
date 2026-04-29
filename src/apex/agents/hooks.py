@@ -8,7 +8,7 @@ from typing import Any
 from apex.agents.state import AgentState
 from apex.agents.tool_schemas import TradeDecisionInput
 from apex.core.config import get_settings
-from apex.core.constants import MIN_CONFIDENCE, TICKERS_WHITELIST
+from apex.core.constants import HOLD_CONFIDENCE_THRESHOLD, TICKERS_WHITELIST
 from apex.services.cost_guard import BudgetLimiter
 
 PROMPT_INJECTION_PATTERNS: tuple[str, ...] = (
@@ -45,8 +45,8 @@ def post_analysis_hook(state: AgentState) -> AgentState:
     risk = state.get("risk_assessment")
     risk_score = float(risk.get("risk_score", 0.0)) if isinstance(risk, Mapping) else 0.0
     payload = TradeDecisionInput.model_validate({**decision, "risk_score": risk_score})
-    if payload.confidence < MIN_CONFIDENCE:
-        raise ValueError(f"confidence validation failed: {payload.confidence} < {MIN_CONFIDENCE}")
+    if payload.confidence < HOLD_CONFIDENCE_THRESHOLD:
+        raise ValueError(f"confidence validation failed: {payload.confidence} < {HOLD_CONFIDENCE_THRESHOLD}")
 
     reasoning_hits = _scan_text(payload.reasoning)
     if reasoning_hits:
