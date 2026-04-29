@@ -25,7 +25,13 @@ def register_error_handlers(app: FastAPI) -> None:
         del request
         return JSONResponse(
             status_code=422,
-            content={"error": {"type": "ValidationError", "message": "Request validation failed", "details": exc.errors()}},
+            content={
+                "error": {
+                    "type": "ValidationError",
+                    "message": "Request validation failed",
+                    "details": exc.errors(),
+                }
+            },
         )
 
     @app.exception_handler(Exception)

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
 from fastapi import APIRouter
+from pydantic import BaseModel, Field
 
 from apex.core.constants import FALLBACK_CONFIDENCE, TICKERS_WHITELIST
 from apex.domain.models import AnalysisResult

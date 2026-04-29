@@ -18,7 +18,9 @@ class BudgetLimiter:
         redis_client: Any | None = None,
         key_prefix: str = "apex:budget",
     ) -> None:
-        self.daily_budget_usd = daily_budget_usd if daily_budget_usd is not None else get_settings().llm_daily_budget_usd
+        self.daily_budget_usd = (
+            daily_budget_usd if daily_budget_usd is not None else get_settings().llm_daily_budget_usd
+        )
         self.redis = redis_client
         self.key_prefix = key_prefix
         self._memory_usage: dict[str, float] = {}

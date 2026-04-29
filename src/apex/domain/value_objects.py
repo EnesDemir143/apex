@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel
 
 
-class Signal(str, Enum):
+class Signal(StrEnum):
     """Trading signal produced by the agent workflow."""
 
     BUY = "BUY"

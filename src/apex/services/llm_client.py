@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
@@ -50,13 +50,13 @@ class OpenAIClient(LLMClient):
         max_tokens: int | None = None,
     ) -> LLMResponse:
         """Generate a response using ChatOpenAI."""
-        llm = ChatOpenAI(
+        llm = ChatOpenAI(  # type: ignore[call-arg]
             model=self.settings.llm_model,
             temperature=temperature if temperature is not None else self.settings.llm_temperature,
-            max_tokens=max_tokens if max_tokens is not None else self.settings.llm_max_tokens,
-            api_key=self.settings.openai_api_key.get_secret_value() or None,
+            max_completion_tokens=max_tokens if max_tokens is not None else self.settings.llm_max_tokens,
+            api_key=self.settings.openai_api_key if self.settings.openai_api_key.get_secret_value() else None,
         )
-        messages = []
+        messages: list[BaseMessage] = []
         if system:
             messages.append(SystemMessage(content=system))
         messages.append(HumanMessage(content=prompt))
@@ -96,9 +96,7 @@ def _estimate_cost_usd(*, input_tokens: int, output_tokens: int) -> float:
     """Estimate cost using conservative gpt-4o-mini-style token pricing."""
     input_cost_per_million = 0.15
     output_cost_per_million = 0.60
-    return (input_tokens / 1_000_000 * input_cost_per_million) + (
-        output_tokens / 1_000_000 * output_cost_per_million
-    )
+    return (input_tokens / 1_000_000 * input_cost_per_million) + (output_tokens / 1_000_000 * output_cost_per_million)
 
 
 def parse_response_content(response: Any) -> str:

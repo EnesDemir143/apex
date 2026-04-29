@@ -8,12 +8,13 @@ from time import monotonic
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
+from starlette.types import ASGIApp
 
 
 class RateLimiterMiddleware(BaseHTTPMiddleware):
     """Token-bucket rate limiting by client host."""
 
-    def __init__(self, app: object, requests_per_minute: int = 120) -> None:
+    def __init__(self, app: ASGIApp, requests_per_minute: int = 120) -> None:
         super().__init__(app)
         self.capacity = float(requests_per_minute)
         self.refill_per_second = self.capacity / 60.0
