@@ -59,6 +59,7 @@ if bars:
     highs  = [float(b["high"])  for b in bars]
     lows   = [float(b["low"])   for b in bars]
     closes = [float(b["close"]) for b in bars]
+    volumes = [float(b.get("volume", 0)) for b in bars]
 else:
     # Fallback synthetic when backend offline
     import datetime as dt
@@ -68,8 +69,9 @@ else:
     closes = [o + 0.3 * (1 if i % 2 == 0 else -1) for i, o in enumerate(opens)]
     highs  = [max(o, c) + 0.8 for o, c in zip(opens, closes)]
     lows   = [min(o, c) - 0.8 for o, c in zip(opens, closes)]
+    volumes = [float(1_000_000 + i * 10_000) for i in range(60)]
 
-fig = candlestick_chart(dates, opens, highs, lows, closes, ticker=ticker)
+fig = candlestick_chart(dates, opens, highs, lows, closes, ticker=ticker, volumes=volumes)
 st.plotly_chart(fig, use_container_width=True)
 
 st.divider()

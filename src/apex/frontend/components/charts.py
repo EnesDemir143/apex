@@ -17,26 +17,79 @@ def candlestick_chart(
     lows: list[float],
     closes: list[float],
     ticker: str = "",
+    volumes: list[float] | None = None,
     prediction_high: list[float] | None = None,
     prediction_low: list[float] | None = None,
 ) -> go.Figure:
-    """Candlestick chart with optional prediction band overlay."""
+    """Mountain (area) price chart + volume histogram — Yahoo Finance style.
+
+    Upper panel: filled area line with OHLCV hover tooltip.
+    Lower panel: volume bars (green=up day, red=down day).
+    """
+    vol_colors = [
+        "#26a69a" if c >= o else "#ef5350"
+        for o, c in zip(opens, closes)
+    ]
+    vols = volumes or [0] * len(closes)
+
     fig = go.Figure()
-    fig.add_trace(go.Candlestick(
-        x=dates, open=opens, high=highs, low=lows, close=closes,
-        name=ticker, increasing_line_color="#00D4AA", decreasing_line_color="#FF4B4B",
+
+    # Upper panel: mountain area
+    fig.add_trace(go.Scatter(
+        x=dates, y=closes,
+        mode="lines",
+        name=ticker,
+        line={"color": "#2962ff", "width": 1.5},
+        fill="tozeroy",
+        fillcolor="rgba(41,98,255,0.15)",
+        customdata=list(zip(opens, highs, lows, closes, vols)),
+        hovertemplate=(
+            "<b>%{x}</b><br>"
+            "O: %{customdata[0]:.2f}  H: %{customdata[1]:.2f}<br>"
+            "L: %{customdata[2]:.2f}  C: %{customdata[3]:.2f}<br>"
+            "V: %{customdata[4]:,.0f}<extra></extra>"
+        ),
+        yaxis="y",
     ))
-    if prediction_high and prediction_low:
-        fig.add_trace(go.Scatter(
-            x=dates + list(reversed(dates)),
-            y=prediction_high + list(reversed(prediction_low)),
-            fill="toself", fillcolor="rgba(0,212,170,0.15)",
-            line={"color": "rgba(0,0,0,0)"}, name="Prediction Band",
-        ))
+
+    # Lower panel: volume bars
+    fig.add_trace(go.Bar(
+        x=dates, y=vols,
+        name="Volume",
+        marker_color=vol_colors,
+        opacity=0.8,
+        yaxis="y2",
+        hovertemplate="%{y:,.0f}<extra>Volume</extra>",
+    ))
+
     fig.update_layout(
-        template=_TEMPLATE, paper_bgcolor=_BG, plot_bgcolor=_BG,
-        xaxis_rangeslider_visible=False, margin={"l": 0, "r": 0, "t": 30, "b": 0},
-        title=f"{ticker} Price" if ticker else None,
+        template=_TEMPLATE,
+        paper_bgcolor="#0E1117",
+        plot_bgcolor="#0E1117",
+        margin={"l": 10, "r": 60, "t": 40, "b": 10},
+        title={"text": f"{ticker} Price", "font": {"size": 14}} if ticker else None,
+        hovermode="x unified",
+        showlegend=False,
+        xaxis={
+            "rangeslider": {"visible": False},
+            "showgrid": True,
+            "gridcolor": "#1e2130",
+            "zeroline": False,
+        },
+        yaxis={
+            "domain": [0.28, 1.0],
+            "showgrid": True,
+            "gridcolor": "#1e2130",
+            "zeroline": False,
+            "side": "right",
+        },
+        yaxis2={
+            "domain": [0.0, 0.25],
+            "showgrid": False,
+            "zeroline": False,
+            "side": "right",
+        },
+        bargap=0.1,
     )
     return fig
 
