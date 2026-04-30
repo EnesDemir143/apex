@@ -4,11 +4,12 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from typing import Any
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from apex.agents.workflow import create_workflow
+from apex.agents.workflow import MAX_AGENT_ITERATIONS, WORKFLOW_TIMEOUT_SECONDS, create_workflow, workflow_run_config
 from apex.api.app import create_app
 from apex.domain.models import OHLCVBar
 from apex.services.llm_client import FakeLLMClient
@@ -29,6 +30,15 @@ def _bars(ticker: str = "AAPL") -> list[OHLCVBar]:
         )
         for idx in range(35)
     ]
+
+
+def test_workflow_config_includes_trace_and_iteration_guards() -> None:
+    config = workflow_run_config("aapl")
+
+    assert config["metadata"] == {"ticker": "AAPL", "project": "apex"}
+    assert config["run_name"] == "analyze_AAPL"
+    assert config["recursion_limit"] == MAX_AGENT_ITERATIONS
+    assert WORKFLOW_TIMEOUT_SECONDS == 120
 
 
 @pytest.mark.asyncio
@@ -58,7 +68,7 @@ async def test_analyze_route_returns_signal_confidence_and_usage(monkeypatch: py
     import apex.api.routes.analysis as analysis
 
     class FakeWorkflow:
-        async def ainvoke(self, state: dict, config: dict | None = None) -> dict:
+        async def ainvoke(self, state: dict[str, Any], config: dict[str, Any] | None = None) -> dict[str, Any]:
             assert config and config["metadata"]["project"] == "apex"
             return {
                 **state,

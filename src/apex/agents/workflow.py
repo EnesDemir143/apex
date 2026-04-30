@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Mapping
 from typing import Any, cast
 
@@ -20,6 +21,9 @@ from apex.infrastructure_layer.models import AgentDecision
 from apex.services.analysis_repository import AnalysisRepository
 
 WorkflowConfig = RunnableConfig
+
+MAX_AGENT_ITERATIONS = 5
+WORKFLOW_TIMEOUT_SECONDS = 120
 
 
 def _build_graph() -> Any:
@@ -62,15 +66,20 @@ def create_workflow_with_checkpointer(checkpointer: Any) -> Any:
 
 
 def workflow_run_config(ticker: str) -> WorkflowConfig:
-    """Return LangSmith config for an end-to-end Apex workflow trace."""
+    """Return LangSmith config and max-iteration guard for an end-to-end workflow trace."""
     normalized = ticker.upper()
-    return {"run_name": f"analyze_{normalized}", "metadata": {"ticker": normalized, "project": "apex"}}
+    return {
+        "run_name": f"analyze_{normalized}",
+        "metadata": {"ticker": normalized, "project": "apex"},
+        "recursion_limit": MAX_AGENT_ITERATIONS,
+    }
 
 
 async def analyze_with_workflow(state: AgentState) -> AgentState:
-    """Run the compiled workflow with LangSmith trace metadata."""
+    """Run the compiled workflow with LangSmith metadata and a 120s timeout guard."""
     workflow = create_workflow()
-    return cast(AgentState, await workflow.ainvoke(state, config=workflow_run_config(state["ticker"])))
+    async with asyncio.timeout(WORKFLOW_TIMEOUT_SECONDS):
+        return cast(AgentState, await workflow.ainvoke(state, config=workflow_run_config(state["ticker"])))
 
 
 async def persist_workflow_results(session: AsyncSession, *, stock_id: int, state: AgentState) -> Any:
