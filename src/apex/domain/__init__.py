@@ -4,11 +4,11 @@ from apex.domain.models import (
     AnalysisResult,
     OHLCVBar,
     OHLCVResponse,
-    Portfolio,
-    PortfolioPosition,
     PredictionBand,
     Stock,
     Trade,
+    Watchlist,
+    WatchlistItem,
 )
 from apex.domain.value_objects import Indicator, Signal
 
@@ -17,8 +17,8 @@ __all__ = [
     "Indicator",
     "OHLCVBar",
     "OHLCVResponse",
-    "Portfolio",
-    "PortfolioPosition",
+    "Watchlist",
+    "WatchlistItem",
     "PredictionBand",
     "Signal",
     "Stock",

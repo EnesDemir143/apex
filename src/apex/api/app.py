@@ -14,7 +14,7 @@ from apex.api.middleware import CorrelationIDMiddleware
 from apex.api.rate_limiter import RateLimiterMiddleware
 from apex.api.routes.analysis import router as analysis_router
 from apex.api.routes.health import router as health_router
-from apex.api.routes.portfolio import router as portfolio_router
+from apex.api.routes.watchlist import router as watchlist_router
 from apex.core.config import settings
 from apex.core.logging import setup_logging
 
@@ -52,7 +52,7 @@ def create_app() -> FastAPI:
     # Routers
     app.include_router(analysis_router)
     app.include_router(health_router)
-    app.include_router(portfolio_router)
+    app.include_router(watchlist_router)
     register_error_handlers(app)
 
     return app
