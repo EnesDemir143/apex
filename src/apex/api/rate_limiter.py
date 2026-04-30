@@ -5,10 +5,13 @@ from __future__ import annotations
 from collections.abc import Awaitable, Callable
 from time import monotonic
 
+import structlog
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.types import ASGIApp
+
+logger = structlog.get_logger(__name__)
 
 
 class RateLimiterMiddleware(BaseHTTPMiddleware):
@@ -28,6 +31,12 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
         """Allow or reject a request based on available bucket tokens."""
         client = request.client.host if request.client else "unknown"
         if not self._consume_token(client):
+            logger.warning(
+                "rate_limit.exceeded",
+                client=client,
+                path=request.url.path,
+                method=request.method,
+            )
             return JSONResponse(
                 status_code=429,
                 content={"error": {"type": "RateLimitExceeded", "message": "Too many requests"}},
