@@ -1,4 +1,8 @@
-"""Repository for analysis run persistence operations."""
+"""Repository for analysis run persistence operations.
+
+v1 scope: prediction and analysis only — no trade execution.
+Buy/sell execution is planned for v2 (see BET5 backlog: TRADE-01).
+"""
 
 from __future__ import annotations
 
@@ -11,7 +15,12 @@ from apex.infrastructure_layer.models import AnalysisRun
 
 
 class AnalysisRepository:
-    """CRUD operations for AnalysisRun ORM rows."""
+    """Persistence operations for AnalysisRun records.
+
+    Stores prediction results (BUY/SELL/HOLD signals with confidence scores)
+    produced by the agent pipeline. Does not execute or record actual trades —
+    that is out of scope for v1.
+    """
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -20,15 +29,24 @@ class AnalysisRepository:
         self,
         *,
         stock_id: int,
-        final_signal: str | None = None,
+        predicted_signal: str | None = None,
         final_confidence: float | None = None,
         status: str = "completed",
         summary: dict[str, object] | None = None,
     ) -> AnalysisRun:
-        """Create and flush an analysis run."""
+        """Persist a completed analysis/prediction run.
+
+        Args:
+            stock_id: FK to the stock being analysed.
+            predicted_signal: Agent pipeline output — BUY/SELL/HOLD prediction.
+                              This is a prediction, not a trade order.
+            final_confidence: Confidence score [0, 1] for the predicted signal.
+            status: Run status (completed, failed, degraded).
+            summary: Optional JSON blob with per-agent details.
+        """
         analysis = AnalysisRun(
             stock_id=stock_id,
-            final_signal=final_signal,
+            final_signal=predicted_signal,  # ORM column kept as-is; semantics: prediction
             final_confidence=final_confidence,
             status=status,
             summary=summary,
