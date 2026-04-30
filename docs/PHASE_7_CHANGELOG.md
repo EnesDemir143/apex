@@ -28,6 +28,7 @@ Bu phase’de Apex’in tekil agent node’ları tam bir LangGraph workflow’un
 | `d46a709` | LangGraph workflow foundation, checkpoint saver, context compaction ve state reducer altyapısı |
 | `d79c0cd` | Circuit breaker, retry, rule-based fallback ve LLM cache resilience primitive’leri |
 | `f6b792b` | Analysis API’nin workflow’a bağlanması ve Phase 7 testleri |
+| `6eea858` | Workflow timeout ve max-iteration guard tamamlaması |
 
 ## Değişen / Eklenen Dosyalar
 
@@ -317,7 +318,7 @@ fish -c "uv run pytest -q"
 
 Sonuç:
 
-- `29 passed, 1 skipped`
+- `30 passed, 1 skipped`
 
 Graphify update:
 
@@ -327,7 +328,7 @@ fish -c "graphify update ."
 
 Sonuç:
 
-- Graph rebuilt: `650 nodes`, `1131 edges`, `57 communities`
+- Graph rebuilt: `656 nodes`, `1143 edges`, `58 communities`
 
 ## Önemli Notlar
 
