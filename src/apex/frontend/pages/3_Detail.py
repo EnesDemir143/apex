@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-import datetime as dt
-
 import streamlit as st
 from plotly.graph_objects import Candlestick  # noqa: F401 — confirms plotly.graph_objects import
 
-from apex.frontend.api_client import fetch_analysis
+from apex.frontend.api_client import fetch_analysis, fetch_ohlcv
 from apex.frontend.components.cards import agent_decision_card, signal_hero_card
 from apex.frontend.components.charts import candlestick_chart
 
@@ -50,15 +48,26 @@ signal_hero_card(
 
 st.divider()
 
-# --- Candlestick chart with synthetic OHLCV ---
+# --- Candlestick chart with real OHLCV ---
 st.subheader("Price Chart")
-today = dt.date.today()
-dates = [today - dt.timedelta(days=i) for i in range(30, 0, -1)]
-base = 150.0
-opens  = [base + i * 0.5 for i in range(30)]
-closes = [o + 0.3 * (1 if i % 2 == 0 else -1) for i, o in enumerate(opens)]
-highs  = [max(o, c) + 0.8 for o, c in zip(opens, closes)]
-lows   = [min(o, c) - 0.8 for o, c in zip(opens, closes)]
+with st.spinner("Loading OHLCV…"):
+    bars = fetch_ohlcv(ticker, days=60)
+
+if bars:
+    dates  = [b["timestamp"] for b in bars]
+    opens  = [float(b["open"])  for b in bars]
+    highs  = [float(b["high"])  for b in bars]
+    lows   = [float(b["low"])   for b in bars]
+    closes = [float(b["close"]) for b in bars]
+else:
+    # Fallback synthetic when backend offline
+    import datetime as dt
+    today = dt.date.today()
+    dates  = [today - dt.timedelta(days=i) for i in range(60, 0, -1)]
+    opens  = [150.0 + i * 0.5 for i in range(60)]
+    closes = [o + 0.3 * (1 if i % 2 == 0 else -1) for i, o in enumerate(opens)]
+    highs  = [max(o, c) + 0.8 for o, c in zip(opens, closes)]
+    lows   = [min(o, c) - 0.8 for o, c in zip(opens, closes)]
 
 fig = candlestick_chart(dates, opens, highs, lows, closes, ticker=ticker)
 st.plotly_chart(fig, use_container_width=True)

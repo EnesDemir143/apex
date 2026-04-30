@@ -6,7 +6,7 @@ from datetime import date, timedelta
 
 import streamlit as st
 
-from apex.frontend.api_client import fetch_analysis
+from apex.frontend.api_client import fetch_ohlcv
 from apex.frontend.components.charts import price_band_chart
 
 st.set_page_config(page_title="Ledger — Apex", page_icon="📋", layout="wide")
@@ -35,20 +35,15 @@ chart_ticker = ticker_filter.upper() if ticker_filter else st.session_state.get(
 st.subheader(f"Price History — {chart_ticker}")
 
 with st.spinner("Loading chart…"):
-    result = fetch_analysis(chart_ticker)
+    bars = fetch_ohlcv(chart_ticker, days=60)
 
-if result:
-    # Build synthetic price series from analysis metadata (real data would come from OHLCV endpoint)
-    import datetime as dt
-
-    today = dt.date.today()
-    dates = [today - dt.timedelta(days=i) for i in range(30, 0, -1)]
-    base = 150.0
-    closes = [base + i * 0.5 + (i % 3) * 0.3 for i in range(30)]
+if bars:
+    dates = [b["timestamp"] for b in bars]
+    closes = [float(b["close"]) for b in bars]
     fig = price_band_chart(dates, closes, ticker=chart_ticker)
     st.plotly_chart(fig, use_container_width=True)
 else:
-    st.info("No data available — backend may be offline.")
+    st.info("No OHLCV data available — backend may be offline.")
 
 # --- Analysis table ---
 st.divider()

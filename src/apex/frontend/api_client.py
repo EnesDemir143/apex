@@ -37,3 +37,16 @@ def fetch_health() -> dict[str, Any]:
 def clear_analysis_cache(ticker: str) -> None:
     """Invalidate cached analysis for a ticker."""
     fetch_analysis.clear()  # type: ignore[attr-defined]
+
+
+@st.cache_data(ttl=300)
+def fetch_ohlcv(ticker: str, days: int = 60) -> list[dict[str, Any]]:
+    """GET /api/v1/ohlcv/{ticker} and return list of bar dicts."""
+    try:
+        with httpx.Client(timeout=_TIMEOUT) as client:
+            resp = client.get(f"{BASE_URL}/api/v1/ohlcv/{ticker.upper()}", params={"days": days})
+            resp.raise_for_status()
+            data = resp.json()
+            return data.get("bars", [])  # type: ignore[no-any-return]
+    except httpx.HTTPError:
+        return []
