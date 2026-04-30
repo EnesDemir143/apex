@@ -8,12 +8,15 @@ from apex.agents.state import AgentState
 from apex.agents.technical import technical_agent
 from apex.agents.tool_schemas import TradeDecisionInput
 from apex.agents.usage_tracker import AnalysisTurnSummary, UsageTracker
+from apex.agents.workflow import create_workflow, create_workflow_with_checkpointer
 
 __all__ = [
     "AgentState",
     "AnalysisTurnSummary",
     "TradeDecisionInput",
     "UsageTracker",
+    "create_workflow",
+    "create_workflow_with_checkpointer",
     "fundamental_agent",
     "post_analysis_hook",
     "portfolio_manager",
