@@ -22,7 +22,7 @@ from apex.services.analysis_repository import AnalysisRepository
 
 WorkflowConfig = RunnableConfig
 
-MAX_AGENT_ITERATIONS = 5
+MAX_AGENT_ITERATIONS = 25
 WORKFLOW_TIMEOUT_SECONDS = 120
 
 

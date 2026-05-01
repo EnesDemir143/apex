@@ -2,18 +2,23 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
 import structlog
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from apex.agents.workflow import create_workflow, workflow_run_config
 from apex.core.constants import FALLBACK_CONFIDENCE, TICKERS_WHITELIST
 from apex.domain.models import AnalysisResult, OHLCVBar, OHLCVResponse
 from apex.domain.value_objects import Signal
+from apex.infrastructure_layer.database import get_db_session
+from apex.infrastructure_layer.models.stock import Stock
+from apex.infrastructure_layer.models.stock_price import StockPrice
 
 router = APIRouter(prefix="/api/v1", tags=["analysis"])
 logger = structlog.get_logger(__name__)
@@ -80,13 +85,53 @@ async def analyze_ticker(ticker: str, request: AnalyzeRequest | None = None) -> 
 
 
 @router.get("/ohlcv/{ticker}", response_model=OHLCVResponse)
-async def get_ohlcv(ticker: str, days: int = 60) -> OHLCVResponse:
-    """Return OHLCV bars for a ticker (synthetic when DB unavailable)."""
+async def get_ohlcv(
+    ticker: str,
+    days: int = 60,
+    session: AsyncSession = Depends(get_db_session),
+) -> OHLCVResponse:
+    """Return OHLCV bars for a ticker — real DB rows when available, synthetic fallback otherwise."""
     normalized = ticker.upper()
     logger.info("ohlcv.request", ticker=normalized, days=days)
+
+    try:
+        bars = await _db_market_data(session, normalized, days=min(days, 365))
+        if bars:
+            logger.info("ohlcv.response", ticker=normalized, bar_count=len(bars), source="db")
+            return OHLCVResponse(ticker=normalized, bars=bars, source="db")
+    except Exception as exc:
+        logger.warning("ohlcv.db_error", ticker=normalized, error=str(exc))
+
     bars = _default_market_data(normalized, days=min(days, 365))
-    logger.info("ohlcv.response", ticker=normalized, bar_count=len(bars))
+    logger.info("ohlcv.response", ticker=normalized, bar_count=len(bars), source="synthetic")
     return OHLCVResponse(ticker=normalized, bars=bars, source="synthetic")
+
+
+async def _db_market_data(session: AsyncSession, ticker: str, days: int) -> list[OHLCVBar]:
+    """Query stock_prices for the most recent *days* bars."""
+    cutoff = date.today() - timedelta(days=days)
+    stmt = (
+        select(StockPrice)
+        .join(Stock, StockPrice.stock_id == Stock.id)
+        .where(Stock.ticker == ticker, StockPrice.date >= cutoff)
+        .order_by(StockPrice.date.asc())
+        .limit(days)
+    )
+    result = await session.execute(stmt)
+    rows = result.scalars().all()
+    return [
+        OHLCVBar(
+            ticker=ticker,
+            timestamp=datetime(row.date.year, row.date.month, row.date.day, tzinfo=UTC),
+            open=Decimal(str(row.open or 0)),
+            high=Decimal(str(row.high or 0)),
+            low=Decimal(str(row.low or 0)),
+            close=Decimal(str(row.close or 0)),
+            volume=int(row.volume or 0),
+            source=row.source or "db",
+        )
+        for row in rows
+    ]
 
 
 def _default_market_data(ticker: str, days: int = 35) -> list[OHLCVBar]:

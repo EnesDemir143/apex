@@ -2,10 +2,18 @@
 
 from __future__ import annotations
 
+import os
 from functools import lru_cache
+from typing import Any
 
-from pydantic import Field, SecretStr, computed_field
+from pydantic import AliasChoices, Field, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _set_env_default(key: str, value: str) -> None:
+    """Set a process env var only when the runtime did not provide one."""
+    if key not in os.environ and value:
+        os.environ[key] = value
 
 
 class Settings(BaseSettings):
@@ -16,6 +24,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
+        populate_by_name=True,
     )
 
     # --- Application ---
@@ -61,10 +70,44 @@ class Settings(BaseSettings):
     embedding_dim: int = 768
 
     # --- LangSmith ---
-    langchain_tracing: bool = True
-    langchain_api_key: SecretStr = SecretStr("")
-    langchain_project: str = "apex"
-    langchain_endpoint: str = "https://api.smith.langchain.com"
+    langchain_tracing: bool = Field(
+        default=True,
+        validation_alias=AliasChoices("LANGSMITH_TRACING", "LANGCHAIN_TRACING", "LANGCHAIN_TRACING_V2"),
+    )
+    langchain_api_key: SecretStr = Field(
+        default=SecretStr(""),
+        validation_alias=AliasChoices("LANGCHAIN_API_KEY", "LANGSMITH_API_KEY"),
+    )
+    langchain_project: str = Field(
+        default="apex",
+        validation_alias=AliasChoices("LANGCHAIN_PROJECT", "LANGSMITH_PROJECT"),
+    )
+    langchain_endpoint: str = Field(
+        default="https://api.smith.langchain.com",
+        validation_alias=AliasChoices("LANGSMITH_ENDPOINT", "LANGCHAIN_ENDPOINT"),
+    )
+
+    def model_post_init(self, __context: Any) -> None:
+        """Expose LangSmith settings to LangChain/LangGraph auto-tracing.
+
+        Pydantic reads local ``.env`` files for our application settings, but
+        LangChain/LangSmith auto-tracing reads process environment variables.
+        Kubernetes already injects these values via envFrom; local development
+        needs this bridge so both runtimes behave the same. Existing process env
+        values always win to avoid changing cluster/runtime overrides.
+        """
+        tracing = str(self.langchain_tracing).lower()
+        api_key = self.langchain_api_key.get_secret_value()
+        _set_env_default("LANGSMITH_TRACING", tracing)
+        _set_env_default("LANGCHAIN_TRACING", tracing)
+        _set_env_default("LANGCHAIN_TRACING_V2", tracing)
+        _set_env_default("LANGCHAIN_PROJECT", self.langchain_project)
+        _set_env_default("LANGSMITH_PROJECT", self.langchain_project)
+        _set_env_default("LANGSMITH_ENDPOINT", self.langchain_endpoint)
+        _set_env_default("LANGCHAIN_ENDPOINT", self.langchain_endpoint)
+        if api_key:
+            _set_env_default("LANGCHAIN_API_KEY", api_key)
+            _set_env_default("LANGSMITH_API_KEY", api_key)
 
     # --- Observability ---
     otel_service_name: str = "apex"

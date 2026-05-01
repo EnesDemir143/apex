@@ -12,6 +12,12 @@ if str(_src) not in _sys.path:
 
 import streamlit as st
 
+from apex.core.constants import TICKERS_WHITELIST
+from apex.frontend.api_client import (
+    fetch_all_signals,
+    fetch_analysis,
+    fetch_observability,
+)
 from apex.frontend.components.agent_consensus import agent_consensus_panel
 from apex.frontend.components.backtest_cards import backtest_performance_panel
 from apex.frontend.components.latest_analysis import latest_analysis_card
@@ -23,14 +29,13 @@ from apex.frontend.components.tradingview_widget import tradingview_chart
 from apex.frontend.mock_data import (
     BACKTEST_SPARKLINES,
     BACKTEST_SUMMARY,
-    HERO_METRICS,
     HERO_SPARKLINES,
     MARKET_REGIME,
-    OBS_SPARKLINES,
-    OBSERVABILITY,
-    TOP_SIGNALS,
-    get_consensus,
-    get_latest_analysis,
+    OBSERVABILITY as _MOCK_OBS,
+    OBS_SPARKLINES as _MOCK_OBS_SPARKLINES,
+    TOP_SIGNALS as _MOCK_TOP_SIGNALS,
+    get_consensus as _mock_get_consensus,
+    get_latest_analysis as _mock_get_latest_analysis,
 )
 
 st.set_page_config(
@@ -42,6 +47,38 @@ st.set_page_config(
 
 if "selected_symbol" not in st.session_state:
     st.session_state.selected_symbol = "AAPL"
+
+# ── Fetch live data ────────────────────────────────────────────────────────
+with st.spinner("Loading signals…"):
+    live_signals = fetch_all_signals(TICKERS_WHITELIST)
+
+api_available = bool(live_signals)
+top_signals = live_signals if api_available else _MOCK_TOP_SIGNALS
+
+if not api_available:
+    st.warning("⚠️ API unavailable — showing cached demo data.", icon="⚠️")
+
+# ── Derive HERO_METRICS from live signals ──────────────────────────────────
+if api_available and live_signals:
+    avg_conf = sum(s["confidence"] for s in live_signals) / len(live_signals)
+    strongest = max(live_signals, key=lambda s: s["confidence"])
+    hero_metrics = {
+        "market_regime":    {"value": "Live"},
+        "analyzed_symbols": {"value": len(live_signals), "delta": f"{len(live_signals)} tickers"},
+        "strongest_signal": {"value": strongest["symbol"], "signal": strongest["signal"]},
+        "avg_confidence":   {"value": avg_conf, "delta": None},
+        "system_health":    {"value": "Healthy"},
+    }
+else:
+    from apex.frontend.mock_data import HERO_METRICS as _MOCK_HERO
+    hero_metrics = _MOCK_HERO
+
+# ── Fetch observability ────────────────────────────────────────────────────
+obs_data = fetch_observability()
+observability = _MOCK_OBS.copy()
+obs_sparklines = _MOCK_OBS_SPARKLINES
+if obs_data.get("data_provider"):
+    observability["data_provider"] = obs_data["data_provider"]
 
 # ── Top header ─────────────────────────────────────────────────────────────
 hdr_left, hdr_mid, hdr_right = st.columns([2, 3, 2])
@@ -67,11 +104,13 @@ with hdr_mid:
         st.rerun()
 
 with hdr_right:
+    health_color = "#00D4AA" if api_available else "#FF4B4B"
+    health_label = "Healthy" if api_available else "Unreachable"
     st.markdown(
-        """
+        f"""
         <div style="display:flex;justify-content:flex-end;align-items:center;gap:16px;padding-top:8px;">
             <span style="font-size:12px;color:#AAA;">⚡ Market: <b style="color:#FFD700;">Volatile</b></span>
-            <span style="font-size:12px;color:#AAA;">System Status <b style="color:#00D4AA;">● Healthy</b></span>
+            <span style="font-size:12px;color:#AAA;">System Status <b style="color:{health_color};">● {health_label}</b></span>
         </div>
         """,
         unsafe_allow_html=True,
@@ -84,29 +123,29 @@ k1, k2, k3, k4, k5 = st.columns(5)
 
 with k1:
     hero_metric_card(
-        "Market Regime", HERO_METRICS["market_regime"]["value"],
+        "Market Regime", hero_metrics["market_regime"]["value"],
         sparkline=HERO_SPARKLINES["market_regime"], spark_color="#7C3AED",
     )
 with k2:
     hero_metric_card(
-        "Analyzed Symbols", str(HERO_METRICS["analyzed_symbols"]["value"]),
-        delta=HERO_METRICS["analyzed_symbols"]["delta"],
+        "Analyzed Symbols", str(hero_metrics["analyzed_symbols"]["value"]),
+        delta=hero_metrics["analyzed_symbols"].get("delta"),
     )
 with k3:
     hero_metric_card(
-        "Strongest Signal", HERO_METRICS["strongest_signal"]["value"],
-        signal_badge=HERO_METRICS["strongest_signal"]["signal"],
+        "Strongest Signal", hero_metrics["strongest_signal"]["value"],
+        signal_badge=hero_metrics["strongest_signal"]["signal"],
     )
 with k4:
     hero_metric_card(
         "Avg Confidence",
-        f'{HERO_METRICS["avg_confidence"]["value"]:.0%}',
-        delta=HERO_METRICS["avg_confidence"]["delta"],
+        f'{hero_metrics["avg_confidence"]["value"]:.0%}',
+        delta=hero_metrics["avg_confidence"].get("delta"),
         sparkline=HERO_SPARKLINES["avg_confidence"], spark_color="#00D4AA",
     )
 with k5:
     hero_metric_card(
-        "System Health", HERO_METRICS["system_health"]["value"],
+        "System Health", hero_metrics["system_health"]["value"],
         sparkline=HERO_SPARKLINES["system_health"], spark_color="#00D4AA",
     )
 
@@ -120,9 +159,8 @@ with left_col:
         top_hdr, top_link = st.columns([3, 1])
         top_hdr.markdown('<div style="font-size:15px;font-weight:600;color:#F0F0F0;">Top Signals</div>', unsafe_allow_html=True)
         top_link.page_link("pages/2_Signals.py", label="View all →")
-        signal_leaderboard(TOP_SIGNALS[:5])
+        signal_leaderboard(top_signals[:5])
 
-        # Agent legend
         st.markdown(
             """
             <div style="display:flex;gap:16px;padding-top:8px;flex-wrap:wrap;">
@@ -147,6 +185,58 @@ with right_col:
 
 st.markdown('<div style="margin-bottom:8px;"></div>', unsafe_allow_html=True)
 
+# ── Consensus + latest analysis helpers ───────────────────────────────────
+def _get_consensus(symbol: str) -> dict:  # type: ignore[type-arg]
+    if not api_available:
+        return _mock_get_consensus(symbol)
+    result = fetch_analysis(symbol)
+    if result is None:
+        return _mock_get_consensus(symbol)
+    agent_outputs = (result.get("summary") or {}).get("agent_outputs") or {}
+    signal = result.get("signal", "HOLD")
+    color_map = {"BUY": "#00D4AA", "SELL": "#FF4B4B", "HOLD": "#FFD700"}
+    color = color_map.get(signal, "#FFD700")
+    consensus: dict = {}  # type: ignore[type-arg]
+    for agent_name in ("technical", "fundamental", "risk"):
+        agent_data = agent_outputs.get(agent_name) or {}
+        summary = (
+            agent_data.get("reasoning")
+            or agent_data.get("risk_factors")
+            or "Analysis complete."
+        )
+        consensus[agent_name] = {
+            "stance":  agent_data.get("signal", signal),
+            "color":   color,
+            "summary": summary,
+        }
+    consensus["portfolio"] = {
+        "stance":  signal,
+        "color":   color,
+        "summary": result.get("summary", {}).get("usage_summary", {}) and "Synthesis complete." or "Synthesis complete.",
+    }
+    return consensus
+
+
+def _get_latest_analysis(symbol: str) -> dict:  # type: ignore[type-arg]
+    if not api_available:
+        return _mock_get_latest_analysis(symbol)
+    result = fetch_analysis(symbol)
+    if result is None:
+        return _mock_get_latest_analysis(symbol)
+    confidence: float = result.get("confidence", 0.0) or 0.0
+    risk = "Low" if confidence >= 0.7 else ("Medium" if confidence >= 0.5 else "High")
+    agent_outputs = (result.get("summary") or {}).get("agent_outputs") or {}
+    pm_data = agent_outputs.get("portfolio_manager") or {}
+    explanation = pm_data.get("reasoning") or f"{result.get('signal', 'HOLD')} signal with {confidence:.0%} confidence."
+    return {
+        "signal":        result.get("signal", "HOLD"),
+        "confidence":    confidence,
+        "risk":          risk,
+        "last_analysis": "just now",
+        "explanation":   explanation,
+    }
+
+
 # ── Bottom grid: consensus | backtest | regime ─────────────────────────────
 b1, b2, b3 = st.columns([1, 1.2, 1])
 
@@ -155,7 +245,7 @@ with b1:
         hdr_c, hdr_l = st.columns([2, 1])
         hdr_c.markdown(f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;">Agent Consensus ({sym})</div>', unsafe_allow_html=True)
         hdr_l.page_link("pages/2_Signals.py", label="View details →")
-        agent_consensus_panel(get_consensus(sym))
+        agent_consensus_panel(_get_consensus(sym))
 
 with b2:
     with st.container(border=True):
@@ -179,14 +269,14 @@ obs_col, lat_col = st.columns([1.6, 1])
 with obs_col:
     with st.container(border=True):
         st.markdown('<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:10px;">System Observability <span style="font-size:11px;color:#00D4AA;">(Live)</span></div>', unsafe_allow_html=True)
-        observability_panel(OBSERVABILITY, OBS_SPARKLINES)
+        observability_panel(observability, obs_sparklines)
 
 with lat_col:
     with st.container(border=True):
         hdr_c, hdr_l = st.columns([2, 1])
         hdr_c.markdown(f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;">Latest Analysis ({sym})</div>', unsafe_allow_html=True)
         hdr_l.page_link("pages/6_Observability.py", label="View all →")
-        latest_analysis_card(sym, get_latest_analysis(sym))
+        latest_analysis_card(sym, _get_latest_analysis(sym))
 
 # ── Footer disclaimer ──────────────────────────────────────────────────────
 st.divider()

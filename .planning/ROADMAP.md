@@ -161,6 +161,21 @@
 
 ---
 
+### Phase 11: Streamlit API Wiring
+**Goal:** Replace all mock_data imports in Streamlit pages with real FastAPI calls — Dashboard, Signals, Observability wired to live API; Backtest/Replay remain stubbed (no endpoint yet)
+**Bet:** 5 | **Day:** 1
+**Requirements:** FE-02
+**Depends on:** Phase 10
+**UI hint:** yes
+**Success criteria:**
+1. Dashboard shows real BUY/SELL/HOLD signals from `POST /api/v1/analyze/{ticker}`
+2. Agent consensus and latest analysis panels use real API response
+3. Observability page shows real `/health` status
+4. Graceful fallback to mock when API is unreachable (warning banner, no crash)
+5. `make check` green
+
+---
+
 ## Phase Status
 
 | # | Phase | Bet | Status | Plans | Progress |
@@ -174,11 +189,12 @@
 | 7 | Workflow Assembly & Resilience | 2 | ✅ | 3/3 | 100% |
 | 8 | Streamlit Frontend | 3 | ✅ | 2/2 | 100% |
 | 9 | CI/CD, K8s & Monitoring | 3 | ✅ | 3/3 | 100% |
-| 10 | Cooldown — Polish & Harden | CL | ◎ | 2/2 | 0% |
+| 10 | Cooldown — Polish & Harden | CL | ✅ | 2/2 | 100% |
+| 11 | Streamlit API Wiring | 5 | ✅ | 1/1 | 100% |
 
-**Total:** 10 phases | 22 plans | 80 v1 requirements | 91% plan complete
+**Total:** 11 phases | 23 plans | 100% plan complete
 
 
 ---
 *Roadmap created: 2026-04-28*
-*Last updated: 2026-05-01 — Phase 9 CI/CD, K8s & Monitoring complete*
+*Last updated: 2026-05-01 — Phase 10 Cooldown complete. v1.0 MVP done. Phase 11 planned.*
