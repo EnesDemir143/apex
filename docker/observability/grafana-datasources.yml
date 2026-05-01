@@ -8,4 +8,30 @@ datasources:
     isDefault: true
     jsonData:
       maxLines: 1000
+      derivedFields:
+        - datasourceUid: tempo
+          matcherRegex: '"trace_id":"([a-f0-9]+)"'
+          name: trace_id
+          url: "$${__value.raw}"
+    editable: true
+
+  - name: Tempo
+    uid: tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    jsonData:
+      tracesToLogsV2:
+        datasourceUid: loki
+        filterByTraceID: true
+      serviceMap:
+        datasourceUid: prometheus
+    editable: true
+
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: false
     editable: true

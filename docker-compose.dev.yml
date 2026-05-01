@@ -98,6 +98,54 @@ services:
       - apex-net
     restart: unless-stopped
 
+  # ─── Tempo (Trace Storage) ───
+  tempo:
+    image: grafana/tempo:2.9.0
+    container_name: apex-tempo
+    ports:
+      - "3200:3200"
+    volumes:
+      - ./docker/observability/tempo-config.yml:/etc/tempo/tempo.yml:ro
+      - tempo_data:/var/tempo
+    command: -config.file=/etc/tempo/tempo.yml
+    networks:
+      - apex-net
+    restart: unless-stopped
+
+  # ─── OTel Collector (Trace + Metrics Pipeline) ───
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.139.0
+    container_name: apex-otel-collector
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "8889:8889"
+    volumes:
+      - ./docker/observability/otel-collector-config.yml:/etc/otelcol-contrib/config.yml:ro
+    depends_on:
+      - tempo
+    networks:
+      - apex-net
+    restart: unless-stopped
+
+  # ─── Prometheus (Metrics) ───
+  prometheus:
+    image: prom/prometheus:v3.7.3
+    container_name: apex-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    depends_on:
+      - otel-collector
+    networks:
+      - apex-net
+    restart: unless-stopped
+
   # ─── Grafana (Dashboards & Visualization) ───
   grafana:
     image: grafana/grafana:11.6.0
@@ -115,6 +163,10 @@ services:
     depends_on:
       loki:
         condition: service_healthy
+      tempo:
+        condition: service_started
+      prometheus:
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "wget --quiet --tries=1 --output-document=/dev/null http://localhost:3000/api/health || exit 1"]
       interval: 10s
@@ -133,6 +185,10 @@ volumes:
   redisinsight_data:
     driver: local
   loki_data:
+    driver: local
+  tempo_data:
+    driver: local
+  prometheus_data:
     driver: local
   grafana_data:
     driver: local
