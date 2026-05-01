@@ -190,7 +190,7 @@
 | 8 | Streamlit Frontend | 3 | ✅ | 2/2 | 100% |
 | 9 | CI/CD, K8s & Monitoring | 3 | ✅ | 3/3 | 100% |
 | 10 | Cooldown — Polish & Harden | CL | ✅ | 2/2 | 100% |
-| 11 | Streamlit API Wiring | 5 | ◎ | 1/1 | 0% |
+| 11 | Streamlit API Wiring | 5 | ✅ | 1/1 | 100% |
 
 **Total:** 11 phases | 23 plans | 100% plan complete
 

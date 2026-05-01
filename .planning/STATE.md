@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: — MVP Trading Analysis System
 status: complete
-last_updated: "2026-05-01T21:10:00.000Z"
+last_updated: "2026-05-01T22:05:00.000Z"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -24,13 +24,13 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 
 - **Phase:** 11
 - **Name:** Streamlit API Wiring
-- **Status:** Ready to execute
-- **Plans:** 0/1
+- **Status:** Complete
+- **Plans:** 1/1
 
 ## Progress
 
 - **Milestone:** v1.0 — MVP Trading Analysis System
-- **Phases complete:** 10/11
+- **Phases complete:** 11/11
 - **Phases planned:** 11/11
 - **Requirements complete:** 80/80
 
@@ -48,7 +48,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 8. Streamlit Frontend | 2 | 2 | ✅ Complete |
 | 9. CI/CD, K8s & Monitoring | 3 | 2 | ✅ Complete |
 | 10. Cooldown — Polish & Harden | 2 | 2 | ✅ Complete |
-| 11. Streamlit API Wiring | 1 | 1 | Ready to execute |
+| 11. Streamlit API Wiring | 1 | 1 | ✅ Complete |
 
 **Total:** 22 plans across 10 phases
 
@@ -67,6 +67,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 - 2026-05-01: Phase 8 redesigned — full "AI market intelligence cockpit" dashboard; old 4-page MVP replaced with 6-page architecture (Dashboard, Signals, Backtest, Replay Mode, Architecture, Observability); TradingView embed, agent consensus panel, KPI cards, market regime donut, system observability; mock_data.py drives all pages; admin/raw-data layer removed (Alpaca raw data stays backend-only); MABA-TS branding → Apex everywhere; ruff/mypy clean, make check green
 - 2026-05-01: Phase 9 complete — GitHub Actions CI/CD, uvx pre-commit hooks, K3s Kustomize manifests, OpenTelemetry FastAPI instrumentation, Tempo/Prometheus/OTel Collector compose stack, Grafana trace/log/metric datasources, PostgreSQL backup/restore scripts, Kustomize usage docs; make check and k8s-local-build green
 - 2026-05-01: Phase 10 complete — RAG pipeline (pgvector cosine search, model-agnostic), input sanitizer, DLQ, distributed lock, E2E testcontainers tests, README, 4 ADRs, K3s deployment runbook, weekly restore test script, real DB OHLCV wiring, recursion limit fix (5→25); make check green (34 passed)
+- 2026-05-01: Phase 11 complete — Dashboard, Signals, Observability pages wired to live FastAPI; fetch_all_signals + fetch_observability added to api_client; graceful mock fallback on API unavailability; post_hook graceful degradation fix; make check green (36 passed)
 
 ## Decisions Log
 
