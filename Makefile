@@ -1,4 +1,4 @@
-.PHONY: check test lint typecheck format frontend
+.PHONY: check test lint typecheck format frontend k8s-local-build k8s-local-dry-run
 
 check: lint typecheck test
 
@@ -23,3 +23,9 @@ verify:
 
 frontend:
 	PYTHONPATH=src uv run streamlit run src/apex/frontend/app.py
+
+k8s-local-build:
+	kubectl kustomize k8s/overlays/local
+
+k8s-local-dry-run:
+	kubectl apply --dry-run=client -k k8s/overlays/local
