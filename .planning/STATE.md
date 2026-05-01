@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: — MVP Trading Analysis System
-status: executing
-last_updated: "2026-05-01T00:00:00.000Z"
+status: ready
+last_updated: "2026-05-01T12:00:00.000Z"
 progress:
   total_phases: 10
-  completed_phases: 7
+  completed_phases: 9
   total_plans: 22
-  completed_plans: 15
+  completed_plans: 20
 ---
 
 # Project State: Apex (MABA-TS)
@@ -18,21 +18,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-29)
 
 **Core value:** Reliable 4-agent BUY/SELL/HOLD decisions with rule-based fallbacks
-**Current focus:** Phase 8 — Streamlit Frontend
+**Current focus:** Phase 10 — Cooldown, Polish & Harden
 
 ## Current Phase
 
-- **Phase:** 09
-- **Name:** CI/CD, K8s & Monitoring
+- **Phase:** 10
+- **Name:** Cooldown — Polish & Harden
 - **Status:** Ready to execute
-- **Plans:** 0/3
+- **Plans:** 0/2
 
 ## Progress
 
 - **Milestone:** v1.0 — MVP Trading Analysis System
-- **Phases complete:** 8/10
+- **Phases complete:** 9/10
 - **Phases planned:** 10/10
-- **Requirements complete:** 63/71
+- **Requirements complete:** 73/80
 
 ## Phase Planning Summary
 
@@ -46,7 +46,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 6. LangGraph Agents (Individual) | 2 | 2 | ✅ Complete |
 | 7. Workflow Assembly & Resilience | 3 | 2 | ✅ Complete |
 | 8. Streamlit Frontend | 2 | 2 | ✅ Complete |
-| 9. CI/CD, K8s & Monitoring | 3 | 2 | Ready to execute |
+| 9. CI/CD, K8s & Monitoring | 3 | 2 | ✅ Complete |
 | 10. Cooldown — Polish & Harden | 2 | 2 | Ready to execute |
 
 **Total:** 22 plans across 10 phases
@@ -64,6 +64,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 - 2026-05-01: Phase 7 complete — assembled LangGraph workflow, PostgreSQL checkpoint saver, context compaction, resilience primitives, LLM cache, workflow-backed analysis endpoint
 - 2026-05-01: Phase 8 complete — 4-page Streamlit MVP (Dashboard, Ledger, Detail, Backtest), dark theme, mountain+volume chart, OHLCV endpoint, structlog → Grafana
 - 2026-05-01: Phase 8 redesigned — full "AI market intelligence cockpit" dashboard; old 4-page MVP replaced with 6-page architecture (Dashboard, Signals, Backtest, Replay Mode, Architecture, Observability); TradingView embed, agent consensus panel, KPI cards, market regime donut, system observability; mock_data.py drives all pages; admin/raw-data layer removed (Alpaca raw data stays backend-only); MABA-TS branding → Apex everywhere; ruff/mypy clean, make check green
+- 2026-05-01: Phase 9 complete — GitHub Actions CI/CD, uvx pre-commit hooks, K3s Kustomize manifests, OpenTelemetry FastAPI instrumentation, Tempo/Prometheus/OTel Collector compose stack, Grafana trace/log/metric datasources, PostgreSQL backup/restore scripts, Kustomize usage docs; make check and k8s-local-build green
 
 ## Decisions Log
 
@@ -85,6 +86,8 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 2026-05-01 | Alpaca raw data admin-only → removed from frontend | Raw OHLCV never reaches public pages; legal compliance via data layer isolation |
 | 2026-05-01 | Streamlit MVP → Next.js in Bet 5 backlog | Streamlit cockpit is the working prototype; Next.js migration planned as B6 in MABA_TS_SHAPEUP_PLAN |
 | 2026-05-01 | mock_data.py drives all frontend pages | API wiring deferred; UI fully functional with deterministic mock data |
+| 2026-05-01 | Kustomize overlays use apply -k, not apply -f | Overlay kustomization.yaml is rendered by kubectl/kustomize; it is not a Kubernetes CRD resource. |
+| 2026-05-01 | Observability stack extended in Compose | Loki/Promtail/Grafana remain; Tempo, Prometheus, and OTel Collector add traces and metrics. |
 
 ---
-*Last updated: 2026-05-01 after completing Phase 7*
+*Last updated: 2026-05-01 after completing Phase 9*
