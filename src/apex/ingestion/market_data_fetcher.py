@@ -28,8 +28,22 @@ class MarketDataFetcher:
         primary: MarketDataClient | None = None,
         fallback: MarketDataClient | None = None,
     ) -> None:
-        self._primary = primary or AlpacaClient()
-        self._fallback = fallback or YFinanceClient()
+        self._primary = primary
+        self._fallback = fallback
+
+    @property
+    def primary(self) -> MarketDataClient:
+        """Return the primary provider, constructing it only when market data is fetched."""
+        if self._primary is None:
+            self._primary = AlpacaClient()
+        return self._primary
+
+    @property
+    def fallback(self) -> MarketDataClient:
+        """Return the fallback provider, constructing it only when market data is fetched."""
+        if self._fallback is None:
+            self._fallback = YFinanceClient()
+        return self._fallback
 
     async def fetch_bars(
         self,
@@ -39,19 +53,21 @@ class MarketDataFetcher:
         timeframe: str = "1D",
     ) -> OHLCVResponse:
         """Fetch bars from primary; fall back to secondary on failure."""
+        primary = self.primary
+        fallback = self.fallback
         try:
-            bars = await self._primary.fetch_bars(ticker, start, end, timeframe)
-            return OHLCVResponse(bars=bars, ticker=ticker, source=self._primary.name, degraded=False)
+            bars = await primary.fetch_bars(ticker, start, end, timeframe)
+            return OHLCVResponse(bars=bars, ticker=ticker, source=primary.name, degraded=False)
         except Exception as exc:
             logger.warning(
                 "market_data.primary_failed.switching_fallback",
-                primary=self._primary.name,
-                fallback=self._fallback.name,
+                primary=primary.name,
+                fallback=fallback.name,
                 ticker=ticker,
                 error=str(exc),
             )
-            bars = await self._fallback.fetch_bars(ticker, start, end, timeframe)
-            return OHLCVResponse(bars=bars, ticker=ticker, source=self._fallback.name, degraded=True)
+            bars = await fallback.fetch_bars(ticker, start, end, timeframe)
+            return OHLCVResponse(bars=bars, ticker=ticker, source=fallback.name, degraded=True)
 
     async def upsert_bars(
         self,

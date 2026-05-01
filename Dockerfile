@@ -6,14 +6,13 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 WORKDIR /app
 
-# Copy dependency files first (layer caching)
-COPY pyproject.toml uv.lock ./
+# Copy package metadata and source before installing the project.
+# uv's non-editable project install validates src/apex/__init__.py during sync.
+COPY pyproject.toml uv.lock README.md ./
+COPY src/ ./src/
 
 # Install production dependencies only (no dev, no editable)
 RUN uv sync --frozen --no-dev --no-editable
-
-# Copy application source
-COPY src/ ./src/
 
 # ─── Stage 2: Runtime ───
 FROM python:3.13-slim AS runtime
