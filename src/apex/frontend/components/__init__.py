@@ -1,1 +1,1 @@
-"""Frontend UI components."""
+"""Apex frontend components."""
