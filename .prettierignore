@@ -1,0 +1,20 @@
+# Python
+*.py
+*.pyi
+__pycache__/
+.venv/
+
+# Build & deps
+node_modules/
+dist/
+build/
+
+# Generated / lock files
+uv.lock
+*.lock
+
+# Data & cache
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+graphify-out/
