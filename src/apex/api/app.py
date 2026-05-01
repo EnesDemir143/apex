@@ -17,6 +17,7 @@ from apex.api.routes.health import router as health_router
 from apex.api.routes.watchlist import router as watchlist_router
 from apex.core.config import settings
 from apex.core.logging import setup_logging
+from apex.infrastructure_layer.otel import setup_otel
 
 logger = structlog.get_logger(__name__)
 
@@ -38,6 +39,7 @@ def create_app() -> FastAPI:
         description="Multi-Agent Based Automated Trading System",
         lifespan=lifespan,
     )
+    setup_otel(app)
 
     # Middleware (order matters — outermost first)
     app.add_middleware(

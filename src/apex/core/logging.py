@@ -10,6 +10,7 @@ from contextvars import ContextVar
 from typing import Any, cast
 
 import structlog
+from opentelemetry import trace
 
 # Per-request correlation ID stored in a ContextVar for async safety.
 correlation_id_var: ContextVar[str] = ContextVar("correlation_id", default="")
@@ -41,6 +42,19 @@ def add_correlation_id(
     return event_dict
 
 
+def add_trace_context(
+    logger: Any,  # noqa: ARG001
+    method_name: str,  # noqa: ARG001
+    event_dict: MutableMapping[str, Any],
+) -> MutableMapping[str, Any]:
+    """Structlog processor that injects active OpenTelemetry trace IDs."""
+    span_context = trace.get_current_span().get_span_context()
+    if span_context.is_valid:
+        event_dict["trace_id"] = f"{span_context.trace_id:032x}"
+        event_dict["span_id"] = f"{span_context.span_id:016x}"
+    return event_dict
+
+
 def setup_logging(log_level: str = "INFO", log_format: str = "json") -> None:
     """Configure structlog with stdlib integration, JSON or console rendering.
 
@@ -51,6 +65,7 @@ def setup_logging(log_level: str = "INFO", log_format: str = "json") -> None:
     shared_processors: list[structlog.types.Processor] = [
         structlog.contextvars.merge_contextvars,
         add_correlation_id,
+        add_trace_context,
         structlog.stdlib.add_log_level,
         structlog.stdlib.add_logger_name,
         structlog.processors.TimeStamper(fmt="iso"),
