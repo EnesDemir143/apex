@@ -63,6 +63,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 - 2026-04-29: Phase 6 complete — individual LangGraph-ready agent nodes, technical indicators, security hooks, tool schema isolation, usage tracking, LangSmith metadata
 - 2026-05-01: Phase 7 complete — assembled LangGraph workflow, PostgreSQL checkpoint saver, context compaction, resilience primitives, LLM cache, workflow-backed analysis endpoint
 - 2026-05-01: Phase 8 complete — 4-page Streamlit MVP (Dashboard, Ledger, Detail, Backtest), dark theme, mountain+volume chart, OHLCV endpoint, structlog → Grafana
+- 2026-05-01: Phase 8 redesigned — full "AI market intelligence cockpit" dashboard; old 4-page MVP replaced with 6-page architecture (Dashboard, Signals, Backtest, Replay Mode, Architecture, Observability); TradingView embed, agent consensus panel, KPI cards, market regime donut, system observability; mock_data.py drives all pages; admin/raw-data layer removed (Alpaca raw data stays backend-only); MABA-TS branding → Apex everywhere; ruff/mypy clean, make check green
 
 ## Decisions Log
 
@@ -80,6 +81,10 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 2026-04-29 | Meaningful post-analysis confidence gate | Post-hook uses HOLD confidence threshold instead of MIN_CONFIDENCE=0.0 |
 | 2026-05-01 | Post-hook validates final workflow output | Existing post hook requires portfolio_decision, so Phase 7 runs it after Portfolio Manager synthesis |
 | 2026-05-01 | LangGraph owns checkpoint schema | AsyncPostgresSaver.setup() creates checkpoint tables; Alembic remains app-schema only |
+| 2026-05-01 | Public dashboard = AI cockpit, not chart site | TradingView widget for price (no Alpaca datafeed); agent signals/confidence/risk/explanation are the product |
+| 2026-05-01 | Alpaca raw data admin-only → removed from frontend | Raw OHLCV never reaches public pages; legal compliance via data layer isolation |
+| 2026-05-01 | Streamlit MVP → Next.js in Bet 5 backlog | Streamlit cockpit is the working prototype; Next.js migration planned as B6 in MABA_TS_SHAPEUP_PLAN |
+| 2026-05-01 | mock_data.py drives all frontend pages | API wiring deferred; UI fully functional with deterministic mock data |
 
 ---
 *Last updated: 2026-05-01 after completing Phase 7*

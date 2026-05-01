@@ -111,18 +111,22 @@
 9. Each agent decision persisted to agent_decisions table with reasoning + token usage
 
 ### Phase 8: Streamlit Frontend
-**Goal:** 4-page Streamlit MVP with dark mode, Plotly charts
+**Goal:** AI market intelligence cockpit — 6-page Streamlit app, TradingView embed, agent consensus, KPI cards, mock data
 **Bet:** 3 | **Days:** 1-2 (Monday-Tuesday)
 **Requirements:** UI-01, UI-02, UI-03, UI-04, UI-05, UI-06
 **Depends on:** Phase 7
 **UI hint:** yes
 **Success criteria:**
-1. Dashboard shows hero card with latest analysis, metrics, and ticker search
-2. Ledger shows filterable table with Plotly price band chart
-3. Detail page shows candlestick chart, prediction band, and agent decisions
-4. Backtest page accepts input parameters and shows results
-5. Dark mode theme applied consistently across all pages
-6. Session state persists between page navigations
+1. Dashboard: 5 KPI cards, Top Signals leaderboard, TradingView chart embed, Agent Consensus, Backtest summary, Market Regime donut, System Observability, Latest Analysis
+2. Signals page: full filterable signal list + per-symbol detail panel
+3. Backtest page: strategy performance metrics with sparklines
+4. Replay Mode: step through historical agent decisions
+5. Architecture page: system diagram for CV/portfolio
+6. Observability page: API latency, cache hit rate, LLM cost, agent runs
+7. Dark theme, Apex branding, mock_data.py drives all pages
+8. Public pages: no raw Alpaca OHLCV (legal compliance)
+9. `make check` green (ruff + mypy + unit tests)
+10. Next step: wire mock_data → real API endpoints; Next.js migration in Bet 5 (B6)
 
 ### Phase 9: CI/CD, K8s & Monitoring
 **Goal:** GitHub Actions pipeline, K3s manifests, LGTM observability stack
