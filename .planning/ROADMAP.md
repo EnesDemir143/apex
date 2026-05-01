@@ -168,7 +168,7 @@
 | 5 | Domain Models & Core Services | 2 | ✅ | 3/3 | 100% |
 | 6 | LangGraph Agents (Individual) | 2 | ✅ | 2/2 | 100% |
 | 7 | Workflow Assembly & Resilience | 2 | ✅ | 3/3 | 100% |
-| 8 | Streamlit Frontend | 3 | ◎ | 2/2 | 0% |
+| 8 | Streamlit Frontend | 3 | ✅ | 2/2 | 100% |
 | 9 | CI/CD, K8s & Monitoring | 3 | ◎ | 3/3 | 0% |
 | 10 | Cooldown — Polish & Harden | CL | ◎ | 2/2 | 0% |
 
@@ -177,4 +177,4 @@
 
 ---
 *Roadmap created: 2026-04-28*
-*Last updated: 2026-05-01 — Phase 7 workflow assembly and resilience complete*
+*Last updated: 2026-05-01 — Phase 8 Streamlit frontend complete*

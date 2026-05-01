@@ -22,17 +22,17 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 
 ## Current Phase
 
-- **Phase:** 08
-- **Name:** Streamlit Frontend
+- **Phase:** 09
+- **Name:** CI/CD, K8s & Monitoring
 - **Status:** Ready to execute
-- **Plans:** 0/2
+- **Plans:** 0/3
 
 ## Progress
 
 - **Milestone:** v1.0 — MVP Trading Analysis System
-- **Phases complete:** 7/10
+- **Phases complete:** 8/10
 - **Phases planned:** 10/10
-- **Requirements complete:** 57/71
+- **Requirements complete:** 63/71
 
 ## Phase Planning Summary
 
@@ -45,7 +45,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 5. Domain Models & Core Services | 3 | 2 | ✅ Complete |
 | 6. LangGraph Agents (Individual) | 2 | 2 | ✅ Complete |
 | 7. Workflow Assembly & Resilience | 3 | 2 | ✅ Complete |
-| 8. Streamlit Frontend | 2 | 2 | Ready to execute |
+| 8. Streamlit Frontend | 2 | 2 | ✅ Complete |
 | 9. CI/CD, K8s & Monitoring | 3 | 2 | Ready to execute |
 | 10. Cooldown — Polish & Harden | 2 | 2 | Ready to execute |
 
@@ -62,6 +62,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 - 2026-04-29: Phase 5 complete — domain models, LLM/cost/cache/database services, repositories, analysis/watchlist API seams, error handling, rate limiting
 - 2026-04-29: Phase 6 complete — individual LangGraph-ready agent nodes, technical indicators, security hooks, tool schema isolation, usage tracking, LangSmith metadata
 - 2026-05-01: Phase 7 complete — assembled LangGraph workflow, PostgreSQL checkpoint saver, context compaction, resilience primitives, LLM cache, workflow-backed analysis endpoint
+- 2026-05-01: Phase 8 complete — 4-page Streamlit MVP (Dashboard, Ledger, Detail, Backtest), dark theme, mountain+volume chart, OHLCV endpoint, structlog → Grafana
 
 ## Decisions Log
 

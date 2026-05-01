@@ -61,6 +61,10 @@ target-version = "py313"
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
 
+[tool.ruff.lint.per-file-ignores]
+# Frontend: sys.path bootstrap causes E402/I001; HTML f-strings cause E501; semicolons in Streamlit callbacks cause E702
+"src/apex/frontend/**" = ["E402", "E501", "I001", "E702"]
+
 [tool.mypy]
 python_version = "3.13"
 strict = true
@@ -69,6 +73,14 @@ plugins = ["pydantic.mypy"]
 [[tool.mypy.overrides]]
 module = ["asyncpg", "asyncpg.*", "yfinance", "yfinance.*", "pandas_market_calendars", "pandas_market_calendars.*", "pgvector", "pgvector.*"]
 ignore_missing_imports = true
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["plotly", "plotly.*", "streamlit", "streamlit.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["apex.frontend.*"]
 ignore_errors = true
 
 [tool.pydantic-mypy]

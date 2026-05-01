@@ -1,4 +1,4 @@
-.PHONY: check test lint typecheck format
+.PHONY: check test lint typecheck format frontend
 
 check: lint typecheck test
 
@@ -12,7 +12,7 @@ typecheck:
 	uv run mypy src/
 
 test:
-	uv run pytest tests/ -v
+	uv run pytest tests/ -v 
 
 verify:
 	uv run python -c "import apex; print('✓ apex package importable')"
@@ -20,3 +20,6 @@ verify:
 	$(MAKE) lint
 	$(MAKE) typecheck
 	$(MAKE) test
+
+frontend:
+	PYTHONPATH=src uv run streamlit run src/apex/frontend/app.py
