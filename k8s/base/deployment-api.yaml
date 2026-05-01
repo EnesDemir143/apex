@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apex-api
+  namespace: apex
+  labels:
+    app.kubernetes.io/name: apex-api
+    app.kubernetes.io/part-of: apex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: apex-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: apex-api
+        app.kubernetes.io/part-of: apex
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/enesdemir143/apex:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: apex-config
+            - secretRef:
+                name: apex-secrets
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apex-frontend
+  namespace: apex
+  labels:
+    app.kubernetes.io/name: apex-frontend
+    app.kubernetes.io/part-of: apex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: apex-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: apex-frontend
+        app.kubernetes.io/part-of: apex
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/enesdemir143/apex:latest
+          imagePullPolicy: IfNotPresent
+          command: ["streamlit"]
+          args:
+            - run
+            - src/apex/frontend/app.py
+            - --server.address=0.0.0.0
+            - --server.port=8501
+          ports:
+            - name: http
+              containerPort: 8501
+          env:
+            - name: APEX_API_BASE_URL
+              value: http://apex-api:8000
+          envFrom:
+            - configMapRef:
+                name: apex-config
+          readinessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30

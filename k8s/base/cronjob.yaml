@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: apex-scheduled-analysis
+  namespace: apex
+spec:
+  schedule: "0 14 * * 1-5"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: apex-scheduled-analysis
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: scheduled-analysis
+              image: ghcr.io/enesdemir143/apex:latest
+              imagePullPolicy: IfNotPresent
+              command: ["python", "-m", "apex"]
+              env:
+                - name: APEX_SCHEDULED_TICKERS
+                  value: AAPL,MSFT,NVDA,TSLA,GOOGL
+              envFrom:
+                - configMapRef:
+                    name: apex-config
+                - secretRef:
+                    name: apex-secrets
