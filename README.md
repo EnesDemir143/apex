@@ -12,7 +12,7 @@
 
 ```mermaid
 graph TD
-    Client["HTTP Client"] -->|POST /api/v1/analyze/{ticker}| API["FastAPI\n(api.app)"]
+    Client["HTTP Client"] -->|"POST /api/v1/analyze/{ticker}"| API["FastAPI\n(api.app)"]
     API --> PreHook["Pre-hook\n(security + whitelist)"]
     PreHook --> Tech["Technical Agent\n(RSI, MACD, BB, SMA/EMA)"]
     PreHook --> Fund["Fundamental Agent\n(RAG + LLM)"]
