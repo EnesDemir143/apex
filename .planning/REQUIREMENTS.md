@@ -289,12 +289,30 @@ Requirements for initial release (Bet 1–3 + Cooldown). Each maps to roadmap ph
 | TEST-03 | Phase 7 | Complete |
 | LSMI-01 | Phase 6 | Complete |
 | LSMI-02 | Phase 7 | Complete |
+| FE-02 | Phase 11 | Complete |
+| TUI-01 | Phase 12 | Planned |
+| TUI-02 | Phase 13 | Planned |
+| TUI-03 | Phase 13 | Planned |
+| TUI-04 | Phase 14 | Planned |
+| TUI-05 | Phase 14 | Planned |
+| TUI-06 | Phase 15 | Planned |
+| TUI-07 | Phase 15 | Planned |
+| TUI-08 | Phase 16 | Planned |
+| TUI-09 | Phase 17 | Planned |
+| TUI-10 | Phase 17 | Planned |
+| TUI-11 | Phase 18 | Planned |
+| DOC-01 | Phase 12 | Planned |
+| DOC-02 | Phase 16 | Planned |
+| ML-01 | Phase 19 | Planned |
+| ML-02 | Phase 19 | Planned |
+| ML-03 | Phase 19 | Planned |
 
 **Coverage:**
 - v1 requirements: 71 total
-- Mapped to phases: 71
+- Bet 5 TUI pivot requirements: 19 (TUI-01–11, DOC-01–02, ML-01–03, FE-02)
+- Mapped to phases: 90
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-28*
-*Last updated: 2026-05-01 — Phase 7 workflow assembly, resilience, checkpointing, caching, and workflow tests complete*
+*Last updated: 2026-05-03 — Bet 5 TUI pivot requirements (TUI-01–11, DOC-01–02, ML-01–03) added with phase traceability*

@@ -6,7 +6,7 @@ status: active
 last_updated: "2026-05-03T00:00:00.000Z"
 progress:
   total_phases: 19
-  completed_phases: 11
+  completed_phases: 12
   total_plans: 31
   completed_plans: 23
 ---
@@ -22,8 +22,8 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 
 ## Current Phase
 
-- **Phase:** 12
-- **Name:** TUI Pivot Product Cleanup
+- **Phase:** 13
+- **Name:** Local Analysis + CLI Foundation
 - **Status:** Planned
 - **Plans:** 1/1
 
@@ -49,7 +49,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 9. CI/CD, K8s & Monitoring | 3 | 2 | ✅ Complete |
 | 10. Cooldown — Polish & Harden | 2 | 2 | ✅ Complete |
 | 11. Streamlit API Wiring | 1 | 1 | ✅ Complete |
-| 12. TUI Pivot Product Cleanup | 1 | 1 | 📋 Planned |
+| 12. TUI Pivot Product Cleanup | 1 | 1 | ✅ Complete |
 | 13. Local Analysis + CLI Foundation | 1 | 1 | 📋 Planned |
 | 14. Textual Terminal Cockpit | 1 | 1 | 📋 Planned |
 | 15. Reports, History, Replay | 1 | 1 | 📋 Planned |
@@ -78,7 +78,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 - 2026-05-01: Phase 11 complete — Dashboard, Signals, Observability pages wired to live FastAPI; fetch_all_signals + fetch_observability added to api_client; graceful mock fallback on API unavailability; post_hook graceful degradation fix; make check green (36 passed)
 - 2026-05-03: Bet 5 pivot planned — project direction changed from server-first web/dashboard evolution to local-first TUI cockpit; Phases 12-17 added for product cleanup, local CLI, Textual cockpit, reports/history, web stack freeze, and local RAG/provider options
 - 2026-05-03: Bet 5 final localization phase added — English remains MVP default; optional Turkish output/report mode deferred to Phase 18
-- 2026-05-03: Optional Quant ML Agent phase added — CPU/MPS/CUDA device selection and ML signal integration deferred until after TUI/report/provider stack is stable
+- 2026-05-03: Phase 12 complete — README confirmed TUI-first, REQUIREMENTS.md traceability updated with TUI-01–11/DOC-01–02/ML-01–03, BET5/ROADMAP consistency verified, make check green
 
 ## Decisions Log
 
