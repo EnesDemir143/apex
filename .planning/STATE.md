@@ -6,9 +6,9 @@ status: active
 last_updated: "2026-05-03T00:00:00.000Z"
 progress:
   total_phases: 19
-  completed_phases: 12
+  completed_phases: 13
   total_plans: 31
-  completed_plans: 23
+  completed_plans: 24
 ---
 
 # Project State: Apex (MABA-TS)
@@ -22,15 +22,15 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 
 ## Current Phase
 
-- **Phase:** 13
-- **Name:** Local Analysis + CLI Foundation
+- **Phase:** 14
+- **Name:** Textual Terminal Cockpit
 - **Status:** Planned
 - **Plans:** 1/1
 
 ## Progress
 
 - **Milestone:** v1.0 complete; Bet 5 TUI pivot planned
-- **Phases complete:** 11/19
+- **Phases complete:** 12/19
 - **Phases planned:** 19/19
 - **Requirements complete:** 80/96
 
@@ -50,7 +50,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 10. Cooldown — Polish & Harden | 2 | 2 | ✅ Complete |
 | 11. Streamlit API Wiring | 1 | 1 | ✅ Complete |
 | 12. TUI Pivot Product Cleanup | 1 | 1 | ✅ Complete |
-| 13. Local Analysis + CLI Foundation | 1 | 1 | 📋 Planned |
+| 13. Local Analysis + CLI Foundation | 1 | 1 | ✅ Complete |
 | 14. Textual Terminal Cockpit | 1 | 1 | 📋 Planned |
 | 15. Reports, History, Replay | 1 | 1 | 📋 Planned |
 | 16. Web Stack Freeze + Revival Docs | 1 | 1 | 📋 Planned |
@@ -79,6 +79,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 - 2026-05-03: Bet 5 pivot planned — project direction changed from server-first web/dashboard evolution to local-first TUI cockpit; Phases 12-17 added for product cleanup, local CLI, Textual cockpit, reports/history, web stack freeze, and local RAG/provider options
 - 2026-05-03: Bet 5 final localization phase added — English remains MVP default; optional Turkish output/report mode deferred to Phase 18
 - 2026-05-03: Phase 12 complete — README confirmed TUI-first, REQUIREMENTS.md traceability updated with TUI-01–11/DOC-01–02/ML-01–03, BET5/ROADMAP consistency verified, make check green
+- 2026-05-03: Phase 13 complete — local_analysis service seam (run_local_analysis + sync wrapper, market data fallback, date validation), apex CLI entrypoint (typer, default TUI placeholder, analyze command), typer added to deps, 19 new unit tests, 41 total passed, ruff clean
 
 ## Decisions Log
 

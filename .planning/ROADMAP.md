@@ -300,7 +300,7 @@
 | 10 | Cooldown — Polish & Harden | CL | ✅ | 2/2 | 100% |
 | 11 | Streamlit API Wiring | 5 | ✅ | 1/1 | 100% |
 | 12 | TUI Pivot Product Cleanup | 5 | 📋 | 1/1 | 0% |
-| 13 | Local Analysis + CLI Foundation | 5 | 📋 | 1/1 | 0% |
+| 13 | Local Analysis + CLI Foundation | 5 | ✅ | 1/1 | 100% |
 | 14 | Textual Terminal Cockpit | 5 | 📋 | 1/1 | 0% |
 | 15 | Reports, History, Replay | 5 | 📋 | 1/1 | 0% |
 | 16 | Web Stack Freeze + Revival Docs | 5 | 📋 | 1/1 | 0% |

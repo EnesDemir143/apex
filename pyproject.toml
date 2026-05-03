@@ -34,12 +34,13 @@ dependencies = [
     "sqlalchemy[asyncio]>=2.0.49",
     "streamlit>=1.56.0",
     "structlog>=25.1.0",
+    "typer>=0.15.0",
     "uvicorn[standard]>=0.34.0",
     "yfinance>=1.3.0",
 ]
 
 [project.scripts]
-apex = "apex:main"
+apex = "apex.cli.main:main"
 
 [build-system]
 requires = ["uv_build>=0.11.3,<0.12.0"]
