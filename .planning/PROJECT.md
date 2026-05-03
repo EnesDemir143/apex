@@ -11,6 +11,22 @@ Apex is a Multi-Agent Based Automated Trading System (MABA-TS) that uses 4 speci
 
 The 4-agent LangGraph workflow must produce reliable BUY/SELL/HOLD decisions with confidence scores — if the agent pipeline fails, rule-based fallbacks must keep the system operational.
 
+## Bet 5 Pivot
+
+After the v1 web/API/Streamlit MVP, Apex is pivoting from a server-first dashboard direction to a **local-first CLI/TUI multi-agent market research cockpit**. The goal is to preserve the existing backend, agent, Streamlit, and production-infra work for CV value while making the primary demo cheaper, more distinctive, and easier to run locally.
+
+Primary Bet 5 experience:
+
+```bash
+apex analyze AAPL
+apex tui
+apex report AAPL
+apex history
+apex backtest AAPL
+```
+
+Streamlit, FastAPI, PostgreSQL, Redis, observability, Docker, and K8s remain in the repository as optional/legacy/production extensions. They are not deleted, but they are no longer the main Bet 5 path.
+
 ## Requirements
 
 ### Validated
@@ -37,7 +53,7 @@ The 4-agent LangGraph workflow must produce reliable BUY/SELL/HOLD decisions wit
 ### Out of Scope
 
 - Real-time live trading execution — analysis-only for v1, no auto-execution. Broker execution planned for v2 (TRADE-01 in BET5 backlog — requires Policy Engine + prod signal validation first)
-- Next.js frontend — Streamlit MVP first, Next.js is post-prod (Bet 5)
+- Production web frontend rewrite — Bet 5 primary path is local-first TUI; existing Streamlit/API work is preserved as optional extension
 - Alpaca MCP Server integration — wait for stable release
 - Chaos engineering — post-prod hardening
 - pgAudit + HashiCorp Vault — post-prod security
@@ -93,6 +109,8 @@ The 4-agent LangGraph workflow must produce reliable BUY/SELL/HOLD decisions wit
 | HOLD threshold for post-analysis confidence gate | `MIN_CONFIDENCE=0.0` would make the gate a no-op | Validated in Phase 6 |
 | Post-hook after Portfolio Manager | Current post-hook validates `portfolio_decision`, so final validation must run after synthesis | Validated in Phase 7 |
 | Deterministic degraded fallback | RSI-only fallback keeps analysis available without implying trade execution | Validated in Phase 7 |
+| Bet 5 local-first TUI pivot | Avoids hosting cost and differentiates CV demo while preserving existing web/API work | Planned in Phases 12-17 |
+| Streamlit freeze instead of deletion | Keeps completed UI work visible but removes it from the primary product path | Planned in Phase 16 |
 
 ## Evolution
 
@@ -112,4 +130,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-01 — Phase 7 workflow assembly and resilience validated*
+*Last updated: 2026-05-03 — Bet 5 local-first TUI pivot planned*

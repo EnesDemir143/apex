@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: — MVP Trading Analysis System
-status: complete
-last_updated: "2026-05-01T22:05:00.000Z"
+milestone_name: — MVP Trading Analysis System + Bet 5 Local-First TUI Pivot
+status: active
+last_updated: "2026-05-03T00:00:00.000Z"
 progress:
-  total_phases: 10
-  completed_phases: 10
-  total_plans: 22
-  completed_plans: 22
+  total_phases: 19
+  completed_phases: 11
+  total_plans: 31
+  completed_plans: 23
 ---
 
 # Project State: Apex (MABA-TS)
@@ -18,21 +18,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-29)
 
 **Core value:** Reliable 4-agent BUY/SELL/HOLD decisions with rule-based fallbacks
-**Current focus:** Phase 10 — Cooldown, Polish & Harden
+**Current focus:** Bet 5 — Local-First TUI Pivot
 
 ## Current Phase
 
-- **Phase:** 11
-- **Name:** Streamlit API Wiring
-- **Status:** Complete
+- **Phase:** 12
+- **Name:** TUI Pivot Product Cleanup
+- **Status:** Planned
 - **Plans:** 1/1
 
 ## Progress
 
-- **Milestone:** v1.0 — MVP Trading Analysis System
-- **Phases complete:** 11/11
-- **Phases planned:** 11/11
-- **Requirements complete:** 80/80
+- **Milestone:** v1.0 complete; Bet 5 TUI pivot planned
+- **Phases complete:** 11/19
+- **Phases planned:** 19/19
+- **Requirements complete:** 80/96
 
 ## Phase Planning Summary
 
@@ -49,8 +49,16 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 9. CI/CD, K8s & Monitoring | 3 | 2 | ✅ Complete |
 | 10. Cooldown — Polish & Harden | 2 | 2 | ✅ Complete |
 | 11. Streamlit API Wiring | 1 | 1 | ✅ Complete |
+| 12. TUI Pivot Product Cleanup | 1 | 1 | 📋 Planned |
+| 13. Local Analysis + CLI Foundation | 1 | 1 | 📋 Planned |
+| 14. Textual Terminal Cockpit | 1 | 1 | 📋 Planned |
+| 15. Reports, History, Replay | 1 | 1 | 📋 Planned |
+| 16. Web Stack Freeze + Revival Docs | 1 | 1 | 📋 Planned |
+| 17. Local RAG Lite + Provider Options | 1 | 1 | 📋 Planned |
+| 18. Turkish Output / Localization | 1 | 1 | 📋 Planned |
+| 19. Optional Quant ML Agent + Device Selection | 1 | 1 | 📋 Planned |
 
-**Total:** 22 plans across 10 phases
+**Total:** 31 plans across 19 phases
 
 ## Recent Activity
 
@@ -68,6 +76,9 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 - 2026-05-01: Phase 9 complete — GitHub Actions CI/CD, uvx pre-commit hooks, K3s Kustomize manifests, OpenTelemetry FastAPI instrumentation, Tempo/Prometheus/OTel Collector compose stack, Grafana trace/log/metric datasources, PostgreSQL backup/restore scripts, Kustomize usage docs; make check and k8s-local-build green
 - 2026-05-01: Phase 10 complete — RAG pipeline (pgvector cosine search, model-agnostic), input sanitizer, DLQ, distributed lock, E2E testcontainers tests, README, 4 ADRs, K3s deployment runbook, weekly restore test script, real DB OHLCV wiring, recursion limit fix (5→25); make check green (34 passed)
 - 2026-05-01: Phase 11 complete — Dashboard, Signals, Observability pages wired to live FastAPI; fetch_all_signals + fetch_observability added to api_client; graceful mock fallback on API unavailability; post_hook graceful degradation fix; make check green (36 passed)
+- 2026-05-03: Bet 5 pivot planned — project direction changed from server-first web/dashboard evolution to local-first TUI cockpit; Phases 12-17 added for product cleanup, local CLI, Textual cockpit, reports/history, web stack freeze, and local RAG/provider options
+- 2026-05-03: Bet 5 final localization phase added — English remains MVP default; optional Turkish output/report mode deferred to Phase 18
+- 2026-05-03: Optional Quant ML Agent phase added — CPU/MPS/CUDA device selection and ML signal integration deferred until after TUI/report/provider stack is stable
 
 ## Decisions Log
 
@@ -87,10 +98,12 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 2026-05-01 | LangGraph owns checkpoint schema | AsyncPostgresSaver.setup() creates checkpoint tables; Alembic remains app-schema only |
 | 2026-05-01 | Public dashboard = AI cockpit, not chart site | TradingView widget for price (no Alpaca datafeed); agent signals/confidence/risk/explanation are the product |
 | 2026-05-01 | Alpaca raw data admin-only → removed from frontend | Raw OHLCV never reaches public pages; legal compliance via data layer isolation |
-| 2026-05-01 | Streamlit MVP → Next.js in Bet 5 backlog | Streamlit cockpit is the working prototype; Next.js migration planned as B6 in MABA_TS_SHAPEUP_PLAN |
+| 2026-05-01 | Streamlit MVP first | Streamlit cockpit became the working prototype before the later Bet 5 TUI pivot. |
 | 2026-05-01 | mock_data.py drives all frontend pages | API wiring deferred; UI fully functional with deterministic mock data |
 | 2026-05-01 | Kustomize overlays use apply -k, not apply -f | Overlay kustomization.yaml is rendered by kubectl/kustomize; it is not a Kubernetes CRD resource. |
 | 2026-05-01 | Observability stack extended in Compose | Loki/Promtail/Grafana remain; Tempo, Prometheus, and OTel Collector add traces and metrics. |
+| 2026-05-03 | Bet 5 primary path changed to local-first TUI | Hosting cost, API-key economics, and CV/demo differentiation favor terminal cockpit over production web frontend work. |
+| 2026-05-03 | Streamlit/FastAPI stack frozen, not deleted | Existing work remains as optional/legacy/production extension and will get a revival guide. |
 
 ---
-*Last updated: 2026-05-01 after completing Phase 9*
+*Last updated: 2026-05-03 after planning Bet 5 local-first TUI pivot*

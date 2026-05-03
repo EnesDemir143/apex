@@ -126,7 +126,7 @@
 7. Dark theme, Apex branding, mock_data.py drives all pages
 8. Public pages: no raw Alpaca OHLCV (legal compliance)
 9. `make check` green (ruff + mypy + unit tests)
-10. Next step: wire mock_data → real API endpoints; Next.js migration in Bet 5 (B6)
+10. Next step: wire mock_data → real API endpoints; production web rewrite is no longer active after Bet 5 TUI pivot
 
 ### Phase 9: CI/CD, K8s & Monitoring
 **Goal:** GitHub Actions pipeline, K3s manifests, LGTM observability stack
@@ -176,6 +176,114 @@
 
 ---
 
+### Phase 12: TUI Pivot Product Cleanup
+**Goal:** Reposition Apex as a local-first terminal cockpit; sync README, requirements, roadmap, state, and Bet 5 planning surfaces
+**Bet:** 5 | **Priority:** P0
+**Requirements:** TUI-01, DOC-01
+**Depends on:** Phase 11
+**UI hint:** no
+**Success criteria:**
+1. README first screen describes Apex as a local-first CLI/TUI multi-agent market research cockpit
+2. Old web production frontend rewrite is no longer an active roadmap item
+3. Streamlit/FastAPI/Postgres/K8s are documented as optional/legacy/production extensions, not the primary path
+4. `.planning` and `plans/BET5_POSTPROD_PLAN.md` agree on the TUI pivot
+
+### Phase 13: Local Analysis + CLI Foundation
+**Goal:** Make LangGraph analysis callable locally without a running API/DB/server; add `apex` app entrypoint foundation and secondary classic analyze command
+**Bet:** 5 | **Priority:** P0
+**Requirements:** TUI-02, TUI-03
+**Depends on:** Phase 12
+**UI hint:** no
+**Success criteria:**
+1. `run_local_analysis("AAPL")` works without FastAPI/Streamlit startup
+2. `uv run apex --help` exposes app/TUI-oriented entrypoint
+3. `uv run apex analyze AAPL` remains available as secondary classic/dev command
+4. Local app/CLI path does not require PostgreSQL or Redis to be running
+5. CLI tests use fakes and do not require real LLM/market-data credentials
+
+### Phase 14: Textual Terminal Cockpit
+**Goal:** Build an app-first Hermes-inspired Textual cockpit: launch `apex`, switch ticker/company inside the app, inspect chart/market panels, enter optional analysis/per-agent prompts, and run agent analysis
+**Bet:** 5 | **Priority:** P0
+**Requirements:** TUI-04, TUI-05
+**Depends on:** Phase 13
+**UI hint:** yes
+**Success criteria:**
+1. `apex` launches the modern Textual cockpit by default
+2. TUI has ticker/company selector and can change selected company without restart
+3. TUI has upper chart/market panel placeholders for selected ticker
+4. TUI has Apex-specific setup panel: ticker, analysis/as-of date, depth, current provider/model display, LangSmith optional tracing status, enabled agents, and global/per-agent prompts
+5. TUI has team progress table, event log, current report panel, report-section progress, and footer stats
+6. TUI accepts at least `/select AAPL` and `/analyze AAPL` and routes to the shared local analysis path
+7. Typing `/` opens a command palette for LangSmith, usage/tokens/cost, provider/model, agents, events, report/history, settings, and help
+8. `/langsmith`, `/usage`, `/tokens`, `/cost`, `/provider`, `/model`, `/agents`, and `/events` show focused panels or safe status output
+9. Long-running analysis does not freeze the UI
+10. TUI and slash-command smoke tests run without manual terminal interaction
+
+### Phase 15: Reports, History, Replay
+**Goal:** Persist local analysis outputs as markdown reports and queryable JSONL/local history; replay saved runs
+**Bet:** 5 | **Priority:** P1
+**Requirements:** TUI-06, TUI-07
+**Depends on:** Phase 13
+**UI hint:** no
+**Success criteria:**
+1. `apex analyze AAPL --save-report` or TUI save action creates sectioned report output
+2. Report includes final signal, confidence, Apex-specific agent sections, caveats, cost/tokens, and disclaimer
+3. Report directory includes `1_technical/`, `2_fundamental/`, `3_risk/`, `4_portfolio/`, `complete_report.md`, `state.json`, and `metadata.json`
+4. `apex history` lists previous local runs
+5. `apex replay PATH` renders a saved run without rerunning LLM calls
+
+### Phase 16: Web Stack Freeze + Revival Docs
+**Goal:** Preserve Streamlit/FastAPI/web-prod work as optional legacy extension and document how to revive it later
+**Bet:** 5 | **Priority:** P1
+**Requirements:** DOC-02, TUI-08
+**Depends on:** Phase 12, Phase 13
+**UI hint:** no
+**Success criteria:**
+1. `docs/WEB_STACK_REVIVAL_GUIDE.md` documents Streamlit, FastAPI, DB/Redis, Docker/K8s, and revival steps
+2. Streamlit files remain in the repo but are clearly marked optional/legacy
+3. README quickstart remains TUI-first
+4. No web stack code is deleted just to satisfy the pivot
+
+### Phase 17: Local RAG Lite + Provider Options
+**Goal:** Add local knowledge retrieval and provider configuration without reintroducing mandatory server dependencies
+**Bet:** 5 | **Priority:** P2
+**Requirements:** TUI-09, TUI-10
+**Depends on:** Phase 15
+**UI hint:** no
+**Success criteria:**
+1. User chooses local knowledge location and next provider priority before execution
+2. Fundamental Agent can include local markdown knowledge snippets/source paths when available
+3. No-knowledge case degrades gracefully
+4. CLI can show configured LLM provider/model and current OpenAI behavior remains intact
+
+### Phase 18: Turkish Output / Localization
+**Goal:** Add optional Turkish report/output language after English-first TUI and report workflow are stable
+**Bet:** 5 | **Priority:** P3
+**Requirements:** TUI-11
+**Depends on:** Phase 15, Phase 17
+**UI hint:** yes
+**Success criteria:**
+1. English remains the default output/report language
+2. Turkish can be explicitly selected in setup/config
+3. Turkish mode affects report prose and prompt language instructions, not stable structured values like ticker or BUY/SELL/HOLD enums
+4. Metadata records selected language
+5. Tests prove default English behavior is unchanged
+
+### Phase 19: Optional Quant ML Agent + Device Selection
+**Goal:** Add optional ML-based Quant Agent with CPU/MPS/CUDA device selection after the TUI/report/provider stack is stable
+**Bet:** 5+ | **Priority:** P4
+**Requirements:** ML-01, ML-02, ML-03
+**Depends on:** Phase 14, Phase 15, Phase 17
+**UI hint:** yes
+**Success criteria:**
+1. Quant Agent can be enabled/disabled without breaking the existing 4-agent workflow
+2. Quant Agent returns signal, confidence, reasoning/top features, model version, and selected device
+3. Device selector supports auto/cpu/mps/cuda with CPU guaranteed and unavailable accelerators handled safely
+4. TUI setup shows Quant/model/device controls only when this feature exists
+5. Portfolio Manager can include Quant output when present but does not require it
+
+---
+
 ## Phase Status
 
 | # | Phase | Bet | Status | Plans | Progress |
@@ -191,10 +299,18 @@
 | 9 | CI/CD, K8s & Monitoring | 3 | ✅ | 3/3 | 100% |
 | 10 | Cooldown — Polish & Harden | CL | ✅ | 2/2 | 100% |
 | 11 | Streamlit API Wiring | 5 | ✅ | 1/1 | 100% |
+| 12 | TUI Pivot Product Cleanup | 5 | 📋 | 1/1 | 0% |
+| 13 | Local Analysis + CLI Foundation | 5 | 📋 | 1/1 | 0% |
+| 14 | Textual Terminal Cockpit | 5 | 📋 | 1/1 | 0% |
+| 15 | Reports, History, Replay | 5 | 📋 | 1/1 | 0% |
+| 16 | Web Stack Freeze + Revival Docs | 5 | 📋 | 1/1 | 0% |
+| 17 | Local RAG Lite + Provider Options | 5 | 📋 | 1/1 | 0% |
+| 18 | Turkish Output / Localization | 5 | 📋 | 1/1 | 0% |
+| 19 | Optional Quant ML Agent + Device Selection | 5+ | 📋 | 1/1 | 0% |
 
-**Total:** 11 phases | 23 plans | 100% plan complete
+**Total:** 19 phases | 31 plans | 11 phases complete, 8 Bet 5/5+ pivot phases planned
 
 
 ---
 *Roadmap created: 2026-04-28*
-*Last updated: 2026-05-01 — Phase 10 Cooldown complete. v1.0 MVP done. Phase 11 planned.*
+*Last updated: 2026-05-03 — Bet 5 local-first TUI pivot planned as Phases 12-19.*

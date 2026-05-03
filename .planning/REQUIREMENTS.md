@@ -155,11 +155,33 @@ Requirements for initial release (Bet 1–3 + Cooldown). Each maps to roadmap ph
 
 ### Frontend Evolution
 
-- **FE-01**: Streamlit Pro — real-time simulation, agent conflict indicators, RAG transparency
+- **FE-01**: Streamlit optional dashboard polish — frozen as legacy/optional after Bet 5 pivot
 - **FE-02**: API layer separation — Streamlit consumes FastAPI, no direct DB
-- **FE-03**: Next.js production frontend (widget architecture, Prediction Explorer, Agent War Room)
-- **FE-04**: Public real-site polish — landing, responsive UI, professional visual design, loading/empty/error states
-- **FE-05**: Google Ads/AdSense readiness — ad slots, consent/cookie banner, privacy policy, terms, risk disclaimer, analytics funnel
+
+### Bet 5 Local-First TUI Pivot
+
+- **TUI-01**: Product positioning pivot — README, roadmap, state, and Bet 5 plan describe Apex as a local-first CLI/TUI multi-agent market research cockpit.
+- **TUI-02**: Server-independent local analysis service — existing LangGraph workflow callable without running FastAPI, Streamlit, PostgreSQL, Redis, or K8s.
+- **TUI-03**: App entrypoint foundation — bare `apex` is prepared as the primary app/cockpit entrypoint; `apex analyze TICKER` remains only as secondary classic/dev command.
+- **TUI-04**: App-first Hermes-style terminal surface — modern Textual cockpit is the primary UX, with classic Rich CLI as fallback/dev surface sharing the same local analysis actions.
+- **TUI-05**: TUI cockpit MVP — `apex` opens a cockpit with ticker/company selector, setup panel, LangSmith optional tracing status, slash-command palette, usage/tokens/cost panels, provider/model status, chart/market panels, command/prompt composer, team progress table, event log, current report panel, report-section progress, footer stats, signal, confidence, cost/tokens, and errors.
+- **TUI-06**: Markdown report export — local analysis can write readable sectioned research reports with Apex-specific agent folders, caveats, cost/tokens, metadata, state, and disclaimer.
+- **TUI-07**: Local history/replay — saved runs can be listed and replayed without rerunning LLM calls.
+- **TUI-08**: Web stack freeze — Streamlit/FastAPI/Postgres/K8s remain in repo as optional/legacy/production extensions, not primary path.
+- **TUI-09**: Local RAG Lite — Fundamental Agent can use ticker-scoped local markdown/plaintext knowledge without requiring pgvector/Postgres.
+- **TUI-10**: Local/provider cost options — CLI exposes provider/model configuration and keeps API-key cost visible; OpenAI remains supported while Ollama/OpenRouter are evaluated.
+- **TUI-11**: Optional Turkish output/localization — English remains default; Turkish report/agent-output mode can be explicitly selected after TUI/report workflow is stable.
+
+### Optional ML / Quant Extension
+
+- **ML-01**: Optional Quant Agent — ML-based signal node can be enabled after TUI/report/provider stack is stable; disabled path preserves existing 4-agent workflow.
+- **ML-02**: ML device selection — setup/config supports auto/cpu/mps/cuda with CPU guaranteed and safe handling for unavailable accelerators.
+- **ML-03**: Quant output integration — Quant Agent emits signal, confidence, top features/reasoning, model version, device, and latency metadata; Portfolio Manager can consume it when present.
+
+### Documentation
+
+- **DOC-01**: Pivot story documentation — explain that the project started web/dashboard-first and moved to TUI-first due to hosting cost, API-key economics, and CV/demo differentiation.
+- **DOC-02**: Web stack revival guide — document how to restore the Streamlit/API/DB/K8s path if web deployment becomes desirable later.
 
 ### Hardening
 
@@ -175,7 +197,9 @@ Requirements for initial release (Bet 1–3 + Cooldown). Each maps to roadmap ph
 | Feature | Reason |
 |---------|--------|
 | Live auto-execution of trades | v1 is analysis-only, safety first |
-| Next.js frontend | Streamlit MVP first, Next.js is Bet 5+ |
+| Production web frontend rewrite | Bet 5 pivot prioritizes local-first TUI; existing web stack is optional only |
+| Production web frontend rewrite | Bet 5 pivot makes TUI/local-first the primary product path; web stack is preserved only as optional extension |
+| Public ads/landing monetization | Not aligned with CV/local-first goal and would add non-core legal/hosting work |
 | Alpaca MCP Server | Preview stage, expect breaking changes |
 | Mobile app | Web-first, self-hosted |
 | Multi-user auth | Single-user system for now |
