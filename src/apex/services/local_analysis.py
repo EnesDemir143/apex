@@ -12,7 +12,7 @@ from apex.core.constants import TICKERS_WHITELIST
 from apex.services.sanitizer import canonicalize_ticker
 
 
-def _default_market_data(ticker: str) -> list[dict[str, Any]]:
+def _default_market_data(ticker: str) -> list[Any]:
     """Return minimal deterministic OHLCV bars when no live data is available."""
     from datetime import timedelta
     from decimal import Decimal
