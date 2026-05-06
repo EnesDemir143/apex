@@ -45,10 +45,13 @@ def test_analyze_help_exits_zero() -> None:
 # default command (no subcommand)
 # ---------------------------------------------------------------------------
 
-def test_default_command_prints_placeholder() -> None:
-    result = runner.invoke(app, [])
+def test_default_command_launches_tui() -> None:
+    """Default command (no args) should launch the TUI."""
+    with patch("apex.tui.app.run_tui") as mock_tui:
+        result = runner.invoke(app, [])
+
+    mock_tui.assert_called_once()
     assert result.exit_code == 0
-    assert "Phase 14" in result.output or "cockpit" in result.output.lower()
 
 
 # ---------------------------------------------------------------------------

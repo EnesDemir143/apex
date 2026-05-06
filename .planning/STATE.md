@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: — MVP Trading Analysis System + Bet 5 Local-First TUI Pivot
 status: active
-last_updated: "2026-05-03T00:00:00.000Z"
+last_updated: "2026-05-06T00:00:00.000Z"
 progress:
-  total_phases: 19
-  completed_phases: 13
-  total_plans: 31
-  completed_plans: 24
+  total_phases: 20
+  completed_phases: 14
+  total_plans: 32
+  completed_plans: 25
 ---
 
 # Project State: Apex (MABA-TS)
@@ -22,17 +22,17 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 
 ## Current Phase
 
-- **Phase:** 14
-- **Name:** Textual Terminal Cockpit
+- **Phase:** 14.1
+- **Name:** TUI Market Panel + Terminal Chart
 - **Status:** Planned
 - **Plans:** 1/1
 
 ## Progress
 
-- **Milestone:** v1.0 complete; Bet 5 TUI pivot planned
-- **Phases complete:** 12/19
-- **Phases planned:** 19/19
-- **Requirements complete:** 80/96
+- **Milestone:** v1.0 complete; Bet 5 TUI pivot in progress
+- **Phases complete:** 14/20
+- **Phases planned:** 20/20
+- **Requirements complete:** 82/97
 
 ## Phase Planning Summary
 
@@ -51,14 +51,15 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 11. Streamlit API Wiring | 1 | 1 | ✅ Complete |
 | 12. TUI Pivot Product Cleanup | 1 | 1 | ✅ Complete |
 | 13. Local Analysis + CLI Foundation | 1 | 1 | ✅ Complete |
-| 14. Textual Terminal Cockpit | 1 | 1 | 📋 Planned |
+| 14. Textual Terminal Cockpit | 1 | 1 | ✅ Complete |
+| 14.1. TUI Market Panel + Terminal Chart | 1 | 1 | 📋 Planned |
 | 15. Reports, History, Replay | 1 | 1 | 📋 Planned |
 | 16. Web Stack Freeze + Revival Docs | 1 | 1 | 📋 Planned |
 | 17. Local RAG Lite + Provider Options | 1 | 1 | 📋 Planned |
 | 18. Turkish Output / Localization | 1 | 1 | 📋 Planned |
 | 19. Optional Quant ML Agent + Device Selection | 1 | 1 | 📋 Planned |
 
-**Total:** 31 plans across 19 phases
+**Total:** 32 plans across 20 phases
 
 ## Recent Activity
 
@@ -80,6 +81,11 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 - 2026-05-03: Bet 5 final localization phase added — English remains MVP default; optional Turkish output/report mode deferred to Phase 18
 - 2026-05-03: Phase 12 complete — README confirmed TUI-first, REQUIREMENTS.md traceability updated with TUI-01–11/DOC-01–02/ML-01–03, BET5/ROADMAP consistency verified, make check green
 - 2026-05-03: Phase 13 complete — local_analysis service seam (run_local_analysis + sync wrapper, market data fallback, date validation), apex CLI entrypoint (typer, default TUI placeholder, analyze command), typer added to deps, 19 new unit tests, 41 total passed, ruff clean
+- 2026-05-06: Phase 14 complete — ApexTuiApp Textual terminal cockpit (ticker selector, market panel, setup panel, progress table, event log, report panel, command input, footer stats), slash command system (/select, /analyze, /langsmith, /usage, /tokens, /cost, /provider, /model, /agents, /events, /settings, /help), responsive worker for analysis, 31 TUI tests (7 app + 24 command), apex launches TUI by default, apex analyze as secondary classic mode; make check green (86 passed)
+- 2026-05-03: Phase 12 complete — README confirmed TUI-first, REQUIREMENTS.md traceability updated with TUI-01–11/DOC-01–02/ML-01–03, BET5/ROADMAP consistency verified, make check green
+- 2026-05-03: Phase 13 complete — local_analysis service seam (run_local_analysis + sync wrapper, market data fallback, date validation), apex CLI entrypoint (typer, default TUI placeholder, analyze command), typer added to deps, 19 new unit tests, 41 total passed, ruff clean
+
+- 2026-05-06: Phase 14.1 inserted before Phase 15 — TUI market panel wiring and terminal-native `/chart` screen planned so real/local OHLCV, volume, and indicators are visible before report/history work.
 
 ## Decisions Log
 
@@ -107,4 +113,4 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 2026-05-03 | Streamlit/FastAPI stack frozen, not deleted | Existing work remains as optional/legacy/production extension and will get a revival guide. |
 
 ---
-*Last updated: 2026-05-03 after planning Bet 5 local-first TUI pivot*
+*Last updated: 2026-05-06 after inserting Phase 14.1 TUI market/chart work*

@@ -219,6 +219,20 @@
 9. Long-running analysis does not freeze the UI
 10. TUI and slash-command smoke tests run without manual terminal interaction
 
+### Phase 14.1: TUI Market Panel + Terminal Chart (INSERTED)
+**Goal:** Wire the selected-ticker market panel to real/local OHLCV and indicators, and add a terminal-native `/chart` view with ticker selection before report/history persistence
+**Bet:** 5 | **Priority:** P0
+**Requirements:** TUI-12
+**Depends on:** Phase 14
+**UI hint:** yes
+**Success criteria:**
+1. Market panel shows latest Open/High/Low/Close/Volume for the selected ticker using local/live OHLCV or deterministic fallback
+2. Market panel shows indicator summary such as RSI, MACD, SMA/EMA without running LLM calls
+3. `/chart` opens a dedicated terminal-native chart screen for the current ticker
+4. `/chart TICKER` and chart ticker picker flow can switch the chart target from the slash UI
+5. Chart screen shows price trend, volume summary, latest OHLCV, and indicator summary in terminal-friendly form
+6. Tests cover snapshot fallback, chart command routing, and selected ticker market panel updates
+
 ### Phase 15: Reports, History, Replay
 **Goal:** Persist local analysis outputs as markdown reports and queryable JSONL/local history; replay saved runs
 **Bet:** 5 | **Priority:** P1
@@ -299,18 +313,19 @@
 | 9 | CI/CD, K8s & Monitoring | 3 | ✅ | 3/3 | 100% |
 | 10 | Cooldown — Polish & Harden | CL | ✅ | 2/2 | 100% |
 | 11 | Streamlit API Wiring | 5 | ✅ | 1/1 | 100% |
-| 12 | TUI Pivot Product Cleanup | 5 | 📋 | 1/1 | 0% |
+| 12 | TUI Pivot Product Cleanup | 5 | ✅ | 1/1 | 100% |
 | 13 | Local Analysis + CLI Foundation | 5 | ✅ | 1/1 | 100% |
-| 14 | Textual Terminal Cockpit | 5 | 📋 | 1/1 | 0% |
+| 14 | Textual Terminal Cockpit | 5 | ✅ | 1/1 | 100% |
+| 14.1 | TUI Market Panel + Terminal Chart | 5 | 📋 | 1/1 | 0% |
 | 15 | Reports, History, Replay | 5 | 📋 | 1/1 | 0% |
 | 16 | Web Stack Freeze + Revival Docs | 5 | 📋 | 1/1 | 0% |
 | 17 | Local RAG Lite + Provider Options | 5 | 📋 | 1/1 | 0% |
 | 18 | Turkish Output / Localization | 5 | 📋 | 1/1 | 0% |
 | 19 | Optional Quant ML Agent + Device Selection | 5+ | 📋 | 1/1 | 0% |
 
-**Total:** 19 phases | 31 plans | 11 phases complete, 8 Bet 5/5+ pivot phases planned
+**Total:** 20 phases | 32 plans | 14 phases complete, 6 Bet 5/5+ pivot phases remaining
 
 
 ---
 *Roadmap created: 2026-04-28*
-*Last updated: 2026-05-03 — Bet 5 local-first TUI pivot planned as Phases 12-19.*
+*Last updated: 2026-05-06 — Phase 14.1 inserted for TUI market panel + terminal chart before Phase 15.*
