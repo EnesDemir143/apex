@@ -15,6 +15,8 @@ Make local analyses useful after the terminal session ends: save markdown report
 - Start with local filesystem + JSONL history; SQLite may be added later if JSONL becomes limiting.
 - Store under project `reports/` by default for repo demo, with future option for `~/.apex` user data.
 - Report content must be readable and CV-friendly: executive summary, agent sections, final decision, caveats, cost/tokens.
+- Persist a deterministic request hash for each saved run so identical local analyses can be detected and replayed without spending LLM calls again.
+- Treat cache reuse as an explicit user-visible behavior: if ticker/date/mode/instructions/agent settings match a saved run, commands should be able to render the saved report/history entry instead of rerunning analysis unless the user forces a refresh.
 </decisions>
 
 <canonical_refs>

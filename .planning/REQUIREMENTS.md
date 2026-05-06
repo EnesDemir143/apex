@@ -171,6 +171,7 @@ Requirements for initial release (Bet 1–3 + Cooldown). Each maps to roadmap ph
 - **TUI-09**: Local RAG Lite — Fundamental Agent can use ticker-scoped local markdown/plaintext knowledge without requiring pgvector/Postgres.
 - **TUI-10**: Local/provider cost options — CLI exposes provider/model configuration and keeps API-key cost visible; OpenAI remains supported while Ollama/OpenRouter are evaluated.
 - **TUI-11**: Optional Turkish output/localization — English remains default; Turkish report/agent-output mode can be explicitly selected after TUI/report workflow is stable.
+- **TUI-12**: TUI market/chart wiring — selected ticker market panel shows local/live OHLCV and indicator summaries, and `/chart` opens a terminal-native chart view with ticker selection without running LLM calls.
 
 ### Optional ML / Quant Extension
 
@@ -301,6 +302,7 @@ Requirements for initial release (Bet 1–3 + Cooldown). Each maps to roadmap ph
 | TUI-09 | Phase 17 | Planned |
 | TUI-10 | Phase 17 | Planned |
 | TUI-11 | Phase 18 | Planned |
+| TUI-12 | Phase 14.1 | Planned |
 | DOC-01 | Phase 12 | Planned |
 | DOC-02 | Phase 16 | Planned |
 | ML-01 | Phase 19 | Planned |
@@ -309,10 +311,10 @@ Requirements for initial release (Bet 1–3 + Cooldown). Each maps to roadmap ph
 
 **Coverage:**
 - v1 requirements: 71 total
-- Bet 5 TUI pivot requirements: 19 (TUI-01–11, DOC-01–02, ML-01–03, FE-02)
-- Mapped to phases: 90
+- Bet 5 TUI pivot requirements: 20 (TUI-01–12, DOC-01–02, ML-01–03, FE-02)
+- Mapped to phases: 91
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-28*
-*Last updated: 2026-05-03 — Bet 5 TUI pivot requirements (TUI-01–11, DOC-01–02, ML-01–03) added with phase traceability*
+*Last updated: 2026-05-06 — TUI-12 added for Phase 14.1 market/chart wiring before report/history work*
