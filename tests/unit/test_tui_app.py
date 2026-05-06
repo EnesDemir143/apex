@@ -130,3 +130,45 @@ async def test_main_report_placeholder_avoids_no_analysis_copy() -> None:
         content = app.screen.query_one("#report-content", Static).content
 
     assert "No analysis run yet" not in str(content)
+
+
+def test_ticker_select_palette_filters_tickers_by_prefix() -> None:
+    """The /select picker should only show tickers matching the typed prefix."""
+    from apex.tui.app import TickerSelectPalette
+
+    palette = TickerSelectPalette()
+    options = palette._options_for_query("M")
+
+    assert [option.id for option in options] == ["MSFT"]
+    assert "MSFT" in options[0].prompt.plain
+
+
+def test_ticker_select_palette_opens_for_select_command() -> None:
+    """Typing /select should open ticker choices, including all whitelisted symbols."""
+    from apex.core.constants import TICKERS_WHITELIST
+    from apex.tui.app import TickerSelectPalette
+
+    palette = TickerSelectPalette()
+
+    assert palette._query_from_input("/select") == ""
+    assert palette._query_from_input("/select n") == "N"
+    assert [option.id for option in palette._options_for_query("")] == list(TICKERS_WHITELIST)
+
+
+@pytest.mark.asyncio
+async def test_select_result_switches_chat_ticker_header() -> None:
+    """Selecting a ticker from any screen should return to chat and update the header ticker."""
+    from apex.tui.commands import dispatch
+
+    app = ApexTuiApp(initial_ticker="AAPL")
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        app.switch_screen("setup")
+        await pilot.pause()
+
+        app._handle_result(dispatch("/select NVDA", app._state))
+        await pilot.pause()
+
+        assert app.screen.id == "chat"
+        assert app._state.setup.ticker == "NVDA"
+        assert app.screen.query_one("#ticker-selector", TickerSelector).ticker == "NVDA"

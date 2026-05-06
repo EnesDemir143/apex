@@ -9,10 +9,12 @@ from rich.text import Text
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container
+from textual.message import Message
 from textual.screen import Screen
 from textual.widgets import Footer, Header, Input, OptionList, Static
 from textual.widgets.option_list import Option
 
+from apex.core.constants import TICKERS_WHITELIST
 from apex.tui.commands import COMMAND_HELP, CommandResult, dispatch
 from apex.tui.state import TuiState
 from apex.tui.widgets import (
@@ -26,6 +28,108 @@ from apex.tui.widgets import (
 )
 
 CSS_PATH = "apex.tcss"
+
+
+class TickerSelectPalette(Container):
+    """Ticker picker shown after /select."""
+
+    MAX_OPTIONS = 8
+
+    class TickerSelected(Message):
+        """Emitted when a ticker is selected from the picker."""
+
+        def __init__(self, ticker: str) -> None:
+            super().__init__()
+            self.ticker = ticker
+
+    DEFAULT_CSS = """
+    TickerSelectPalette {
+        display: none;
+        layer: overlay;
+        width: 44;
+        height: auto;
+        max-height: 14;
+        background: #0d1117;
+        border: round #30363d;
+        padding: 0 1;
+        offset: 1 13;
+    }
+
+    TickerSelectPalette.visible {
+        display: block;
+    }
+
+    TickerSelectPalette #ticker-palette-title {
+        height: 1;
+        color: #8b949e;
+        text-style: bold;
+    }
+
+    TickerSelectPalette #ticker-options {
+        height: auto;
+        max-height: 8;
+        background: #0d1117;
+    }
+
+    TickerSelectPalette #ticker-palette-hint {
+        height: 1;
+        color: #6e7681;
+    }
+    """
+
+    def compose(self) -> ComposeResult:
+        yield Static("Select ticker", id="ticker-palette-title")
+        yield OptionList(*self._options_for_query(""), id="ticker-options")
+        yield Static("↑↓ select  ·  enter choose  ·  esc close", id="ticker-palette-hint")
+
+    def update_query(self, value: str) -> None:
+        """Refresh ticker choices while the user types /select ..."""
+        query = self._query_from_input(value)
+        if query is None:
+            self.hide_palette()
+            return
+
+        option_list = self.query_one("#ticker-options", OptionList)
+        option_list.set_options(self._options_for_query(query))
+        if option_list.option_count:
+            option_list.highlighted = 0
+        self.show_palette()
+
+    def _query_from_input(self, value: str) -> str | None:
+        text = value.strip()
+        if not text.lower().startswith("/select"):
+            return None
+        if text.lower() == "/select":
+            return ""
+        if not text.lower().startswith("/select "):
+            return None
+        return text.split(maxsplit=1)[1].strip().upper()
+
+    def _options_for_query(self, query: str) -> list[Option]:
+        matches: list[Option] = []
+        for ticker in TICKERS_WHITELIST:
+            if query and not ticker.startswith(query):
+                continue
+            matches.append(Option(self._option_label(ticker), id=ticker))
+            if len(matches) >= self.MAX_OPTIONS:
+                break
+
+        if matches:
+            return matches
+        return [Option(Text("No tickers match", style="dim"), id="__no_match__", disabled=True)]
+
+    def _option_label(self, ticker: str) -> Text:
+        label = Text()
+        label.append(ticker, style="bold #58a6ff")
+        if ticker == "SPY":
+            label.append("  S&P 500 ETF", style="#8b949e")
+        return label
+
+    def show_palette(self) -> None:
+        self.add_class("visible")
+
+    def hide_palette(self) -> None:
+        self.remove_class("visible")
 
 
 class CommandPalette(Container):
@@ -76,11 +180,17 @@ class CommandPalette(Container):
 
     def update_query(self, value: str) -> None:
         """Refresh visible commands for the current slash input."""
-        if not value.startswith("/") or " " in value:
+        if not value.startswith("/"):
             self.hide_palette()
             return
 
         query = value[1:].strip().lower()
+        if " " in query:
+            command_name = query.split(maxsplit=1)[0]
+            if command_name == "select":
+                self.hide_palette()
+                return
+            query = command_name
         options = self._options_for_query(query)
         option_list = self.query_one("#command-options", OptionList)
         option_list.set_options(options)
@@ -119,31 +229,58 @@ class CommandPaletteScreenMixin:
     """Shared slash palette behavior for screens with #command-input."""
 
     def action_close_palette(self) -> None:
-        """Close command palette."""
+        """Close open slash palettes."""
         screen = cast(Screen[None], self)
-        palette = screen.query_one("#command-palette", CommandPalette)
-        palette.hide_palette()
+        screen.query_one("#command-palette", CommandPalette).hide_palette()
+        screen.query_one("#ticker-select-palette", TickerSelectPalette).hide_palette()
         screen.query_one("#command-input", Input).focus()
 
     def on_input_changed(self, event: Input.Changed) -> None:
-        """Show and filter the command palette for slash input."""
+        """Show and filter slash palettes for the current input."""
         screen = cast(Screen[None], self)
-        palette = screen.query_one("#command-palette", CommandPalette)
-        palette.update_query(event.value)
+        command_palette = screen.query_one("#command-palette", CommandPalette)
+        ticker_palette = screen.query_one("#ticker-select-palette", TickerSelectPalette)
+        command_palette.update_query(event.value)
+        ticker_palette.update_query(event.value)
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
-        """Handle command selection from palette."""
+        """Handle command or ticker selection from visible palettes."""
         screen = cast(Screen[None], self)
-        palette = screen.query_one("#command-palette", CommandPalette)
-        palette.hide_palette()
+        if event.option_list.id == "ticker-options":
+            self._select_ticker_option(screen, event.option_id)
+            return
+
+        screen.query_one("#command-palette", CommandPalette).hide_palette()
 
         if event.option_id == "__no_match__":
             return
 
         cmd = f"/{event.option_id}"
         input_widget = screen.query_one("#command-input", Input)
+        if event.option_id == "select":
+            input_widget.value = "/select "
+            screen.query_one("#ticker-select-palette", TickerSelectPalette).update_query(input_widget.value)
+            input_widget.focus()
+            return
+
         input_widget.value = cmd
         screen.post_message(Input.Submitted(input_widget, cmd))
+
+    def on_ticker_select_palette_ticker_selected(self, message: TickerSelectPalette.TickerSelected) -> None:
+        """Submit the selected ticker as /select TICKER."""
+        screen = cast(Screen[None], self)
+        input_widget = screen.query_one("#command-input", Input)
+        command = f"/select {message.ticker}"
+        input_widget.value = command
+        screen.query_one("#ticker-select-palette", TickerSelectPalette).hide_palette()
+        screen.post_message(Input.Submitted(input_widget, command))
+
+    def _select_ticker_option(self, screen: Screen[None], option_id: str | None) -> None:
+        if option_id in (None, "__no_match__"):
+            return
+        screen.query_one("#ticker-select-palette", TickerSelectPalette).post_message(
+            TickerSelectPalette.TickerSelected(str(option_id))
+        )
 
 
 class ChatScreen(CommandPaletteScreenMixin, Screen[None]):
@@ -168,6 +305,7 @@ class ChatScreen(CommandPaletteScreenMixin, Screen[None]):
         yield FooterStats(id="footer-stats")
         yield Footer()
         yield CommandPalette(id="command-palette")
+        yield TickerSelectPalette(id="ticker-select-palette")
 
 
 class SetupScreen(CommandPaletteScreenMixin, Screen[None]):
@@ -189,6 +327,7 @@ class SetupScreen(CommandPaletteScreenMixin, Screen[None]):
         )
         yield Footer()
         yield CommandPalette(id="command-palette")
+        yield TickerSelectPalette(id="ticker-select-palette")
 
 
 class TeamScreen(CommandPaletteScreenMixin, Screen[None]):
@@ -211,6 +350,7 @@ class TeamScreen(CommandPaletteScreenMixin, Screen[None]):
         )
         yield Footer()
         yield CommandPalette(id="command-palette")
+        yield TickerSelectPalette(id="ticker-select-palette")
 
 
 class CommandDetailScreen(CommandPaletteScreenMixin, Screen[None]):
@@ -254,6 +394,7 @@ class CommandDetailScreen(CommandPaletteScreenMixin, Screen[None]):
         )
         yield Footer()
         yield CommandPalette(id="command-palette")
+        yield TickerSelectPalette(id="ticker-select-palette")
 
 
 class ApexTuiApp(App[None]):
@@ -304,7 +445,9 @@ class ApexTuiApp(App[None]):
 
         if result.action == "select":
             self._state.setup.ticker = result.ticker
-            self._sync_ticker(result.ticker)
+            if self.screen.id != "chat":
+                self.switch_screen("chat")
+            self.call_after_refresh(lambda: self._sync_ticker(result.ticker))
             self._push_event(result.message)
 
         elif result.action == "analyze":
