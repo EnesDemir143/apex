@@ -187,3 +187,14 @@ async def test_setup_panel_shows_default_language() -> None:
         content = app.screen.query_one("#setup-content", Static).content
 
     assert "Language: English (default)" in str(content)
+
+
+def test_command_palette_includes_exit() -> None:
+    """The slash picker should expose /exit."""
+    from apex.tui.app import CommandPalette
+
+    palette = CommandPalette()
+    options = palette._options_for_query("ex")
+
+    assert [option.id for option in options] == ["exit"]
+    assert "/exit" in options[0].prompt.plain

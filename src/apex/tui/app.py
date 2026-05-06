@@ -443,6 +443,10 @@ class ApexTuiApp(App[None]):
             self.switch_screen(result.message)
             return
 
+        if result.action == "exit":
+            self.exit()
+            return
+
         if result.action == "select":
             self._state.setup.ticker = result.ticker
             if self.screen.id != "chat":

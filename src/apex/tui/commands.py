@@ -19,6 +19,7 @@ _PLANNED: dict[str, str] = {
 
 COMMAND_HELP: dict[str, str] = {
     "chat": "/chat — return to main screen",
+    "exit": "/exit — quit Apex",
     "setup": "/setup — open setup configuration",
     "team": "/team — show agent team progress",
     "select": "/select TICKER — change selected ticker",
@@ -72,6 +73,9 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
     # Screen switching
     if cmd == "chat":
         return CommandResult(action="screen", message="chat")
+
+    if cmd in ("exit", "quit"):
+        return CommandResult(action="exit", title="Exit", message="Exiting Apex…")
 
     if cmd == "setup":
         return CommandResult(action="screen", message="setup")

@@ -50,12 +50,27 @@ def test_help_command(state: TuiState) -> None:
     assert result.action == "help"
     assert "/select" in result.message
     assert "/analyze" in result.message
+    assert "/exit" in result.message
     assert "/settings" not in result.message
 
 
 def test_empty_input_returns_help(state: TuiState) -> None:
     result = dispatch("/", state)
     assert result.action == "help"
+
+
+# /exit
+
+
+def test_exit_command(state: TuiState) -> None:
+    result = dispatch("/exit", state)
+    assert result.action == "exit"
+    assert result.title == "Exit"
+
+
+def test_quit_alias(state: TuiState) -> None:
+    result = dispatch("/quit", state)
+    assert result.action == "exit"
 
 
 # /select
