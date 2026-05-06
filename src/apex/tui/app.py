@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, cast
 
+from rich.text import Text
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container
 from textual.screen import Screen
-from textual.widgets import Footer, Header, Input, OptionList
+from textual.widgets import Footer, Header, Input, OptionList, Static
 from textual.widgets.option_list import Option
 
 from apex.tui.commands import COMMAND_HELP, CommandResult, dispatch
@@ -28,41 +29,124 @@ CSS_PATH = "apex.tcss"
 
 
 class CommandPalette(Container):
-    """Command palette overlay."""
+    """Command palette overlay inspired by opencode's slash-command picker."""
+
+    MAX_OPTIONS = 8
 
     DEFAULT_CSS = """
     CommandPalette {
         display: none;
         layer: overlay;
-        align: center middle;
-        width: 60;
+        width: 74;
         height: auto;
-        max-height: 20;
-        background: $panel;
-        border: thick $accent;
-        offset: 50% 50%;
+        max-height: 16;
+        background: #0d1117;
+        border: round #30363d;
+        padding: 0 1;
+        offset: 1 13;
     }
 
     CommandPalette.visible {
         display: block;
     }
+
+    CommandPalette #command-palette-title {
+        height: 1;
+        color: #8b949e;
+        text-style: bold;
+    }
+
+    CommandPalette #command-options {
+        height: auto;
+        max-height: 10;
+        background: #0d1117;
+    }
+
+    CommandPalette #command-palette-hint {
+        height: 1;
+        color: #6e7681;
+    }
     """
 
     def compose(self) -> ComposeResult:
-        options = [Option(desc, id=cmd) for cmd, desc in COMMAND_HELP.items()]
+        yield Static("Commands", id="command-palette-title")
+        options = self._options_for_query("")
         yield OptionList(*options, id="command-options")
+        yield Static("↑↓ select  ·  enter run  ·  esc close", id="command-palette-hint")
+
+    def update_query(self, value: str) -> None:
+        """Refresh visible commands for the current slash input."""
+        if not value.startswith("/") or " " in value:
+            self.hide_palette()
+            return
+
+        query = value[1:].strip().lower()
+        options = self._options_for_query(query)
+        option_list = self.query_one("#command-options", OptionList)
+        option_list.set_options(options)
+        if option_list.option_count:
+            option_list.highlighted = 0
+        self.show_palette()
+
+    def _options_for_query(self, query: str) -> list[Option]:
+        matches: list[Option] = []
+        for cmd, desc in COMMAND_HELP.items():
+            if query and not cmd.lower().startswith(query):
+                continue
+            matches.append(Option(self._option_label(cmd, desc), id=cmd))
+            if len(matches) >= self.MAX_OPTIONS:
+                break
+
+        if matches:
+            return matches
+        return [Option(Text("No commands match", style="dim"), id="__no_match__", disabled=True)]
+
+    def _option_label(self, cmd: str, desc: str) -> Text:
+        description = desc.split(" — ", 1)[1] if " — " in desc else desc
+        label = Text()
+        label.append(f"/{cmd:<12}", style="bold #58a6ff")
+        label.append(description, style="#8b949e")
+        return label
 
     def show_palette(self) -> None:
         self.add_class("visible")
-        self.query_one("#command-options", OptionList).focus()
 
     def hide_palette(self) -> None:
         self.remove_class("visible")
 
-CSS_PATH = "apex.tcss"
+
+class CommandPaletteScreenMixin:
+    """Shared slash palette behavior for screens with #command-input."""
+
+    def action_close_palette(self) -> None:
+        """Close command palette."""
+        screen = cast(Screen[None], self)
+        palette = screen.query_one("#command-palette", CommandPalette)
+        palette.hide_palette()
+        screen.query_one("#command-input", Input).focus()
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        """Show and filter the command palette for slash input."""
+        screen = cast(Screen[None], self)
+        palette = screen.query_one("#command-palette", CommandPalette)
+        palette.update_query(event.value)
+
+    def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
+        """Handle command selection from palette."""
+        screen = cast(Screen[None], self)
+        palette = screen.query_one("#command-palette", CommandPalette)
+        palette.hide_palette()
+
+        if event.option_id == "__no_match__":
+            return
+
+        cmd = f"/{event.option_id}"
+        input_widget = screen.query_one("#command-input", Input)
+        input_widget.value = cmd
+        screen.post_message(Input.Submitted(input_widget, cmd))
 
 
-class ChatScreen(Screen[None]):
+class ChatScreen(CommandPaletteScreenMixin, Screen[None]):
     """Main chat/analysis screen."""
 
     BINDINGS = [
@@ -85,34 +169,13 @@ class ChatScreen(Screen[None]):
         yield Footer()
         yield CommandPalette(id="command-palette")
 
-    def action_close_palette(self) -> None:
-        """Close command palette."""
-        palette = self.query_one("#command-palette", CommandPalette)
-        palette.hide_palette()
-        self.query_one("#command-input", Input).focus()
 
-    def on_input_changed(self, event: Input.Changed) -> None:
-        """Show palette when / is typed."""
-        if event.value == "/":
-            palette = self.query_one("#command-palette", CommandPalette)
-            palette.show_palette()
-
-    def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
-        """Handle command selection from palette."""
-        palette = self.query_one("#command-palette", CommandPalette)
-        palette.hide_palette()
-
-        cmd = f"/{event.option_id}"
-        input_widget = self.query_one("#command-input", Input)
-        input_widget.value = cmd
-        # Trigger submit by posting the event
-        self.post_message(Input.Submitted(input_widget, cmd))
-
-
-class SetupScreen(Screen[None]):
+class SetupScreen(CommandPaletteScreenMixin, Screen[None]):
     """Setup configuration screen."""
 
-    BINDINGS = []
+    BINDINGS = [
+        ("escape", "close_palette", "Close"),
+    ]
 
     def __init__(self) -> None:
         super().__init__(id="setup")
@@ -125,12 +188,15 @@ class SetupScreen(Screen[None]):
             id="command-input",
         )
         yield Footer()
+        yield CommandPalette(id="command-palette")
 
 
-class TeamScreen(Screen[None]):
+class TeamScreen(CommandPaletteScreenMixin, Screen[None]):
     """Agent team progress screen."""
 
-    BINDINGS = []
+    BINDINGS = [
+        ("escape", "close_palette", "Close"),
+    ]
 
     def __init__(self) -> None:
         super().__init__(id="team")
@@ -144,8 +210,7 @@ class TeamScreen(Screen[None]):
             id="command-input",
         )
         yield Footer()
-
-CSS_PATH = "apex.tcss"
+        yield CommandPalette(id="command-palette")
 
 
 class ApexTuiApp(App[None]):
