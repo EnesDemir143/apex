@@ -115,6 +115,27 @@ def test_analyze_non_whitelisted(state: TuiState) -> None:
     assert result.action == "error"
 
 
+# /chart
+
+
+def test_chart_with_ticker(state: TuiState) -> None:
+    result = dispatch("/chart NVDA", state)
+    assert result.action == "chart"
+    assert result.ticker == "NVDA"
+
+
+def test_chart_uses_state_ticker(state: TuiState) -> None:
+    state.setup.ticker = "TSLA"
+    result = dispatch("/chart", state)
+    assert result.action == "chart"
+    assert result.ticker == "TSLA"
+
+
+def test_chart_non_whitelisted(state: TuiState) -> None:
+    result = dispatch("/chart FAKE", state)
+    assert result.action == "error"
+
+
 # /langsmith
 
 
