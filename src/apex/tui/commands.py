@@ -29,7 +29,6 @@ COMMAND_HELP: dict[str, str] = {
     "cost": "/cost — alias for /usage",
     "agents": "/agents — show enabled agents",
     "events": "/events — show event log",
-    "settings": "/settings — show current setup values",
     "help": "/help — list all commands",
     "history": "/history — list previous runs (Phase 15)",
     "report": "/report — view latest report (Phase 15)",
@@ -145,18 +144,6 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
 
     if cmd == "events":
         return CommandResult(action="screen", message="team")
-
-    if cmd == "settings":
-        setup = state.setup
-        lines = [
-            f"Ticker: {setup.ticker}",
-            f"Date: {setup.analysis_date}",
-            f"Depth: {setup.depth}",
-            f"Agents: {', '.join(sorted(setup.enabled_agents))}",
-        ]
-        if setup.global_instructions:
-            lines.append(f"Global instructions: {setup.global_instructions}")
-        return CommandResult(action="info", title="Settings", message="\n".join(lines))
 
     if cmd in _PLANNED:
         phase = _PLANNED[cmd]

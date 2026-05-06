@@ -50,6 +50,7 @@ def test_help_command(state: TuiState) -> None:
     assert result.action == "help"
     assert "/select" in result.message
     assert "/analyze" in result.message
+    assert "/settings" not in result.message
 
 
 def test_empty_input_returns_help(state: TuiState) -> None:
@@ -160,16 +161,6 @@ def test_agents_switches_to_team_screen(state: TuiState) -> None:
     assert result.message == "team"
 
 
-# /settings
-
-
-def test_settings_shows_ticker(state: TuiState) -> None:
-    state.setup.ticker = "NVDA"
-    result = dispatch("/settings", state)
-    assert result.action == "info"
-    assert result.title == "Settings"
-    assert "NVDA" in result.message
-
 
 # /events
 
@@ -191,6 +182,12 @@ def test_planned_commands_return_info(cmd: str, state: TuiState) -> None:
 
 
 # Unknown command
+
+
+def test_removed_settings_command_is_unknown(state: TuiState) -> None:
+    result = dispatch("/settings", state)
+    assert result.action == "error"
+    assert "Unknown" in result.message
 
 
 def test_unknown_command(state: TuiState) -> None:

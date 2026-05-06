@@ -28,6 +28,7 @@ class SetupState:
     ticker: str = "AAPL"
     analysis_date: date = field(default_factory=date.today)
     depth: str = "Standard"  # Quick | Standard | Deep
+    language: str = "English"
     global_instructions: str = ""
     agent_instructions: dict[str, str] = field(default_factory=dict)
     enabled_agents: set[str] = field(

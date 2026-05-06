@@ -172,3 +172,18 @@ async def test_select_result_switches_chat_ticker_header() -> None:
         assert app.screen.id == "chat"
         assert app._state.setup.ticker == "NVDA"
         assert app.screen.query_one("#ticker-selector", TickerSelector).ticker == "NVDA"
+
+
+@pytest.mark.asyncio
+async def test_setup_panel_shows_default_language() -> None:
+    """Setup owns language display now that /settings was removed."""
+    from textual.widgets import Static
+
+    app = ApexTuiApp(initial_ticker="AAPL")
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        app.switch_screen("setup")
+        await pilot.pause()
+        content = app.screen.query_one("#setup-content", Static).content
+
+    assert "Language: English (default)" in str(content)

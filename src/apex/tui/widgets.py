@@ -89,11 +89,12 @@ class SetupPanel(Widget):
             f"[bold]Setup[/bold]\n"
             f"  Tickers available: {tickers}\n"
             f"  Date: {date.today()}  Depth: Standard\n"
+            f"  Language: English (default)\n"
             f"  Provider: OpenAI  Model: {s.llm_model}\n"
             f"  LangSmith: {ls_status}  Project: {s.langchain_project}\n"
             f"  Agents: technical, fundamental, risk, portfolio (portfolio always on)\n"
             f"  Global instructions: (none)  Per-agent: (none)\n"
-            f"  [dim]Edit via /settings or the setup form[/dim]",
+            f"  [dim]Turkish output is planned for a later phase[/dim]",
             id="setup-content",
         )
 
