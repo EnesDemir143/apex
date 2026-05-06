@@ -1,0 +1,116 @@
+/* Apex TUI — Textual CSS stylesheet */
+
+Screen {
+    background: #0d1117;
+    color: #c9d1d9;
+    layers: base overlay;
+}
+
+/* ── Header / ticker bar ─────────────────────────────────────────────── */
+#header {
+    height: 3;
+    background: #161b22;
+    border-bottom: solid #30363d;
+    padding: 0 2;
+    content-align: left middle;
+}
+
+#app-title {
+    color: #58a6ff;
+    text-style: bold;
+}
+
+/* ── Main layout ─────────────────────────────────────────────────────── */
+#main-grid {
+    grid-size: 2;
+    grid-columns: 1fr 1fr;
+    grid-rows: auto 1fr 1fr;
+    height: 1fr;
+}
+
+/* ── Ticker selector ─────────────────────────────────────────────────── */
+TickerSelector {
+    height: 3;
+    background: #161b22;
+    border: solid #30363d;
+    padding: 0 1;
+    column-span: 2;
+}
+
+/* ── Market panel ────────────────────────────────────────────────────── */
+MarketPanel {
+    height: 7;
+    background: #161b22;
+    border: solid #30363d;
+    padding: 0 1;
+    column-span: 2;
+}
+
+/* ── Setup panel ─────────────────────────────────────────────────────── */
+SetupPanel {
+    background: #161b22;
+    border: solid #30363d;
+    padding: 0 1;
+}
+
+/* ── Agent progress ──────────────────────────────────────────────────── */
+AgentProgressTable {
+    background: #161b22;
+    border: solid #30363d;
+    padding: 0 1;
+}
+
+/* ── Event log ───────────────────────────────────────────────────────── */
+EventLog {
+    background: #0d1117;
+    border: solid #30363d;
+    padding: 0 1;
+    overflow-y: auto;
+}
+
+/* ── Report panel ────────────────────────────────────────────────────── */
+ReportPanel {
+    background: #0d1117;
+    border: solid #30363d;
+    padding: 0 1;
+    overflow-y: auto;
+}
+
+/* ── Command input ───────────────────────────────────────────────────── */
+#command-input {
+    height: 3;
+    background: #161b22;
+    border: solid #58a6ff;
+    padding: 0 1;
+    column-span: 2;
+}
+
+/* ── Footer stats ────────────────────────────────────────────────────── */
+FooterStats {
+    height: 3;
+    background: #161b22;
+    border-top: solid #30363d;
+    padding: 0 1;
+    column-span: 2;
+}
+
+/* ── Output / info panel ─────────────────────────────────────────────── */
+#output-panel {
+    height: 8;
+    background: #161b22;
+    border: solid #30363d;
+    padding: 0 1;
+    overflow-y: auto;
+    column-span: 2;
+}
+
+/* ── Signal colours ──────────────────────────────────────────────────── */
+.signal-buy   { color: #3fb950; text-style: bold; }
+.signal-sell  { color: #f85149; text-style: bold; }
+.signal-hold  { color: #d29922; text-style: bold; }
+.signal-idle  { color: #8b949e; }
+
+/* ── Status colours ──────────────────────────────────────────────────── */
+.status-running   { color: #58a6ff; }
+.status-completed { color: #3fb950; }
+.status-error     { color: #f85149; }
