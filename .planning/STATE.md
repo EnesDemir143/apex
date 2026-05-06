@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: — MVP Trading Analysis System + Bet 5 Local-First TUI Pivot
 status: active
-last_updated: "2026-05-06T00:00:00.000Z"
+last_updated: "2026-05-06T17:00:00.000Z"
 progress:
   total_phases: 20
-  completed_phases: 14
+  completed_phases: 15
   total_plans: 32
   completed_plans: 25
 ---
@@ -22,15 +22,15 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 
 ## Current Phase
 
-- **Phase:** 14.1
-- **Name:** TUI Market Panel + Terminal Chart
+- **Phase:** 15
+- **Name:** Reports, History, Replay
 - **Status:** Planned
 - **Plans:** 1/1
 
 ## Progress
 
 - **Milestone:** v1.0 complete; Bet 5 TUI pivot in progress
-- **Phases complete:** 14/20
+- **Phases complete:** 15/20
 - **Phases planned:** 20/20
 - **Requirements complete:** 82/97
 
@@ -52,7 +52,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 12. TUI Pivot Product Cleanup | 1 | 1 | ✅ Complete |
 | 13. Local Analysis + CLI Foundation | 1 | 1 | ✅ Complete |
 | 14. Textual Terminal Cockpit | 1 | 1 | ✅ Complete |
-| 14.1. TUI Market Panel + Terminal Chart | 1 | 1 | 📋 Planned |
+| 14.1. TUI Market Panel + Terminal Chart | 1 | 1 | ✅ Complete |
 | 15. Reports, History, Replay | 1 | 1 | 📋 Planned |
 | 16. Web Stack Freeze + Revival Docs | 1 | 1 | 📋 Planned |
 | 17. Local RAG Lite + Provider Options | 1 | 1 | 📋 Planned |
@@ -86,6 +86,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 - 2026-05-03: Phase 13 complete — local_analysis service seam (run_local_analysis + sync wrapper, market data fallback, date validation), apex CLI entrypoint (typer, default TUI placeholder, analyze command), typer added to deps, 19 new unit tests, 41 total passed, ruff clean
 
 - 2026-05-06: Phase 14.1 inserted before Phase 15 — TUI market panel wiring and terminal-native `/chart` screen planned so real/local OHLCV, volume, and indicators are visible before report/history work.
+- 2026-05-06: Phase 14.1 complete — market_snapshot service (fallback + indicators), MarketPanel wired to live snapshot, ChartPanel (candles/volume/RSI-MACD/crosshair/bar-inspect), ChartScreen (/chart command, timeframe 1m/5m/1h/1d, zoom, pan, bar-inspect with Tab wrap), /x renamed to /inspect, chart-only slash dropdown, 50 tests passing
 
 ## Decisions Log
 
@@ -113,4 +114,4 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 2026-05-03 | Streamlit/FastAPI stack frozen, not deleted | Existing work remains as optional/legacy/production extension and will get a revival guide. |
 
 ---
-*Last updated: 2026-05-06 after inserting Phase 14.1 TUI market/chart work*
+*Last updated: 2026-05-06 after completing Phase 14.1 TUI market/chart work*
