@@ -299,18 +299,18 @@
 | 9 | CI/CD, K8s & Monitoring | 3 | ✅ | 3/3 | 100% |
 | 10 | Cooldown — Polish & Harden | CL | ✅ | 2/2 | 100% |
 | 11 | Streamlit API Wiring | 5 | ✅ | 1/1 | 100% |
-| 12 | TUI Pivot Product Cleanup | 5 | 📋 | 1/1 | 0% |
+| 12 | TUI Pivot Product Cleanup | 5 | ✅ | 1/1 | 100% |
 | 13 | Local Analysis + CLI Foundation | 5 | ✅ | 1/1 | 100% |
-| 14 | Textual Terminal Cockpit | 5 | 📋 | 1/1 | 0% |
+| 14 | Textual Terminal Cockpit | 5 | ✅ | 1/1 | 100% |
 | 15 | Reports, History, Replay | 5 | 📋 | 1/1 | 0% |
 | 16 | Web Stack Freeze + Revival Docs | 5 | 📋 | 1/1 | 0% |
 | 17 | Local RAG Lite + Provider Options | 5 | 📋 | 1/1 | 0% |
 | 18 | Turkish Output / Localization | 5 | 📋 | 1/1 | 0% |
 | 19 | Optional Quant ML Agent + Device Selection | 5+ | 📋 | 1/1 | 0% |
 
-**Total:** 19 phases | 31 plans | 11 phases complete, 8 Bet 5/5+ pivot phases planned
+**Total:** 19 phases | 31 plans | 14 phases complete, 5 Bet 5/5+ pivot phases remaining
 
 
 ---
 *Roadmap created: 2026-04-28*
-*Last updated: 2026-05-03 — Bet 5 local-first TUI pivot planned as Phases 12-19.*
+*Last updated: 2026-05-06 — Phase 14 (Textual Terminal Cockpit) complete.*
