@@ -23,6 +23,7 @@ COMMAND_HELP: dict[str, str] = {
     "setup": "/setup — open setup configuration",
     "team": "/team — show agent team progress",
     "select": "/select TICKER — change selected ticker",
+    "chart": "/chart [TICKER] — open terminal price/volume chart",
     "analyze": "/analyze [TICKER] — run analysis for selected or given ticker",
     "langsmith": "/langsmith — show LangSmith tracing status",
     "usage": "/usage — show token/cost summary from latest run",
@@ -37,12 +38,26 @@ COMMAND_HELP: dict[str, str] = {
     "model": "/model — show current LLM model",
 }
 
+# Commands only relevant inside ChartScreen
+CHART_COMMAND_HELP: dict[str, str] = {
+    "inspect": "/inspect — enter bar-inspect mode (Tab to move, Enter to inspect)",
+    "refresh": "/refresh — reload chart data",
+    "zoom": "/zoom + | - — zoom chart in or out",
+    "set-tf":    "/set-tf — show timeframe options",
+    "set-tf-1m": "/set-tf-1m — set timeframe to 1 minute",
+    "set-tf-5m": "/set-tf-5m — set timeframe to 5 minutes",
+    "set-tf-1h": "/set-tf-1h — set timeframe to 1 hour",
+    "set-tf-4h": "/set-tf-4h — set timeframe to 4 hours",
+    "set-tf-1d": "/set-tf-1d — set timeframe to 1 day",
+    "set-tf-1w": "/set-tf-1w — set timeframe to 1 week",
+}
+
 
 @dataclass
 class CommandResult:
     """Result of a parsed and dispatched slash command."""
 
-    action: str  # select | analyze | info | error | help | screen
+    action: str  # select | analyze | chart | info | error | help | screen
     message: str = ""
     ticker: str = ""
     planned_phase: str = ""
@@ -96,6 +111,32 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
                 message=f"{ticker!r} not in whitelist: {list(TICKERS_WHITELIST)}",
             )
         return CommandResult(action="select", ticker=ticker, message=f"Selected {ticker}")
+
+    if cmd == "chart":
+        ticker = args[0].upper() if args else state.setup.ticker
+        from apex.core.constants import TICKERS_WHITELIST
+
+        if ticker not in TICKERS_WHITELIST:
+            return CommandResult(
+                action="error",
+                title="Command Error",
+                message=f"{ticker!r} not in whitelist: {list(TICKERS_WHITELIST)}",
+            )
+        return CommandResult(action="chart", ticker=ticker, message=f"Opening chart for {ticker}")
+
+    if cmd == "inspect":
+        return CommandResult(action="bar_select", message="bar_select")
+
+    # Chart-specific commands — handled by ChartScreen but dispatched here as fallback
+    if cmd == "refresh":
+        return CommandResult(action="chart_cmd", message="refresh")
+
+    if cmd == "zoom":
+        direction = args[0] if args else ""
+        return CommandResult(action="chart_cmd", message=f"zoom:{direction}")
+
+    if cmd.startswith("set-tf"):
+        return CommandResult(action="chart_cmd", message=f"set-tf:{cmd}")
 
     if cmd == "analyze":
         ticker = args[0].upper() if args else state.setup.ticker
