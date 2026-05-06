@@ -169,7 +169,7 @@ class ReportPanel(Widget):
     """
 
     def compose(self) -> ComposeResult:
-        yield Static("[dim]No analysis run yet.[/dim]", id="report-content")
+        yield Static("[dim]Run /analyze TICKER to create a report.[/dim]", id="report-content")
 
     def update_report(self, content: str) -> None:
         try:

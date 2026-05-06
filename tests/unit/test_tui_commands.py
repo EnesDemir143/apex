@@ -105,6 +105,7 @@ def test_analyze_non_whitelisted(state: TuiState) -> None:
 def test_langsmith_shows_status(state: TuiState) -> None:
     result = dispatch("/langsmith", state)
     assert result.action == "info"
+    assert result.title == "LangSmith"
     assert "LangSmith" in result.message
     # Key must never be printed in full — only present/missing
     assert "sk-" not in result.message
@@ -116,7 +117,9 @@ def test_langsmith_shows_status(state: TuiState) -> None:
 def test_usage_no_run(state: TuiState) -> None:
     result = dispatch("/usage", state)
     assert result.action == "info"
-    assert "No analysis" in result.message
+    assert result.title == "Usage"
+    assert "Usage metrics" in result.message
+    assert "No analysis" not in result.message
 
 
 def test_tokens_alias(state: TuiState) -> None:
@@ -133,6 +136,7 @@ def test_usage_with_data(state: TuiState) -> None:
     state.analysis.usage = {"total_tokens": 500, "cost_usd": 0.0025}
     result = dispatch("/usage", state)
     assert result.action == "info"
+    assert result.title == "Usage"
     assert "500" in result.message
     assert "0.0025" in result.message
 
@@ -143,6 +147,7 @@ def test_usage_with_data(state: TuiState) -> None:
 def test_model_shows_model(state: TuiState) -> None:
     result = dispatch("/model", state)
     assert result.action == "info"
+    assert result.title == "Model"
     assert "Model:" in result.message
 
 
@@ -162,6 +167,7 @@ def test_settings_shows_ticker(state: TuiState) -> None:
     state.setup.ticker = "NVDA"
     result = dispatch("/settings", state)
     assert result.action == "info"
+    assert result.title == "Settings"
     assert "NVDA" in result.message
 
 

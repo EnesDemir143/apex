@@ -213,6 +213,49 @@ class TeamScreen(CommandPaletteScreenMixin, Screen[None]):
         yield CommandPalette(id="command-palette")
 
 
+class CommandDetailScreen(CommandPaletteScreenMixin, Screen[None]):
+    """Dedicated screen for slash command output."""
+
+    BINDINGS = [
+        ("escape", "close_palette", "Close"),
+    ]
+
+    DEFAULT_CSS = """
+    CommandDetailScreen #detail-title {
+        height: 3;
+        background: #161b22;
+        border-bottom: solid #30363d;
+        padding: 0 1;
+        color: #58a6ff;
+        text-style: bold;
+    }
+
+    CommandDetailScreen #detail-content {
+        height: 1fr;
+        background: #0d1117;
+        border: solid #30363d;
+        padding: 1 2;
+        overflow-y: auto;
+    }
+    """
+
+    def __init__(self, title: str, content: str) -> None:
+        super().__init__()
+        self._title = title
+        self._content = content
+
+    def compose(self) -> ComposeResult:
+        yield Header(show_clock=True)
+        yield Static(f"[bold]{self._title}[/bold]", id="detail-title")
+        yield Static(self._content, id="detail-content")
+        yield Input(
+            placeholder="Type / for commands or /chat to return…",
+            id="command-input",
+        )
+        yield Footer()
+        yield CommandPalette(id="command-palette")
+
+
 class ApexTuiApp(App[None]):
     """Apex terminal cockpit — app-first, Hermes-inspired."""
 
@@ -272,7 +315,7 @@ class ApexTuiApp(App[None]):
             self._run_analysis_worker(ticker)
 
         elif result.action in ("info", "help", "error"):
-            self._show_output(result.message)
+            self._show_output(result.message, title=result.title or result.action.title())
             self._push_event(result.message[:80])
 
     # ── Analysis worker ───────────────────────────────────────────────────
@@ -301,7 +344,7 @@ class ApexTuiApp(App[None]):
             self._state.analysis.status = "error"
             self._state.analysis.errors = [str(exc)]
             self._push_event(f"[red]Error:[/red] {exc}")
-            self._show_output(f"Analysis failed: {exc}")
+            self._show_output(f"Analysis failed: {exc}", title="Analysis Error")
             return
 
         self._state.analysis.status = "completed"
@@ -352,12 +395,8 @@ class ApexTuiApp(App[None]):
         except Exception:
             pass
 
-    def _show_output(self, msg: str) -> None:
-        try:
-            screen = self.screen
-            screen.query_one("#report-panel", ReportPanel).update_report(msg)
-        except Exception:
-            pass
+    def _show_output(self, msg: str, title: str = "Output") -> None:
+        self.push_screen(CommandDetailScreen(title=title, content=msg))
 
     def _show_report(self, content: str) -> None:
         try:

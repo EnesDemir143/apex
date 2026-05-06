@@ -46,6 +46,7 @@ class CommandResult:
     message: str = ""
     ticker: str = ""
     planned_phase: str = ""
+    title: str = ""
 
 
 def parse_command(raw: str) -> tuple[str, list[str]]:
@@ -64,10 +65,10 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
     cmd, args = parse_command(raw)
 
     if not cmd:
-        return CommandResult(action="help", message=_help_text())
+        return CommandResult(action="help", title="Help", message=_help_text())
 
     if cmd == "help":
-        return CommandResult(action="help", message=_help_text())
+        return CommandResult(action="help", title="Help", message=_help_text())
 
     # Screen switching
     if cmd == "chat":
@@ -81,13 +82,14 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
 
     if cmd == "select":
         if not args:
-            return CommandResult(action="error", message="Usage: /select TICKER")
+            return CommandResult(action="error", title="Command Error", message="Usage: /select TICKER")
         ticker = args[0].upper()
         from apex.core.constants import TICKERS_WHITELIST
 
         if ticker not in TICKERS_WHITELIST:
             return CommandResult(
                 action="error",
+                title="Command Error",
                 message=f"{ticker!r} not in whitelist: {list(TICKERS_WHITELIST)}",
             )
         return CommandResult(action="select", ticker=ticker, message=f"Selected {ticker}")
@@ -99,6 +101,7 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
         if ticker not in TICKERS_WHITELIST:
             return CommandResult(
                 action="error",
+                title="Command Error",
                 message=f"{ticker!r} not in whitelist: {list(TICKERS_WHITELIST)}",
             )
         return CommandResult(action="analyze", ticker=ticker, message=f"Analyzing {ticker}…")
@@ -106,11 +109,16 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
     if cmd in ("usage", "tokens", "cost"):
         usage = state.analysis.usage
         if not usage:
-            return CommandResult(action="info", message="No analysis run yet.")
+            return CommandResult(
+                action="info",
+                title="Usage",
+                message="Usage metrics will appear after the first analysis run.",
+            )
         tokens = usage.get("total_tokens", usage.get("_extra_instructions", "—"))
         cost = usage.get("cost_usd", 0.0)
         return CommandResult(
             action="info",
+            title="Usage",
             message=f"Tokens: {tokens} | Cost: ${cost:.4f}",
         )
 
@@ -125,6 +133,7 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
         key_display = "***set***" if key_present else "not set"
         return CommandResult(
             action="info",
+            title="LangSmith",
             message=f"LangSmith: {status} | project={project} | key={key_display}",
         )
 
@@ -132,7 +141,7 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
         from apex.core.config import get_settings
 
         s = get_settings()
-        return CommandResult(action="info", message=f"Model: {s.llm_model}")
+        return CommandResult(action="info", title="Model", message=f"Model: {s.llm_model}")
 
     if cmd == "events":
         return CommandResult(action="screen", message="team")
@@ -147,17 +156,18 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
         ]
         if setup.global_instructions:
             lines.append(f"Global instructions: {setup.global_instructions}")
-        return CommandResult(action="info", message="\n".join(lines))
+        return CommandResult(action="info", title="Settings", message="\n".join(lines))
 
     if cmd in _PLANNED:
         phase = _PLANNED[cmd]
         return CommandResult(
             action="info",
+            title=f"/{cmd}",
             planned_phase=phase,
             message=f"/{cmd} is planned for {phase}.",
         )
 
-    return CommandResult(action="error", message=f"Unknown command: /{cmd}. Type /help.")
+    return CommandResult(action="error", title="Command Error", message=f"Unknown command: /{cmd}. Type /help.")
 
 
 def _help_text() -> str:

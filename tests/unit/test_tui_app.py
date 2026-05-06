@@ -98,3 +98,35 @@ async def test_command_palette_is_available_on_secondary_screens() -> None:
         app.switch_screen("team")
         await pilot.pause()
         assert app.screen.query_one("#command-palette", CommandPalette)
+
+
+@pytest.mark.asyncio
+async def test_info_commands_open_dedicated_detail_screen() -> None:
+    """Info/help/error commands should not overwrite the main report panel."""
+    from textual.widgets import Static
+
+    from apex.tui.commands import dispatch
+
+    app = ApexTuiApp(initial_ticker="AAPL")
+    async with app.run_test() as pilot:
+        await pilot.pause()
+
+        app._handle_result(dispatch("/usage", app._state))
+        await pilot.pause()
+
+        assert app.screen.query_one("#detail-title", Static).content == "[bold]Usage[/bold]"
+        content = app.screen.query_one("#detail-content", Static).content
+        assert "Usage metrics" in str(content)
+
+
+@pytest.mark.asyncio
+async def test_main_report_placeholder_avoids_no_analysis_copy() -> None:
+    """Main screen should not show the old no-analysis placeholder."""
+    from textual.widgets import Static
+
+    app = ApexTuiApp(initial_ticker="AAPL")
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        content = app.screen.query_one("#report-content", Static).content
+
+    assert "No analysis run yet" not in str(content)
