@@ -15,12 +15,14 @@ from textual.widgets import Footer, Header, Input, OptionList, Static
 from textual.widgets.option_list import Option
 
 from apex.core.constants import TICKERS_WHITELIST
-from apex.tui.commands import COMMAND_HELP, CommandResult, dispatch
+from apex.tui.commands import COMMAND_HELP, CHART_COMMAND_HELP, CommandResult, dispatch
 from apex.tui.state import TuiState
 from apex.tui.widgets import (
     AgentProgressTable,
+    ChartPanel,
     EventLog,
     FooterStats,
+    KeybindPanel,
     MarketPanel,
     ReportPanel,
     SetupPanel,
@@ -182,6 +184,10 @@ class CommandPalette(Container):
     }
     """
 
+    def __init__(self, *args: Any, chart_only: bool = False, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._chart_only = chart_only
+
     def compose(self) -> ComposeResult:
         yield Static("Commands", id="command-palette-title")
         options = self._options_for_query("")
@@ -197,7 +203,7 @@ class CommandPalette(Container):
         query = value[1:].strip().lower()
         if " " in query:
             command_name = query.split(maxsplit=1)[0]
-            if command_name == "select":
+            if command_name in ("select", "chart"):
                 self.hide_palette()
                 return
             query = command_name
@@ -209,8 +215,9 @@ class CommandPalette(Container):
         self.show_palette()
 
     def _options_for_query(self, query: str) -> list[Option]:
+        source = CHART_COMMAND_HELP if self._chart_only else COMMAND_HELP
         matches: list[Option] = []
-        for cmd, desc in COMMAND_HELP.items():
+        for cmd, desc in source.items():
             if query and not cmd.lower().startswith(query):
                 continue
             matches.append(Option(self._option_label(cmd, desc), id=cmd))
