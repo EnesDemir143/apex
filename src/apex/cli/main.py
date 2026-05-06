@@ -22,10 +22,24 @@ console = Console()
 
 @app.callback(invoke_without_command=True)
 def default(ctx: typer.Context) -> None:
-    """Launch the Apex terminal cockpit (Phase 14). Prints a placeholder until TUI is ready."""
+    """Launch the Apex terminal cockpit (default)."""
     if ctx.invoked_subcommand is None:
-        console.print("[bold cyan]Apex[/bold cyan] — terminal cockpit coming in Phase 14.")
-        console.print("Run [bold]apex analyze TICKER[/bold] for a one-shot analysis.")
+        from apex.tui.app import run_tui
+
+        run_tui()
+
+
+@app.command()
+def tui(
+    ticker: Annotated[
+        str,
+        typer.Argument(help="Initial ticker to select (default: AAPL)."),
+    ] = "AAPL",
+) -> None:
+    """Open the Apex Textual terminal cockpit (alias for the default command)."""
+    from apex.tui.app import run_tui
+
+    run_tui(ticker=ticker)
 
 
 @app.command()
