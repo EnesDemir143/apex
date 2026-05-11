@@ -104,6 +104,39 @@ FooterStats {
     column-span: 2;
 }
 
+/* ── Chart screen ────────────────────────────────────────────────────── */
+ChartPanel {
+    height: 1fr;
+    layout: vertical;
+}
+
+#chart-header {
+    height: 2;
+    background: #161b22;
+    padding: 0 1;
+}
+
+#chart-body {
+    height: 1fr;
+    background: #0d1117;
+    padding: 0 1;
+    overflow-y: auto;
+}
+
+#chart-volume {
+    height: 6;
+    background: #0d1117;
+    border-top: solid #30363d;
+    padding: 0 1;
+}
+
+#chart-sub {
+    height: 10;
+    background: #0d1117;
+    border-top: solid #30363d;
+    padding: 0 1;
+}
+
 /* ── Signal colours ──────────────────────────────────────────────────── */
 .signal-buy   { color: #3fb950; text-style: bold; }
 .signal-sell  { color: #f85149; text-style: bold; }

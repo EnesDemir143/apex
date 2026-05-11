@@ -37,11 +37,21 @@ class SetupState:
 
 
 @dataclass
+class ChartViewport:
+    """Chart pan/zoom/timeframe state."""
+
+    timeframe: str = "1d"          # 1m | 5m | 1h | 1d
+    viewport_bars: int = 60        # how many bars to show
+    offset: int = 0                # pan offset from the right (0 = latest)
+
+
+@dataclass
 class TuiState:
     """Root TUI state shared across widgets."""
 
     setup: SetupState = field(default_factory=SetupState)
     analysis: AnalysisState = field(default_factory=AnalysisState)
+    chart: ChartViewport = field(default_factory=ChartViewport)
     events: list[str] = field(default_factory=list)
     current_report: str = ""
 
