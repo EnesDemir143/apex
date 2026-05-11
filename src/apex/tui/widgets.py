@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import Any
 
 from textual.app import ComposeResult
 from textual.containers import Horizontal
@@ -169,7 +170,7 @@ class ChartPanel(Widget):
     loading_dots: reactive[int] = reactive(0)
     timeframe: reactive[str] = reactive("1d")
     viewport_bars: reactive[int] = reactive(40)
-    offset: reactive[int] = reactive(0)
+    pan_offset: reactive[int] = reactive(0)
     # crosshair: index into visible bars (-1 = latest / no selection)
     crosshair: reactive[int] = reactive(-1)
     # bar_select_mode: True when /x has been activated
@@ -219,15 +220,15 @@ class ChartPanel(Widget):
         if self.snapshot is None and not self.error:
             self.loading_dots = (self.loading_dots + 1) % 3
 
-    def _visible_bars(self) -> list:
+    def _visible_bars(self) -> list[Any]:
         if not self.snapshot:
             return []
         bars = self.snapshot.bars
-        end = len(bars) - self.offset
+        end = len(bars) - self.pan_offset
         start = max(0, end - self.viewport_bars)
         return bars[start:end]
 
-    def _selected_bar(self):
+    def _selected_bar(self) -> Any | None:
         bars = self._visible_bars()
         if not bars:
             return None
@@ -675,12 +676,12 @@ def _volume_bars(values: list[int], *, width: int = 48) -> str:
 
 # ── ASCII candlestick renderer ────────────────────────────────────────────────
 
-def _render_candles(bars: list, *, chart_height: int = 22) -> str:
+def _render_candles(bars: list, *, chart_height: int = 22) -> str:  # type: ignore[type-arg]
     """Thin wrapper kept for backward compat."""
     return _render_candles_with_axes(bars, chart_height=chart_height)
 
 
-def _render_candles_with_axes(bars: list, *, chart_height: int = 22, crosshair: int = -1) -> str:
+def _render_candles_with_axes(bars: list, *, chart_height: int = 22, crosshair: int = -1) -> str:  # type: ignore[type-arg]
     """Render 2-char-wide candlesticks with right price axis and optional crosshair."""
     if not bars:
         return ""
@@ -719,21 +720,21 @@ def _render_candles_with_axes(bars: list, *, chart_height: int = 22, crosshair: 
         if body_top == body_bot:
             body_bot = min(chart_height - 1, body_top + 1)
 
-        for row in range(chart_height):
-            if body_top <= row <= body_bot:
-                grid[row][col] = co + "█" + cc
-            elif wick_top <= row <= wick_bot:
-                grid[row][col] = co + "╎" + cc
+        for ri in range(chart_height):
+            if body_top <= ri <= body_bot:
+                grid[ri][col] = co + "█" + cc
+            elif wick_top <= ri <= wick_bot:
+                grid[ri][col] = co + "╎" + cc
             # col+1 stays space (gap between candles)
 
     # crosshair vertical line (spans both chars of the candle)
     if 0 <= crosshair < n:
         col = crosshair * candle_w
-        for row in range(chart_height):
-            if grid[row][col] == " ":
-                grid[row][col] = "[dim]┆[/dim]"
-            if col + 1 < total_cols and grid[row][col + 1] == " ":
-                grid[row][col + 1] = "[dim]┆[/dim]"
+        for ri in range(chart_height):
+            if grid[ri][col] == " ":
+                grid[ri][col] = "[dim]┆[/dim]"
+            if col + 1 < total_cols and grid[ri][col + 1] == " ":
+                grid[ri][col + 1] = "[dim]┆[/dim]"
 
     # assemble rows with right price axis
     lines: list[str] = []
@@ -752,7 +753,7 @@ def _render_candles_with_axes(bars: list, *, chart_height: int = 22, crosshair: 
     return "\n".join(lines)
 
 
-def _build_date_axis(bars: list, *, width: int, candle_w: int = 2) -> str:
+def _build_date_axis(bars: list, *, width: int, candle_w: int = 2) -> str:  # type: ignore[type-arg]
     """Build a date label row aligned to bar positions (accounts for candle_w chars per bar)."""
     if not bars:
         return ""
@@ -822,21 +823,21 @@ def _render_volume_panel(
         bullish = c >= o
         co = "[green]" if bullish else "[red]"
         cc = "[/green]" if bullish else "[/red]"
-        for row in range(height):
-            depth = height - 1 - row  # 0 = bottom
+        for ri in range(height):
+            depth = height - 1 - ri
             if depth < filled:
-                grid[row][i] = co + "█" + cc
+                grid[ri][i] = co + "█" + cc
             elif depth == filled and frac > 0:
                 idx = round(frac * height * (len(blocks) - 1)) % len(blocks)
-                grid[row][i] = co + blocks[idx] + cc
+                grid[ri][i] = co + blocks[idx] + cc
 
     if 0 <= crosshair < n:
-        for row in range(height):
-            if grid[row][crosshair] == " ":
-                grid[row][crosshair] = "[dim]┆[/dim]"
+        for ri in range(height):
+            if grid[ri][crosshair] == " ":
+                grid[ri][crosshair] = "[dim]┆[/dim]"
 
     # vol axis label on right
-    lines = []
+    lines: list[str] = []
     for row_idx, row in enumerate(grid):
         if row_idx == 0:
             label = f"[dim]{_volume(max_vol):>8}[/dim]"

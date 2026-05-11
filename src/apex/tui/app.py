@@ -622,11 +622,11 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
         p = self._panel()
         if p.snapshot:
             max_offset = max(0, len(p.snapshot.bars) - p.viewport_bars)
-            p.offset = min(max_offset, p.offset + 10)
+            p.pan_offset = min(max_offset, p.pan_offset + 10)
 
     def action_pan_right(self) -> None:
         p = self._panel()
-        p.offset = max(0, p.offset - 10)
+        p.pan_offset = max(0, p.pan_offset - 10)
 
     # ── timeframe ─────────────────────────────────────────────────────────
 
@@ -645,7 +645,7 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
     def _set_timeframe(self, tf: str) -> None:
         p = self._panel()
         p.timeframe = tf
-        p.offset = 0
+        p.pan_offset = 0
         p.crosshair = -1
         self.app.run_worker(self._fetch_for_timeframe(tf), exclusive=True, name="chart-fetch")
 
