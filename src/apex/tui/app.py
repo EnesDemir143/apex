@@ -15,7 +15,7 @@ from textual.widgets import Footer, Header, Input, OptionList, Static
 from textual.widgets.option_list import Option
 
 from apex.core.constants import TICKERS_WHITELIST
-from apex.tui.commands import COMMAND_HELP, CHART_COMMAND_HELP, CommandResult, dispatch
+from apex.tui.commands import CHART_COMMAND_HELP, COMMAND_HELP, CommandResult, dispatch
 from apex.tui.state import TuiState
 from apex.tui.widgets import (
     AgentProgressTable,
@@ -792,7 +792,7 @@ class ApexTuiApp(App[None]):
         elif result.action == "bar_select":
             # Activate bar-inspect mode on the current ChartScreen if open
             try:
-                from apex.tui.app import ChartScreen as _CS  # noqa: F401
+                from apex.tui.app import ChartScreen as _CS  # noqa: F401, N814
                 if isinstance(self.screen, ChartScreen):
                     self.screen.action_enter_bar_inspect()
                 else:

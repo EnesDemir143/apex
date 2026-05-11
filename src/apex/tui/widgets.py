@@ -5,10 +5,10 @@ from __future__ import annotations
 from decimal import Decimal
 
 from textual.app import ComposeResult
+from textual.containers import Horizontal
 from textual.reactive import reactive
 from textual.widget import Widget
 from textual.widgets import Label, ListItem, ListView, Static
-from textual.containers import Horizontal
 
 from apex.services.market_snapshot import MarketSnapshot
 
@@ -406,17 +406,14 @@ class ChartPanel(Widget):
         closes = [float(b.close) for b in bars]
         ind = self.snapshot.indicators
 
-        from apex.agents.indicators import calculate_rsi
         from decimal import Decimal
+
+        from apex.agents.indicators import calculate_rsi
         try:
             rsi_raw = calculate_rsi([Decimal(str(c)) for c in closes])
             rsi_values = [float(v) for v in rsi_raw.dropna().tolist()]
         except Exception:
             rsi_values = []
-
-        fast = _ema_series(closes, 12)
-        slow = _ema_series(closes, 26)
-        hist = [f - s for f, s in zip(fast, slow)]
 
         rsi_line = _render_mini_line(rsi_values, height=3, lo=0.0, hi=100.0) if rsi_values else "—"
         macd_line = _render_macd_mini(closes, ind=ind)
@@ -698,9 +695,9 @@ def _render_candles_with_axes(bars: list, *, chart_height: int = 22, crosshair: 
     price_range = price_high - price_low or 1.0
     n = len(bars)
     # Each candle occupies 2 columns: body/wick + gap
-    CANDLE_W = 2
-    total_cols = n * CANDLE_W
-    PRICE_AXIS_W = 9  # chars for right price label
+    candle_w = 2
+    total_cols = n * candle_w
+    price_axis_w = 9  # chars for right price label
 
     def to_row(price: float) -> int:
         frac = (price - price_low) / price_range
@@ -709,14 +706,14 @@ def _render_candles_with_axes(bars: list, *, chart_height: int = 22, crosshair: 
     # grid: rows × total_cols chars (each cell = 1 char)
     grid: list[list[str]] = [[" "] * total_cols for _ in range(chart_height)]
 
-    for i, (o, h, l, c) in enumerate(zip(opens, highs, lows, closes)):
-        col = i * CANDLE_W  # left column of this candle
+    for i, (o, h, lo, c) in enumerate(zip(opens, highs, lows, closes)):
+        col = i * candle_w  # left column of this candle
         bullish = c >= o
         co = "[green]" if bullish else "[red]"
         cc = "[/green]" if bullish else "[/red]"
 
         wick_top = to_row(h)
-        wick_bot = to_row(l)
+        wick_bot = to_row(lo)
         body_top = to_row(max(o, c))
         body_bot = to_row(min(o, c))
         if body_top == body_bot:
@@ -731,7 +728,7 @@ def _render_candles_with_axes(bars: list, *, chart_height: int = 22, crosshair: 
 
     # crosshair vertical line (spans both chars of the candle)
     if 0 <= crosshair < n:
-        col = crosshair * CANDLE_W
+        col = crosshair * candle_w
         for row in range(chart_height):
             if grid[row][col] == " ":
                 grid[row][col] = "[dim]┆[/dim]"
@@ -745,11 +742,11 @@ def _render_candles_with_axes(bars: list, *, chart_height: int = 22, crosshair: 
             price = price_high - (row_idx / max(chart_height - 1, 1)) * price_range
             label = f"[dim]{price:>8.2f}[/dim]"
         else:
-            label = " " * PRICE_AXIS_W
+            label = " " * price_axis_w
         lines.append("".join(row) + label)
 
     # Bottom separator (date axis rendered in its own widget)
-    separator = "[dim]" + "─" * total_cols + "[/dim]" + " " * PRICE_AXIS_W
+    separator = "[dim]" + "─" * total_cols + "[/dim]" + " " * price_axis_w
     lines.append(separator)
 
     return "\n".join(lines)
@@ -896,7 +893,6 @@ def _render_macd_mini(closes: list[float], *, height: int = 6, ind: object) -> s
 
     hi = max(abs(v) for v in hist) or 1.0
     blocks_pos = "▁▂▃▄▅▆▇█"
-    blocks_neg = "▁▂▃▄▅▆▇█"
     bar_chars: list[str] = []
     for v in hist:
         idx = int((abs(v) / hi) * (len(blocks_pos) - 1))

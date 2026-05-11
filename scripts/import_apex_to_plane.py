@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 """Import Apex project structure into a Plane project.
 
 Usage:
