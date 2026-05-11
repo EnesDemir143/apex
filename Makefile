@@ -1,4 +1,4 @@
-.PHONY: check test lint typecheck format frontend k8s-local-build k8s-local-dry-run
+.PHONY: check test lint typecheck format frontend k8s-local-build k8s-local-dry-run graphify-update
 
 check: lint typecheck test
 
@@ -29,3 +29,12 @@ k8s-local-build:
 
 k8s-local-dry-run:
 	kubectl apply --dry-run=client -k k8s/overlays/local
+
+graphify-update:
+	@echo "==> Graphify status"
+	@if [ -f .planning/graphs/graph.json ]; then \
+		echo "    graph.json: present"; \
+		echo "    To rebuild graph: run /graphify in agent session"; \
+	else \
+		echo "    graph.json: missing — run /graphify first"; \
+	fi
