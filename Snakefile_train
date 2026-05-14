@@ -223,6 +223,7 @@ rule train_models:
         voter=os.path.join(MODELS_DIR, "ensemble_voter.pkl"),
         scaler=os.path.join(MODELS_DIR, "scaler.pkl"),
         eval_report=os.path.join(MODELS_DIR, "evaluation.txt"),
+        metadata=os.path.join(MODELS_DIR, "metadata.json"),
     run:
         import json
         import warnings
@@ -383,5 +384,20 @@ rule train_models:
 
         with open(output.eval_report, "w") as f:
             f.write(eval_text)
+
+        # Metadata
+        import json
+        metadata = {
+            "model_version": "rf+xgb+lgbm+cb_v1",
+            "features": feature_cols,
+            "n_estimators": 200,
+            "ensemble": "RidgeCV",
+            "n_train": int(len(X_train)),
+            "n_test": int(len(X_test)),
+            "train_date": str(pd.Timestamp.now().date()),
+            "tickers": TICKERS,
+        }
+        with open(output.metadata, "w") as f:
+            json.dump(metadata, f, indent=2)
 
         print(f"\nModels saved to {MODELS_DIR}/")
