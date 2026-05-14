@@ -15,6 +15,7 @@ from apex.agents._common import (
 from apex.agents.state import AgentState
 from apex.services.llm_client import OpenAIClient
 from apex.services.local_knowledge import find_knowledge, format_knowledge_context
+from apex.services.market_news import ensure_market_news
 
 
 async def fundamental_agent(state: AgentState) -> AgentState:
@@ -22,6 +23,7 @@ async def fundamental_agent(state: AgentState) -> AgentState:
     agent_name = "fundamental_agent"
     ticker = state["ticker"]
     try:
+        ensure_market_news(ticker)
         context = retrieve_fundamental_context(ticker)
         local_items = find_knowledge(ticker)
         local_context = format_knowledge_context(local_items)
