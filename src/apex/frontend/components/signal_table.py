@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-_SIG_COLOR  = {"BUY": "#00D4AA", "SELL": "#FF4B4B", "HOLD": "#FFD700"}
+_SIG_COLOR = {"BUY": "#00D4AA", "SELL": "#FF4B4B", "HOLD": "#FFD700"}
 _RISK_COLOR = {"Low": "#00D4AA", "Medium": "#FFD700", "High": "#FF4B4B"}
 
 
@@ -23,7 +23,7 @@ def _conf_bar(pct: float, color: str) -> str:
         f'<span style="color:{color};font-weight:600;font-size:13px;">{pct:.0%}</span>'
         f'<div style="background:#2A2F3E;border-radius:3px;height:5px;width:60px;">'
         f'<div style="background:{color};border-radius:3px;height:5px;width:{w}px;"></div>'
-        f'</div></div>'
+        f"</div></div>"
     )
 
 
@@ -31,19 +31,23 @@ def signal_leaderboard(signals: list[dict]) -> None:
     """Render the Top Signals table with clickable symbol buttons."""
     # Header row
     h1, h2, h3, h4, h5, h6 = st.columns([1.2, 1, 1.4, 1, 1, 1])
-    for col, label in zip([h1, h2, h3, h4, h5, h6],
-                          ["Symbol", "Signal", "Confidence", "Risk", "Agreement", "Last Analysis"]):
-        col.markdown(f'<div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;padding-bottom:4px;">{label}</div>', unsafe_allow_html=True)
+    for col, label in zip(
+        [h1, h2, h3, h4, h5, h6], ["Symbol", "Signal", "Confidence", "Risk", "Agreement", "Last Analysis"]
+    ):
+        col.markdown(
+            f'<div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;padding-bottom:4px;">{label}</div>',
+            unsafe_allow_html=True,
+        )
 
     st.markdown('<hr style="border-color:#2A2F3E;margin:0 0 4px;">', unsafe_allow_html=True)
 
     for row in signals:
-        sym   = row["symbol"]
-        sig   = row["signal"]
-        conf  = row["confidence"]
-        risk  = row["risk"]
+        sym = row["symbol"]
+        sig = row["signal"]
+        conf = row["confidence"]
+        risk = row["risk"]
         agree = row["agreement"]
-        last  = row["last_analysis"]
+        last = row["last_analysis"]
 
         sc = _SIG_COLOR.get(sig, "#888")
         rc = _RISK_COLOR.get(risk, "#888")

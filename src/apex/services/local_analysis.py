@@ -34,7 +34,7 @@ def _default_market_data(ticker: str) -> list[Any]:
             volume=1_000_000 + i * 1000,
             source="local_fallback",
         )
-        for i in range(35)
+        for i in range(80)
     ]
 
 
@@ -45,7 +45,7 @@ async def _fetch_market_data(ticker: str) -> list[Any]:
     from apex.ingestion.market_data_fetcher import MarketDataFetcher
 
     end = date.today()
-    start = end - timedelta(days=60)
+    start = end - timedelta(days=120)
     try:
         fetcher = MarketDataFetcher()
         response = await fetcher.fetch_bars(ticker, start, end)
@@ -84,6 +84,7 @@ async def run_local_analysis(
     save_report: bool = False,
     force: bool = False,
     output_language: str = "English",
+    quant_enabled: bool = False,
 ) -> dict[str, Any]:
     """Run the LangGraph workflow locally without FastAPI/Postgres/Redis.
 
@@ -94,6 +95,7 @@ async def run_local_analysis(
         extra_instructions: Optional global prompt note surfaced to all agents.
         agent_instructions: Optional per-agent prompt notes, e.g. {"risk": "focus on VIX"}.
         output_language: Report language — "English" (default) or "Turkish".
+        quant_enabled: Enable optional quant ML agent (requires trained models).
 
     Returns:
         Dict with keys: ticker, signal, confidence, errors, usage, agent_outputs, analysis_date.
@@ -141,6 +143,7 @@ async def run_local_analysis(
         "market_data": market_data,
         "errors": [],
         "usage": {},
+        "quant_enabled": quant_enabled,
     }
 
     if extra_instructions or agent_instructions:
@@ -163,8 +166,10 @@ async def run_local_analysis(
             "technical": result.get("technical_analysis"),
             "fundamental": result.get("fundamental_analysis"),
             "risk": result.get("risk_assessment"),
+            "quant": result.get("quant_analysis"),
             "portfolio": decision,
         },
+        "quant_analysis": result.get("quant_analysis"),
         "analysis_date": as_of_str,
         "mode": mode,
         "request_hash": request_hash,
@@ -190,6 +195,7 @@ def run_local_analysis_sync(
     save_report: bool = False,
     force: bool = False,
     output_language: str = "English",
+    quant_enabled: bool = False,
 ) -> dict[str, Any]:
     """Synchronous wrapper around run_local_analysis for CLI use."""
     return asyncio.run(
@@ -202,5 +208,6 @@ def run_local_analysis_sync(
             save_report=save_report,
             force=force,
             output_language=output_language,
+            quant_enabled=quant_enabled,
         )
     )

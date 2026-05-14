@@ -1,6 +1,5 @@
 """Dashboard — Apex AI market intelligence cockpit."""
 
-
 from __future__ import annotations
 
 import sys as _sys
@@ -63,14 +62,15 @@ if api_available and live_signals:
     avg_conf = sum(s["confidence"] for s in live_signals) / len(live_signals)
     strongest = max(live_signals, key=lambda s: s["confidence"])
     hero_metrics = {
-        "market_regime":    {"value": "Live"},
+        "market_regime": {"value": "Live"},
         "analyzed_symbols": {"value": len(live_signals), "delta": f"{len(live_signals)} tickers"},
         "strongest_signal": {"value": strongest["symbol"], "signal": strongest["signal"]},
-        "avg_confidence":   {"value": avg_conf, "delta": None},
-        "system_health":    {"value": "Healthy"},
+        "avg_confidence": {"value": avg_conf, "delta": None},
+        "system_health": {"value": "Healthy"},
     }
 else:
     from apex.frontend.mock_data import HERO_METRICS as _MOCK_HERO
+
     hero_metrics = _MOCK_HERO
 
 # ── Fetch observability ────────────────────────────────────────────────────
@@ -96,8 +96,10 @@ with hdr_left:
 
 with hdr_mid:
     search = st.text_input(
-        "search", placeholder="Search symbols (e.g. AAPL)",
-        label_visibility="collapsed", key="dashboard_search",
+        "search",
+        placeholder="Search symbols (e.g. AAPL)",
+        label_visibility="collapsed",
+        key="dashboard_search",
     )
     if search:
         st.session_state.selected_symbol = search.strip().upper()
@@ -123,30 +125,37 @@ k1, k2, k3, k4, k5 = st.columns(5)
 
 with k1:
     hero_metric_card(
-        "Market Regime", hero_metrics["market_regime"]["value"],
-        sparkline=HERO_SPARKLINES["market_regime"], spark_color="#7C3AED",
+        "Market Regime",
+        hero_metrics["market_regime"]["value"],
+        sparkline=HERO_SPARKLINES["market_regime"],
+        spark_color="#7C3AED",
     )
 with k2:
     hero_metric_card(
-        "Analyzed Symbols", str(hero_metrics["analyzed_symbols"]["value"]),
+        "Analyzed Symbols",
+        str(hero_metrics["analyzed_symbols"]["value"]),
         delta=hero_metrics["analyzed_symbols"].get("delta"),
     )
 with k3:
     hero_metric_card(
-        "Strongest Signal", hero_metrics["strongest_signal"]["value"],
+        "Strongest Signal",
+        hero_metrics["strongest_signal"]["value"],
         signal_badge=hero_metrics["strongest_signal"]["signal"],
     )
 with k4:
     hero_metric_card(
         "Avg Confidence",
-        f'{hero_metrics["avg_confidence"]["value"]:.0%}',
+        f"{hero_metrics['avg_confidence']['value']:.0%}",
         delta=hero_metrics["avg_confidence"].get("delta"),
-        sparkline=HERO_SPARKLINES["avg_confidence"], spark_color="#00D4AA",
+        sparkline=HERO_SPARKLINES["avg_confidence"],
+        spark_color="#00D4AA",
     )
 with k5:
     hero_metric_card(
-        "System Health", hero_metrics["system_health"]["value"],
-        sparkline=HERO_SPARKLINES["system_health"], spark_color="#00D4AA",
+        "System Health",
+        hero_metrics["system_health"]["value"],
+        sparkline=HERO_SPARKLINES["system_health"],
+        spark_color="#00D4AA",
     )
 
 st.markdown('<div style="margin-bottom:8px;"></div>', unsafe_allow_html=True)
@@ -157,7 +166,9 @@ left_col, right_col = st.columns([1.1, 1.4])
 with left_col:
     with st.container(border=True):
         top_hdr, top_link = st.columns([3, 1])
-        top_hdr.markdown('<div style="font-size:15px;font-weight:600;color:#F0F0F0;">Top Signals</div>', unsafe_allow_html=True)
+        top_hdr.markdown(
+            '<div style="font-size:15px;font-weight:600;color:#F0F0F0;">Top Signals</div>', unsafe_allow_html=True
+        )
         top_link.page_link("pages/2_Signals.py", label="View all →")
         signal_leaderboard(top_signals[:5])
 
@@ -178,12 +189,13 @@ with right_col:
     with st.container(border=True):
         st.markdown(
             f'<div style="font-size:15px;font-weight:600;color:#F0F0F0;margin-bottom:8px;">'
-            f'{sym} — TradingView Chart</div>',
+            f"{sym} — TradingView Chart</div>",
             unsafe_allow_html=True,
         )
         tradingview_chart(symbol=sym, interval="D", height=400)
 
 st.markdown('<div style="margin-bottom:8px;"></div>', unsafe_allow_html=True)
+
 
 # ── Consensus + latest analysis helpers ───────────────────────────────────
 def _get_consensus(symbol: str) -> dict:  # type: ignore[type-arg]
@@ -199,20 +211,18 @@ def _get_consensus(symbol: str) -> dict:  # type: ignore[type-arg]
     consensus: dict = {}  # type: ignore[type-arg]
     for agent_name in ("technical", "fundamental", "risk"):
         agent_data = agent_outputs.get(agent_name) or {}
-        summary = (
-            agent_data.get("reasoning")
-            or agent_data.get("risk_factors")
-            or "Analysis complete."
-        )
+        summary = agent_data.get("reasoning") or agent_data.get("risk_factors") or "Analysis complete."
         consensus[agent_name] = {
-            "stance":  agent_data.get("signal", signal),
-            "color":   color,
+            "stance": agent_data.get("signal", signal),
+            "color": color,
             "summary": summary,
         }
     consensus["portfolio"] = {
-        "stance":  signal,
-        "color":   color,
-        "summary": result.get("summary", {}).get("usage_summary", {}) and "Synthesis complete." or "Synthesis complete.",
+        "stance": signal,
+        "color": color,
+        "summary": result.get("summary", {}).get("usage_summary", {})
+        and "Synthesis complete."
+        or "Synthesis complete.",
     }
     return consensus
 
@@ -229,11 +239,11 @@ def _get_latest_analysis(symbol: str) -> dict:  # type: ignore[type-arg]
     pm_data = agent_outputs.get("portfolio_manager") or {}
     explanation = pm_data.get("reasoning") or f"{result.get('signal', 'HOLD')} signal with {confidence:.0%} confidence."
     return {
-        "signal":        result.get("signal", "HOLD"),
-        "confidence":    confidence,
-        "risk":          risk,
+        "signal": result.get("signal", "HOLD"),
+        "confidence": confidence,
+        "risk": risk,
         "last_analysis": "just now",
-        "explanation":   explanation,
+        "explanation": explanation,
     }
 
 
@@ -243,22 +253,33 @@ b1, b2, b3 = st.columns([1, 1.2, 1])
 with b1:
     with st.container(border=True):
         hdr_c, hdr_l = st.columns([2, 1])
-        hdr_c.markdown(f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;">Agent Consensus ({sym})</div>', unsafe_allow_html=True)
+        hdr_c.markdown(
+            f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;">Agent Consensus ({sym})</div>',
+            unsafe_allow_html=True,
+        )
         hdr_l.page_link("pages/2_Signals.py", label="View details →")
         agent_consensus_panel(_get_consensus(sym))
 
 with b2:
     with st.container(border=True):
         hdr_c, hdr_l = st.columns([2, 1])
-        hdr_c.markdown('<div style="font-size:14px;font-weight:600;color:#F0F0F0;">Backtest Performance</div>', unsafe_allow_html=True)
+        hdr_c.markdown(
+            '<div style="font-size:14px;font-weight:600;color:#F0F0F0;">Backtest Performance</div>',
+            unsafe_allow_html=True,
+        )
         hdr_l.page_link("pages/3_Backtest.py", label="View full report →")
         backtest_performance_panel(BACKTEST_SUMMARY, BACKTEST_SPARKLINES)
 
 with b3:
     with st.container(border=True):
         hdr_c, hdr_l = st.columns([2, 1])
-        hdr_c.markdown('<div style="font-size:14px;font-weight:600;color:#F0F0F0;">Market Regime Detection</div>', unsafe_allow_html=True)
-        hdr_l.markdown('<div style="text-align:right;font-size:12px;color:#3B82F6;">View all</div>', unsafe_allow_html=True)
+        hdr_c.markdown(
+            '<div style="font-size:14px;font-weight:600;color:#F0F0F0;">Market Regime Detection</div>',
+            unsafe_allow_html=True,
+        )
+        hdr_l.markdown(
+            '<div style="text-align:right;font-size:12px;color:#3B82F6;">View all</div>', unsafe_allow_html=True
+        )
         market_regime_panel(MARKET_REGIME)
 
 st.markdown('<div style="margin-bottom:8px;"></div>', unsafe_allow_html=True)
@@ -268,13 +289,19 @@ obs_col, lat_col = st.columns([1.6, 1])
 
 with obs_col:
     with st.container(border=True):
-        st.markdown('<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:10px;">System Observability <span style="font-size:11px;color:#00D4AA;">(Live)</span></div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:10px;">System Observability <span style="font-size:11px;color:#00D4AA;">(Live)</span></div>',
+            unsafe_allow_html=True,
+        )
         observability_panel(observability, obs_sparklines)
 
 with lat_col:
     with st.container(border=True):
         hdr_c, hdr_l = st.columns([2, 1])
-        hdr_c.markdown(f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;">Latest Analysis ({sym})</div>', unsafe_allow_html=True)
+        hdr_c.markdown(
+            f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;">Latest Analysis ({sym})</div>',
+            unsafe_allow_html=True,
+        )
         hdr_l.page_link("pages/6_Observability.py", label="View all →")
         latest_analysis_card(sym, _get_latest_analysis(sym))
 
@@ -282,8 +309,8 @@ with lat_col:
 st.divider()
 st.markdown(
     '<div style="text-align:center;font-size:11px;color:#333;">'
-    'Disclaimer: Apex is an educational project. Not financial advice. Past performance does not predict future results.'
-    '&nbsp;&nbsp;|&nbsp;&nbsp;Built with ❤️ using Python, LangGraph, FastAPI, Streamlit'
-    '</div>',
+    "Disclaimer: Apex is an educational project. Not financial advice. Past performance does not predict future results."
+    "&nbsp;&nbsp;|&nbsp;&nbsp;Built with ❤️ using Python, LangGraph, FastAPI, Streamlit"
+    "</div>",
     unsafe_allow_html=True,
 )

@@ -1,6 +1,5 @@
 """Observability — system health, API metrics, LLM cost."""
 
-
 from __future__ import annotations
 
 import sys as _sys
@@ -41,7 +40,10 @@ if not api_available:
     st.warning("⚠️ API unavailable — showing cached demo data.", icon="⚠️")
 
 with st.container(border=True):
-    st.markdown('<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:12px;">System Observability <span style="font-size:11px;color:#00D4AA;">(Live)</span></div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:12px;">System Observability <span style="font-size:11px;color:#00D4AA;">(Live)</span></div>',
+        unsafe_allow_html=True,
+    )
     observability_panel(observability, _MOCK_OBS_SPARKLINES)
 
 st.divider()
@@ -61,17 +63,17 @@ with c2:
         # Distribute evenly across 4 agents as approximation
         per_agent = total_cost / 4 if total_cost else None
         cost_data = {
-            "Technical Agent":   f"${per_agent:.4f}" if per_agent is not None else "—",
+            "Technical Agent": f"${per_agent:.4f}" if per_agent is not None else "—",
             "Fundamental Agent": f"${per_agent:.4f}" if per_agent is not None else "—",
-            "Risk Agent":        f"${per_agent:.4f}" if per_agent is not None else "—",
+            "Risk Agent": f"${per_agent:.4f}" if per_agent is not None else "—",
             "Portfolio Manager": f"${per_agent:.4f}" if per_agent is not None else "—",
         }
         total_label = f"${total_cost:.4f}" if total_cost else "—"
     else:
         cost_data = {
-            "Technical Agent":   "$0.12",
+            "Technical Agent": "$0.12",
             "Fundamental Agent": "$0.09",
-            "Risk Agent":        "$0.08",
+            "Risk Agent": "$0.08",
             "Portfolio Manager": "$0.13",
         }
         total_label = f"${observability['llm_cost_today']:.2f}"
@@ -81,13 +83,13 @@ with c2:
             f'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1E2535;">'
             f'<span style="color:#AAA;font-size:13px;">{agent}</span>'
             f'<span style="color:#F0F0F0;font-weight:600;font-size:13px;">{cost}</span>'
-            f'</div>',
+            f"</div>",
             unsafe_allow_html=True,
         )
     st.markdown(
         f'<div style="display:flex;justify-content:space-between;padding:8px 0;">'
         f'<span style="color:#F0F0F0;font-weight:600;">Total Today</span>'
         f'<span style="color:#00D4AA;font-weight:700;">{total_label}</span>'
-        f'</div>',
+        f"</div>",
         unsafe_allow_html=True,
     )

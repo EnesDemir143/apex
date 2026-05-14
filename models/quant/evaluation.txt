@@ -1,0 +1,89 @@
+============================================================
+MODEL EVALUATION
+============================================================
+
+Random Forest:
+  Accuracy:  0.4996
+  Precision: 0.5135
+  Recall:    0.6994
+  F1:        0.5922
+
+              precision    recall  f1-score   support
+
+         0.0       0.47      0.28      0.35       603
+         1.0       0.51      0.70      0.59       652
+
+    accuracy                           0.50      1255
+   macro avg       0.49      0.49      0.47      1255
+weighted avg       0.49      0.50      0.48      1255
+
+
+XGBoost:
+  Accuracy:  0.5020
+  Precision: 0.5163
+  Recall:    0.6549
+  F1:        0.5774
+
+              precision    recall  f1-score   support
+
+         0.0       0.47      0.34      0.39       603
+         1.0       0.52      0.65      0.58       652
+
+    accuracy                           0.50      1255
+   macro avg       0.50      0.50      0.49      1255
+weighted avg       0.50      0.50      0.49      1255
+
+
+LightGBM:
+  Accuracy:  0.5124
+  Precision: 0.5246
+  Recall:    0.6534
+  F1:        0.5820
+
+              precision    recall  f1-score   support
+
+         0.0       0.49      0.36      0.41       603
+         1.0       0.52      0.65      0.58       652
+
+    accuracy                           0.51      1255
+   macro avg       0.51      0.51      0.50      1255
+weighted avg       0.51      0.51      0.50      1255
+
+
+CatBoost:
+  Accuracy:  0.5044
+  Precision: 0.5219
+  Recall:    0.5475
+  F1:        0.5344
+
+              precision    recall  f1-score   support
+
+         0.0       0.48      0.46      0.47       603
+         1.0       0.52      0.55      0.53       652
+
+    accuracy                           0.50      1255
+   macro avg       0.50      0.50      0.50      1255
+weighted avg       0.50      0.50      0.50      1255
+
+
+Ensemble (RidgeCV):
+  Accuracy:  0.5243
+  Precision: 0.5238
+  Recall:    0.9294
+  F1:        0.6700
+
+Confusion Matrix:
+[[ 52 551]
+ [ 46 606]]
+
+Top 10 Features:
+  volume_ratio: 0.0554
+  close_low_ratio: 0.0535
+  return_1d: 0.0527
+  close_high_ratio: 0.0515
+  return_5d: 0.0504
+  sma50_ratio: 0.0493
+  volatility_5d: 0.0493
+  bollinger_pctb: 0.0483
+  rsi_14: 0.0482
+  volume_price_trend: 0.0467

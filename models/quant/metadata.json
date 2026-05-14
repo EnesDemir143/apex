@@ -1,0 +1,40 @@
+{
+  "model_version": "rf+xgb+lgbm+cb_v1",
+  "features": [
+    "return_1d",
+    "return_5d",
+    "return_21d",
+    "volatility_5d",
+    "volatility_21d",
+    "close_high_ratio",
+    "close_low_ratio",
+    "high_low_ratio",
+    "rsi_14",
+    "macd",
+    "macd_signal",
+    "macd_histogram",
+    "bollinger_pctb",
+    "sma20_ratio",
+    "sma50_ratio",
+    "volume_ratio",
+    "volume_price_trend",
+    "rolling_min_5d",
+    "rolling_max_5d",
+    "rolling_mean_5d",
+    "rolling_min_21d",
+    "rolling_max_21d",
+    "rolling_mean_21d"
+  ],
+  "n_estimators": 200,
+  "ensemble": "RidgeCV",
+  "n_train": 5020,
+  "n_test": 1255,
+  "train_date": "2026-05-15",
+  "tickers": [
+    "AAPL",
+    "MSFT",
+    "NVDA",
+    "TSLA",
+    "SPY"
+  ]
+}

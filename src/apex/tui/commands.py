@@ -8,14 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from apex.tui.state import TuiState
 
-# Commands that are deferred to a later phase
-_PLANNED: dict[str, str] = {
-    "history": "Phase 15",
-    "report": "Phase 15",
-    "replay": "Phase 15",
-    "provider": "Phase 17 (read-only display available via /model)",
-    "model": "Phase 17 (read-only display available)",
-}
+VALID_AGENT_KEYS = {"technical", "fundamental", "risk"}
 
 COMMAND_HELP: dict[str, str] = {
     "chat": "/chat — return to main screen",
@@ -32,10 +25,11 @@ COMMAND_HELP: dict[str, str] = {
     "agents": "/agents — show enabled agents",
     "events": "/events — show event log",
     "lang": "/lang — show or switch report language (English / Turkish)",
+    "prompt": "/prompt — show or set agent prompts",
+    "quant": "/quant — show or toggle Quant ML agent (requires trained models)",
     "help": "/help — list all commands",
-    "history": "/history — list previous runs (Phase 15)",
-    "report": "/report — view latest report (Phase 15)",
-    "provider": "/provider — show/switch LLM provider (Phase 17)",
+    "history": "/history — list previous runs",
+    "report": "/report — view latest report",
     "model": "/model — show current LLM model",
 }
 
@@ -44,7 +38,7 @@ CHART_COMMAND_HELP: dict[str, str] = {
     "inspect": "/inspect — enter bar-inspect mode (Tab to move, Enter to inspect)",
     "refresh": "/refresh — reload chart data",
     "zoom": "/zoom + | - — zoom chart in or out",
-    "set-tf":    "/set-tf — show timeframe options",
+    "set-tf": "/set-tf — show timeframe options",
     "set-tf-1m": "/set-tf-1m — set timeframe to 1 minute",
     "set-tf-5m": "/set-tf-5m — set timeframe to 5 minutes",
     "set-tf-1h": "/set-tf-1h — set timeframe to 1 hour",
@@ -197,8 +191,7 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
             return CommandResult(
                 action="info",
                 title="Language",
-                message=f"Current report language: {current}\n"
-                        f"Usage: /lang English  or  /lang Turkish",
+                message=f"Current report language: {current}\nUsage: /lang English  or  /lang Turkish",
             )
         lang = args[0].capitalize()
         if lang not in ("English", "Turkish"):
@@ -214,13 +207,108 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
             message=f"Report language set to {lang}. Next analysis will use {lang}.",
         )
 
-    if cmd in _PLANNED:
-        phase = _PLANNED[cmd]
+    if cmd == "quant":
+        if not args:
+            status = "enabled" if state.setup.quant_enabled else "disabled"
+            device = state.setup.ml_device
+            # Check if models exist
+            from pathlib import Path
+
+            models_path = Path("models/quant")
+            models_ready = "yes" if models_path.exists() and any(models_path.glob("*.pkl")) else "no"
+            return CommandResult(
+                action="info",
+                title="Quant ML Agent",
+                message=(
+                    f"Quant ML Agent: {status}\n"
+                    f"ML Device: {device}\n"
+                    f"Models trained: {models_ready}\n"
+                    f"Usage: /quant on | /quant off  to toggle\n"
+                    f"       /quant device auto|cpu|mps|cuda  to set device"
+                ),
+            )
+
+        sub = args[0].lower()
+        if sub in ("on", "enable", "1", "true"):
+            state.setup.quant_enabled = True
+            return CommandResult(
+                action="info",
+                title="Quant ML Agent",
+                message="Quant ML Agent enabled. Next analysis will include quant signal.",
+            )
+        elif sub in ("off", "disable", "0", "false"):
+            state.setup.quant_enabled = False
+            return CommandResult(
+                action="info", title="Quant ML Agent", message="Quant ML Agent disabled. LLM-only analysis."
+            )
+        elif sub == "device" and len(args) >= 2:
+            device = args[1].lower()
+            if device in ("auto", "cpu", "mps", "cuda"):
+                state.setup.ml_device = device
+                return CommandResult(action="info", title="Quant ML Agent", message=f"ML device set to {device}.")
+            return CommandResult(
+                action="error",
+                title="Command Error",
+                message=f"Unsupported device: {device}. Options: auto, cpu, mps, cuda.",
+            )
+        else:
+            return CommandResult(
+                action="error", title="Command Error", message=f"Unknown quant option: {sub}. Try: on, off, device."
+            )
+
+    if cmd == "prompt":
+        if not args:
+            global_inst = state.setup.global_instructions or "(none)"
+            agent_lines = []
+            for name in ("technical", "fundamental", "risk"):
+                val = state.setup.agent_instructions.get(name)
+                agent_lines.append(f"  {name}: {val or '(none)'}")
+            return CommandResult(
+                action="info",
+                title="Agent Prompts",
+                message=(
+                    f"Global: {global_inst}\n"
+                    f"{chr(10).join(agent_lines)}\n\n"
+                    f"Usage:\n"
+                    f'  /prompt global "text"\n'
+                    f'  /prompt technical "text"\n'
+                    f'  /prompt fundamental "text"\n'
+                    f'  /prompt risk "text"\n'
+                    f"  /prompt clear"
+                ),
+            )
+
+        sub = args[0].lower()
+        rest = " ".join(args[1:]) if len(args) > 1 else ""
+
+        if sub == "clear":
+            state.setup.global_instructions = ""
+            state.setup.agent_instructions = {}
+            return CommandResult(action="info", title="Agent Prompts", message="All agent prompts cleared.")
+
+        if sub == "global":
+            state.setup.global_instructions = rest
+            return CommandResult(
+                action="info",
+                title="Agent Prompts",
+                message=f"Global instruction set: {rest}" if rest else "Global instruction cleared.",
+            )
+
+        if sub in VALID_AGENT_KEYS:
+            if rest:
+                state.setup.agent_instructions[sub] = rest
+            else:
+                state.setup.agent_instructions.pop(sub, None)
+            return CommandResult(
+                action="info",
+                title="Agent Prompts",
+                message=f"Prompt for {sub}: {rest}" if rest else f"Prompt for {sub} cleared.",
+            )
+
         return CommandResult(
-            action="info",
-            title=f"/{cmd}",
-            planned_phase=phase,
-            message=f"/{cmd} is planned for {phase}.",
+            action="error",
+            title="Command Error",
+            message=f"Unknown agent: {sub}. Valid: global, technical, fundamental, risk.",
         )
 
     return CommandResult(action="error", title="Command Error", message=f"Unknown command: /{cmd}. Type /help.")

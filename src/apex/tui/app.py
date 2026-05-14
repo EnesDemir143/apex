@@ -456,6 +456,7 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
 
     def compose(self) -> ComposeResult:
         from textual.containers import Horizontal as HBox
+
         yield Header(show_clock=True)
         with HBox(id="chart-layout"):
             chart_panel = ChartPanel(id="chart-panel")
@@ -476,11 +477,16 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
     # ── chart-specific command handler ────────────────────────────────────
 
     _TF_ALIASES: dict[str, str] = {
-        "1m": "1m", "5m": "5m", "15m": "15m",
-        "1h": "1h", "h": "1h",
+        "1m": "1m",
+        "5m": "5m",
+        "15m": "15m",
+        "1h": "1h",
+        "h": "1h",
         "4h": "4h",
-        "1d": "1d", "d": "1d",
-        "1w": "1w", "w": "1w",
+        "1d": "1d",
+        "d": "1d",
+        "1w": "1w",
+        "w": "1w",
     }
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
@@ -498,13 +504,11 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
 
         # ── /set-tf-1d  or  /set-tf  (hyphenated format) ─────────────────
         if cmd.startswith("set-tf"):
-            remainder = cmd[len("set-tf"):]  # "" | "-1d" | "-1m" etc.
+            remainder = cmd[len("set-tf") :]  # "" | "-1d" | "-1m" etc.
             tf_token = remainder.lstrip("-") or (args[0].lower() if args else "")
             if not tf_token:
                 self._chart_notify(
-                    "Timeframe options:\n"
-                    "  /set-tf-1m   /set-tf-5m   /set-tf-1h\n"
-                    "  /set-tf-4h   /set-tf-1d   /set-tf-1w"
+                    "Timeframe options:\n  /set-tf-1m   /set-tf-5m   /set-tf-1h\n  /set-tf-4h   /set-tf-1d   /set-tf-1w"
                 )
                 return
             tf = self._TF_ALIASES.get(tf_token)
@@ -575,6 +579,7 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
 
         # Everything else → global dispatcher
         from apex.tui.commands import dispatch
+
         result = dispatch(raw, self.app._state)  # type: ignore[attr-defined]
         self.app._handle_result(result)  # type: ignore[attr-defined]
 
@@ -582,12 +587,10 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
         """Show a brief notification in the chart bar-info strip."""
         try:
             from textual.widgets import Static
-            self._panel().query_one("#chart-bar-info", Static).update(
-                f"[bold #58a6ff]ℹ[/bold #58a6ff]  {msg}"
-            )
+
+            self._panel().query_one("#chart-bar-info", Static).update(f"[bold #58a6ff]ℹ[/bold #58a6ff]  {msg}")
         except Exception:
             pass
-
 
     def action_crosshair_left(self) -> None:
         p = self._panel()
@@ -651,6 +654,7 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
 
     async def _fetch_for_timeframe(self, tf: str) -> None:
         from apex.services.market_snapshot import get_market_snapshot
+
         days_map = {"1m": 5, "5m": 10, "1h": 30, "1d": 120}
         days = days_map.get(tf, 60)
         try:
@@ -793,6 +797,7 @@ class ApexTuiApp(App[None]):
             # Activate bar-inspect mode on the current ChartScreen if open
             try:
                 from apex.tui.app import ChartScreen as _CS  # noqa: F401, N814
+
                 if isinstance(self.screen, ChartScreen):
                     self.screen.action_enter_bar_inspect()
                 else:
@@ -830,6 +835,7 @@ class ApexTuiApp(App[None]):
                 extra_instructions=setup.global_instructions or None,
                 agent_instructions=setup.agent_instructions or None,
                 output_language=setup.language,
+                quant_enabled=setup.quant_enabled,
             )
         except Exception as exc:
             self._state.analysis.status = "error"
@@ -846,6 +852,11 @@ class ApexTuiApp(App[None]):
         self._state.analysis.agent_outputs = result.get("agent_outputs") or {}
         self._state.analysis.analysis_date = result.get("analysis_date", "")
 
+        # Track quant output for report
+        quant = result.get("quant_analysis") or {}
+        if quant.get("model_available"):
+            self._state.analysis.quant_output = quant
+
         elapsed = time.monotonic() - self._analysis_start
         signal = result["signal"]
         conf = result["confidence"]
@@ -860,6 +871,20 @@ class ApexTuiApp(App[None]):
             f"Date: {result.get('analysis_date', '')}  "
             f"Tokens: {tokens}  Cost: ${cost:.4f}  Elapsed: {elapsed:.1f}s"
         )
+
+        # Append quant ML info if available
+        quant = result.get("quant_analysis") or {}
+        if quant.get("model_available"):
+            quant_signal = quant.get("signal", "HOLD")
+            quant_conf = quant.get("confidence", 0.0)
+            quant_model = quant.get("model_version", "?")
+            quant_device = quant.get("device", "?")
+            report += (
+                f"\n[bold #58a6ff]Quant ML:[/bold #58a6ff] "
+                f"{quant_signal} ({quant_conf:.0%})  "
+                f"model={quant_model}  device={quant_device}"
+            )
+
         if self._state.analysis.errors:
             report += "\n[red]Errors:[/red] " + "; ".join(self._state.analysis.errors)
 
@@ -949,6 +974,12 @@ class ApexTuiApp(App[None]):
         except Exception:
             pass
 
+    def _quant_footer_info(self) -> str:
+        """Build quant status string for the footer."""
+        if self._state.setup.quant_enabled:
+            return f"[bold #58a6ff]Quant: on[/bold #58a6ff] ({self._state.setup.ml_device})"
+        return ""
+
     def _update_footer(
         self,
         done: int = 0,
@@ -956,10 +987,16 @@ class ApexTuiApp(App[None]):
         cost: float = 0.0,
         elapsed: float = 0.0,
     ) -> None:
+        total = 5 if self._state.setup.quant_enabled else 4
         try:
             screen = self.screen
             screen.query_one("#footer-stats", FooterStats).update_stats(
-                done=done, total=4, tokens=tokens, cost=cost, elapsed=elapsed
+                done=done,
+                total=total,
+                tokens=tokens,
+                cost=cost,
+                elapsed=elapsed,
+                quant_info=self._quant_footer_info(),
             )
         except Exception:
             pass

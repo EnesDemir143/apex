@@ -3,6 +3,7 @@
 from apex.agents.fundamental import fundamental_agent
 from apex.agents.hooks import post_analysis_hook, pre_analysis_hook
 from apex.agents.portfolio_manager import portfolio_manager
+from apex.agents.quant import quant_agent
 from apex.agents.risk import risk_agent
 from apex.agents.state import AgentState
 from apex.agents.technical import technical_agent
@@ -18,9 +19,10 @@ __all__ = [
     "create_workflow",
     "create_workflow_with_checkpointer",
     "fundamental_agent",
-    "post_analysis_hook",
     "portfolio_manager",
+    "post_analysis_hook",
     "pre_analysis_hook",
+    "quant_agent",
     "risk_agent",
     "technical_agent",
 ]

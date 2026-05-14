@@ -16,8 +16,7 @@ def _svg_sparkline(values: list[float], color: str = "#00D4AA", width: int = 80,
     pad = 2
     w, h = width - pad * 2, height - pad * 2
     pts = " ".join(
-        f"{pad + i * w / (len(values) - 1):.1f},{pad + h - (v - mn) / rng * h:.1f}"
-        for i, v in enumerate(values)
+        f"{pad + i * w / (len(values) - 1):.1f},{pad + h - (v - mn) / rng * h:.1f}" for i, v in enumerate(values)
     )
     return (
         f'<svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
@@ -42,7 +41,7 @@ def hero_metric_card(
         c = _SIGNAL_COLOR.get(signal_badge, "#888")
         badge_html = (
             f'<span style="background:{c}22;color:{c};border:1px solid {c}55;'
-            f'border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;'
+            f"border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;"
             f'margin-left:8px;">{signal_badge}</span>'
         )
 
@@ -54,7 +53,7 @@ def hero_metric_card(
     if sparkline:
         spark_html = (
             f'<div style="position:absolute;bottom:12px;right:12px;opacity:0.7;">'
-            f'{_svg_sparkline(sparkline, color=spark_color)}</div>'
+            f"{_svg_sparkline(sparkline, color=spark_color)}</div>"
         )
 
     st.markdown(

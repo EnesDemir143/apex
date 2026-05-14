@@ -5,9 +5,18 @@ from __future__ import annotations
 import streamlit.components.v1 as components
 
 _EXCHANGE_MAP = {
-    "AAPL": "NASDAQ", "NVDA": "NASDAQ", "TSLA": "NASDAQ", "MSFT": "NASDAQ",
-    "AMZN": "NASDAQ", "GOOGL": "NASDAQ", "META": "NASDAQ", "AMD": "NASDAQ",
-    "NFLX": "NASDAQ", "CRM": "NYSE",    "INTC": "NASDAQ", "PYPL": "NASDAQ",
+    "AAPL": "NASDAQ",
+    "NVDA": "NASDAQ",
+    "TSLA": "NASDAQ",
+    "MSFT": "NASDAQ",
+    "AMZN": "NASDAQ",
+    "GOOGL": "NASDAQ",
+    "META": "NASDAQ",
+    "AMD": "NASDAQ",
+    "NFLX": "NASDAQ",
+    "CRM": "NYSE",
+    "INTC": "NASDAQ",
+    "PYPL": "NASDAQ",
     "UBER": "NYSE",
 }
 

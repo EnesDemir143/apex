@@ -17,7 +17,7 @@ _TICKER_NAMES: dict[str, str] = {
     "MSFT": "Microsoft Corp.",
     "NVDA": "NVIDIA Corp.",
     "TSLA": "Tesla Inc.",
-    "SPY":  "SPDR S&P 500 ETF",
+    "SPY": "SPDR S&P 500 ETF",
     "GOOGL": "Alphabet Inc.",
 }
 
@@ -96,15 +96,17 @@ def fetch_all_signals(tickers: tuple[str, ...]) -> list[dict[str, Any]]:
             result.get("summary", {}).get("agent_outputs") if result.get("summary") else None
         )
         confidence: float = result.get("confidence", 0.0) or 0.0
-        rows.append({
-            "symbol":        ticker,
-            "name":          _TICKER_NAMES.get(ticker, ticker),
-            "signal":        result.get("signal", "HOLD"),
-            "confidence":    confidence,
-            "risk":          _confidence_to_risk(confidence),
-            "agreement":     _agent_outputs_to_agreement(agent_outputs),
-            "last_analysis": datetime.now().strftime("%H:%M"),
-        })
+        rows.append(
+            {
+                "symbol": ticker,
+                "name": _TICKER_NAMES.get(ticker, ticker),
+                "signal": result.get("signal", "HOLD"),
+                "confidence": confidence,
+                "risk": _confidence_to_risk(confidence),
+                "agreement": _agent_outputs_to_agreement(agent_outputs),
+                "last_analysis": datetime.now().strftime("%H:%M"),
+            }
+        )
     return rows
 
 
@@ -117,11 +119,11 @@ def fetch_observability() -> dict[str, Any]:
     health = fetch_health()
     status = health.get("status", "unreachable")
     return {
-        "api_latency_ms":   None,          # not available from /health
-        "cache_hit_rate":   None,
-        "llm_cost_today":   None,
+        "api_latency_ms": None,  # not available from /health
+        "cache_hit_rate": None,
+        "llm_cost_today": None,
         "agent_runs_today": None,
-        "failed_runs":      None,
-        "data_provider":    "Healthy" if status == "ok" else status.capitalize(),
-        "_health_raw":      health,
+        "failed_runs": None,
+        "data_provider": "Healthy" if status == "ok" else status.capitalize(),
+        "_health_raw": health,
     }

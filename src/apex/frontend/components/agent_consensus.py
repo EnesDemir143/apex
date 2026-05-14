@@ -5,27 +5,27 @@ from __future__ import annotations
 import streamlit as st
 
 _AGENT_ICONS = {
-    "technical":   "⚙️",
+    "technical": "⚙️",
     "fundamental": "📊",
-    "risk":        "🛡️",
-    "portfolio":   "🎯",
+    "risk": "🛡️",
+    "portfolio": "🎯",
 }
 _AGENT_LABELS = {
-    "technical":   "Technical Agent",
+    "technical": "Technical Agent",
     "fundamental": "Fundamental Agent",
-    "risk":        "Risk Agent",
-    "portfolio":   "Portfolio Manager",
+    "risk": "Risk Agent",
+    "portfolio": "Portfolio Manager",
 }
 
 
 def agent_consensus_panel(consensus: dict) -> None:
     """Render 4-agent consensus rows matching the mockup."""
     for key in ["technical", "fundamental", "risk", "portfolio"]:
-        data   = consensus.get(key, {})
-        icon   = _AGENT_ICONS[key]
-        label  = _AGENT_LABELS[key]
+        data = consensus.get(key, {})
+        icon = _AGENT_ICONS[key]
+        label = _AGENT_LABELS[key]
         stance = data.get("stance", "—")
-        color  = data.get("color", "#888")
+        color = data.get("color", "#888")
         summary = data.get("summary", "")
 
         st.markdown(

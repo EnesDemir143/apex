@@ -276,3 +276,6 @@ assets/
 
 .env.plane.local
 .env.plane.local.example
+.firecrawl/
+.snakemake/
+catboost_info/

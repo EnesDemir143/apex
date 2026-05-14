@@ -10,19 +10,20 @@ from apex.frontend.components.metric_card import _svg_sparkline
 def observability_panel(obs: dict, sparklines: dict) -> None:
     """6-column observability metrics matching the mockup."""
     metrics = [
-        ("API Latency",      f'{obs["api_latency_ms"]} ms',       "#3B82F6", sparklines.get("latency", [])),
-        ("Cache Hit Rate",   f'{obs["cache_hit_rate"]:.0%}',       "#00D4AA", sparklines.get("cache", [])),
-        ("LLM Cost Today",   f'${obs["llm_cost_today"]:.2f}',      "#7C3AED", sparklines.get("cost", [])),
-        ("Agent Runs Today", str(obs["agent_runs_today"]),          "#F59E0B", sparklines.get("runs", [])),
-        ("Failed Runs",      str(obs["failed_runs"]),               "#FF4B4B", sparklines.get("failed", [])),
-        ("Data Provider",    obs["data_provider"],                  "#00D4AA", sparklines.get("provider", [])),
+        ("API Latency", f"{obs['api_latency_ms']} ms", "#3B82F6", sparklines.get("latency", [])),
+        ("Cache Hit Rate", f"{obs['cache_hit_rate']:.0%}", "#00D4AA", sparklines.get("cache", [])),
+        ("LLM Cost Today", f"${obs['llm_cost_today']:.2f}", "#7C3AED", sparklines.get("cost", [])),
+        ("Agent Runs Today", str(obs["agent_runs_today"]), "#F59E0B", sparklines.get("runs", [])),
+        ("Failed Runs", str(obs["failed_runs"]), "#FF4B4B", sparklines.get("failed", [])),
+        ("Data Provider", obs["data_provider"], "#00D4AA", sparklines.get("provider", [])),
     ]
 
     cols = st.columns(6)
     for col, (title, value, color, spark) in zip(cols, metrics):
         spark_html = (
             f'<div style="margin-top:4px;">{_svg_sparkline(spark, color=color, width=80, height=24)}</div>'
-            if spark else ""
+            if spark
+            else ""
         )
         col.markdown(
             f"""

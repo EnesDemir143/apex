@@ -1,6 +1,5 @@
 """Replay Mode — step through historical agent decisions."""
 
-
 from __future__ import annotations
 
 import sys as _sys
@@ -37,14 +36,23 @@ with col_nav:
     st.markdown(f"**Event {idx + 1} / {len(events)}**")
     c1, c2, c3 = st.columns(3)
     if c1.button("⏮ First"):
-        st.session_state.replay_idx = 0; st.rerun()
+        st.session_state.replay_idx = 0
+        st.rerun()
     if c2.button("◀ Prev") and idx > 0:
-        st.session_state.replay_idx -= 1; st.rerun()
+        st.session_state.replay_idx -= 1
+        st.rerun()
     if c3.button("Next ▶") and idx < len(events) - 1:
-        st.session_state.replay_idx += 1; st.rerun()
+        st.session_state.replay_idx += 1
+        st.rerun()
 
-    st.slider("Jump to event", 0, len(events) - 1, idx, key="replay_slider",
-              on_change=lambda: setattr(st.session_state, "replay_idx", st.session_state.replay_slider))
+    st.slider(
+        "Jump to event",
+        0,
+        len(events) - 1,
+        idx,
+        key="replay_slider",
+        on_change=lambda: setattr(st.session_state, "replay_idx", st.session_state.replay_slider),
+    )
 
 with col_card:
     sc = _SIG_COLOR.get(event["signal"], "#888")
@@ -52,14 +60,14 @@ with col_card:
     st.markdown(
         f"""
         <div style="background:#161B27;border:1px solid #2A2F3E;border-radius:10px;padding:20px;">
-            <div style="font-size:12px;color:#555;margin-bottom:4px;">{event['date']} · {sym}</div>
-            <div style="font-size:32px;font-weight:700;color:{sc};">{event['signal']}</div>
+            <div style="font-size:12px;color:#555;margin-bottom:4px;">{event["date"]} · {sym}</div>
+            <div style="font-size:32px;font-weight:700;color:{sc};">{event["signal"]}</div>
             <div style="display:flex;gap:16px;margin-top:8px;">
-                <span style="font-size:13px;color:#AAA;">Confidence: <b style="color:#F0F0F0;">{event['confidence']:.0%}</b></span>
-                <span style="font-size:13px;color:#AAA;">Risk: <b style="color:{rc};">{event['risk']}</b></span>
+                <span style="font-size:13px;color:#AAA;">Confidence: <b style="color:#F0F0F0;">{event["confidence"]:.0%}</b></span>
+                <span style="font-size:13px;color:#AAA;">Risk: <b style="color:{rc};">{event["risk"]}</b></span>
             </div>
             <div style="margin-top:12px;font-size:13px;color:#888;border-top:1px solid #2A2F3E;padding-top:10px;">
-                {event['explanation']}
+                {event["explanation"]}
             </div>
         </div>
         """,

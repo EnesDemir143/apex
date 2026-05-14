@@ -283,18 +283,18 @@
 4. Metadata records selected language
 5. Tests prove default English behavior is unchanged
 
-### Phase 19: Optional Quant ML Agent + Device Selection
-**Goal:** Add optional ML-based Quant Agent with CPU/MPS/CUDA device selection after the TUI/report/provider stack is stable
+### Phase 19: 4-Model Ensemble Quant ML Agent + Training Pipeline
+**Goal:** Add optional 4-model ensemble Quant Agent (Random Forest + XGBoost + LightGBM + CatBoost) with Snakemake training pipeline, joblib persistence, and TUI integration
 **Bet:** 5+ | **Priority:** P4
 **Requirements:** ML-01, ML-02, ML-03
-**Depends on:** Phase 14, Phase 15, Phase 17
+**Depends on:** Phase 14, Phase 15, Phase 17, Phase 18
 **UI hint:** yes
 **Success criteria:**
-1. Quant Agent can be enabled/disabled without breaking the existing 4-agent workflow
-2. Quant Agent returns signal, confidence, reasoning/top features, model version, and selected device
-3. Device selector supports auto/cpu/mps/cuda with CPU guaranteed and unavailable accelerators handled safely
-4. TUI setup shows Quant/model/device controls only when this feature exists
-5. Portfolio Manager can include Quant output when present but does not require it
+1. Snakemake training pipeline (Snakefile_train) fetches OHLCV, engineers features, trains 4 models, saves with joblib
+2. All 4 ML deps are optional (`uv sync --group quant`), core install stays lean
+3. Quant Agent enables/disables without breaking existing 4-agent workflow
+4. Ensemble returns BUY/SELL/HOLD + confidence + top 3 features + model_version + device
+5. TUI setup shows Quant toggle, device selector, and model version
 
 ---
 
@@ -320,11 +320,11 @@
 | 15 | Reports, History, Replay | 5 | ✅ | 1/1 | 100% |
 | 16 | Web Stack Freeze + Revival Docs | 5 | ✅ | 1/1 | 100% |
 | 17 | Local RAG Lite + Provider Options | 5 | ✅ | 1/1 | 100% |
-| 18 | Turkish Output / Localization | 5 | 📋 | 1/1 | 0% |
-| 19 | Optional Quant ML Agent + Device Selection | 5+ | 📋 | 1/1 | 0% |
+| 18 | Turkish Output / Localization | 5 | ✅ | 1/1 | 100% |
+| 19 | Optional Quant ML Agent + Device Selection | 5+ | ✅ | 1/1 | 100% |
 
-**Total:** 20 phases | 32 plans | 18 phases complete, 2 Bet 5 pivot phases remaining
+**Total:** 20 phases | 32 plans | 20/20 phases complete ✅ — **v1.0 milestone complete!**
 
 ---
 *Roadmap created: 2026-04-28*
-*Last updated: 2026-05-15 — Phase 17 complete: local RAG lite + provider options.*
+*Last updated: 2026-05-15 — Phase 19 complete: v1.0 milestone fully delivered.*

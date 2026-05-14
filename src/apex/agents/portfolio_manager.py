@@ -18,16 +18,26 @@ from apex.services.llm_client import OpenAIClient
 
 
 async def portfolio_manager(state: AgentState) -> AgentState:
-    """Synthesize specialist analyses into a final BUY/SELL/HOLD decision."""
+    """Synthesize specialist analyses into a final BUY/SELL/HOLD decision.
+
+    When quant_analysis is present and has a non-HOLD signal, it is included
+    as an additional input for the portfolio manager.
+    """
     agent_name = "portfolio_manager"
     ticker = state["ticker"]
     try:
-        inputs = {
+        inputs: dict[str, Any] = {
             "technical": state.get("technical_analysis"),
             "fundamental": state.get("fundamental_analysis"),
             "risk": state.get("risk_assessment"),
             "errors": state.get("errors", []),
         }
+
+        # Include quant analysis when available and non-HOLD
+        quant = state.get("quant_analysis")
+        if quant and quant.get("model_available") and quant.get("signal") != "HOLD":
+            inputs["quant"] = quant
+
         prompt = (
             f"Synthesize the specialist outputs for {ticker}. "
             "Return BUY, SELL, or HOLD with confidence 0-1 and concise reasoning. "

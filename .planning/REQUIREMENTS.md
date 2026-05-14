@@ -175,9 +175,9 @@ Requirements for initial release (Bet 1–3 + Cooldown). Each maps to roadmap ph
 
 ### Optional ML / Quant Extension
 
-- **ML-01**: Optional Quant Agent — ML-based signal node can be enabled after TUI/report/provider stack is stable; disabled path preserves existing 4-agent workflow.
-- **ML-02**: ML device selection — setup/config supports auto/cpu/mps/cuda with CPU guaranteed and safe handling for unavailable accelerators.
-- **ML-03**: Quant output integration — Quant Agent emits signal, confidence, top features/reasoning, model version, device, and latency metadata; Portfolio Manager can consume it when present.
+- [x] **ML-01**: Optional Quant Agent — ML-based signal node can be enabled after TUI/report/provider stack is stable; disabled path preserves existing 4-agent workflow.
+- [x] **ML-02**: ML device selection — setup/config supports auto/cpu/mps/cuda with CPU guaranteed and safe handling for unavailable accelerators.
+- [x] **ML-03**: Quant output integration — Quant Agent emits signal, confidence, top features/reasoning, model version, device, and latency metadata; Portfolio Manager can consume it when present.
 
 ### Documentation
 
@@ -305,14 +305,15 @@ Requirements for initial release (Bet 1–3 + Cooldown). Each maps to roadmap ph
 | TUI-12 | Phase 14.1 | Planned |
 | DOC-01 | Phase 12 | Planned |
 | DOC-02 | Phase 16 | Planned |
-| ML-01 | Phase 19 | Planned |
-| ML-02 | Phase 19 | Planned |
-| ML-03 | Phase 19 | Planned |
+| ML-01 | Phase 19 | ✅ Complete |
+| ML-02 | Phase 19 | ✅ Complete |
+| ML-03 | Phase 19 | ✅ Complete |
 
 **Coverage:**
 - v1 requirements: 71 total
 - Bet 5 TUI pivot requirements: 20 (TUI-01–12, DOC-01–02, ML-01–03, FE-02)
 - Mapped to phases: 91
+- Complete: 89
 - Unmapped: 0 ✓
 
 ---

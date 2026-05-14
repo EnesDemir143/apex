@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: — MVP Trading Analysis System + Bet 5 Local-First TUI Pivot
 status: active
-last_updated: "2026-05-15T16:30:00.000Z"
+last_updated: "2026-05-15T23:05:00.000Z"
 progress:
   total_phases: 20
-  completed_phases: 19
+  completed_phases: 20
   total_plans: 32
-  completed_plans: 29
+  completed_plans: 30
 ---
 
 # Project State: Apex (MABA-TS)
@@ -22,17 +22,17 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 
 ## Current Phase
 
-- **Phase:** 18
-- **Name:** Turkish Output / Localization
+- **Phase:** 19
+- **Name:** Optional Quant ML Agent + Device Selection
 - **Status:** Complete
 - **Plans:** 1/1
 
 ## Progress
 
 - **Milestone:** v1.0 complete; Bet 5 TUI pivot in progress
-- **Phases complete:** 19/20
+- **Phases complete:** 20/20 — **Milestone v1.0 fully complete!**
 - **Phases planned:** 20/20
-- **Requirements complete:** 86/97
+- **Requirements complete:** 89/97
 
 ## Phase Planning Summary
 
@@ -57,9 +57,9 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 16. Web Stack Freeze + Revival Docs | 1 | 1 | ✅ Complete |
 | 17. Local RAG Lite + Provider Options | 1 | 1 | ✅ Complete |
 | 18. Turkish Output / Localization | 1 | 1 | ✅ Complete |
-| 19. Optional Quant ML Agent + Device Selection | 1 | 1 | 📋 Planned |
+| 19. Optional Quant ML Agent + Device Selection | 1 | 1 | ✅ Complete |
 
-**Total:** 32 plans across 20 phases — 28/32 complete, Phase 17 done
+**Total:** 32 plans across 20 phases — 30/32 complete, all 20 phases done
 
 ## Recent Activity
 
@@ -91,6 +91,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 - 2026-05-15: Phase 16 complete — web stack frozen as optional/legacy; docs/WEB_STACK_REVIVAL_GUIDE.md created covering Streamlit, FastAPI, PostgreSQL/Redis, Docker Compose, K3s, and observability stack; app.py and __init__.py docstrings updated with LEGACY/OPTIONAL warning; all content preserved, no deletions
 - 2026-05-15: Phase 17 complete — local knowledge retrieval from ~/.apex/knowledge/{TICKER}/*.md, Ollama client and create_llm_client factory, llm_provider/ollama config settings, apex config --show command; knowledge location: ~/.apex/knowledge/; provider priority: Ollama
 - 2026-05-15: Phase 18 complete — Turkish output/localization: output_language param on run_local_analysis, Turkish report markdown sections + labels + disclaimer, /lang TUI command to switch between English/Turkish, 18 new tests on feat/turkish-localization branch
+- 2026-05-15: **Phase 19 complete — Optional Quant ML Agent**: 4-model ensemble (RF+XGB+LGBM+CB) with RidgeCV, Snakemake training pipeline, joblib persistence, 23 feature engineering functions, device resolver (auto/cpu/mps/cuda), TUI /quant command with on/off/device toggle, portfolio manager includes quant signal when available. 22 new tests, 190 total passing. **v1.0 milestone complete!**
 
 ## Decisions Log
 
@@ -116,6 +117,9 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 2026-05-01 | Observability stack extended in Compose | Loki/Promtail/Grafana remain; Tempo, Prometheus, and OTel Collector add traces and metrics. |
 | 2026-05-03 | Bet 5 primary path changed to local-first TUI | Hosting cost, API-key economics, and CV/demo differentiation favor terminal cockpit over production web frontend work. |
 | 2026-05-03 | Streamlit/FastAPI stack frozen, not deleted | Existing work remains as optional/legacy/production extension and will get a revival guide. |
+| 2026-05-15 | Quant ML is RidgeCV stacking, not hard-weighted voting | Research showed RidgeCV learns optimal coefficients; plan weights (RF=0.20, XGB=0.25, LGBM=0.25, CB=0.30) used as fallback only. |
+| 2026-05-15 | CPU-is-primary for tree-based ensemble | Device resolver supports auto/cpu/mps/cuda but tree models run on CPU regardless. Generic resolver API kept for future DL use. |
+| 2026-05-15 | Parallel agent, not sequential addition | Quant node runs alongside technical/fundamental/risk in parallel; Portfolio Manager includes it only when model_available and non-HOLD. |
 
 ---
-*Last updated: 2026-05-15 after completing Phase 17 Local RAG Lite + Provider Options*
+*Last updated: 2026-05-15 after completing Phase 19 Optional Quant ML Agent — v1.0 milestone complete!*

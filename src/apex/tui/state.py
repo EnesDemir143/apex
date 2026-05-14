@@ -19,6 +19,7 @@ class AnalysisState:
     usage: dict[str, Any] = field(default_factory=dict)
     agent_outputs: dict[str, Any] = field(default_factory=dict)
     analysis_date: str = ""
+    quant_output: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -31,18 +32,18 @@ class SetupState:
     language: str = "English"
     global_instructions: str = ""
     agent_instructions: dict[str, str] = field(default_factory=dict)
-    enabled_agents: set[str] = field(
-        default_factory=lambda: {"technical", "fundamental", "risk", "portfolio"}
-    )
+    enabled_agents: set[str] = field(default_factory=lambda: {"technical", "fundamental", "risk", "portfolio"})
+    quant_enabled: bool = False
+    ml_device: str = "auto"  # auto | cpu | mps | cuda
 
 
 @dataclass
 class ChartViewport:
     """Chart pan/zoom/timeframe state."""
 
-    timeframe: str = "1d"          # 1m | 5m | 1h | 1d
-    viewport_bars: int = 60        # how many bars to show
-    offset: int = 0                # pan offset from the right (0 = latest)
+    timeframe: str = "1d"  # 1m | 5m | 1h | 1d
+    viewport_bars: int = 60  # how many bars to show
+    offset: int = 0  # pan offset from the right (0 = latest)
 
 
 @dataclass

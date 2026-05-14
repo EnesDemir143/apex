@@ -1,6 +1,5 @@
 """Architecture — Apex system design overview."""
 
-
 from __future__ import annotations
 
 import sys as _sys
@@ -63,18 +62,29 @@ with c1:
 
 with c2:
     st.markdown("**Agent Layer**")
-    for item in ["Technical Agent (RSI, MACD, Bollinger)", "Fundamental Agent (RAG)", "Risk Agent (volatility)", "Portfolio Manager (supervisor)"]:
+    for item in [
+        "Technical Agent (RSI, MACD, Bollinger)",
+        "Fundamental Agent (RAG)",
+        "Risk Agent (volatility)",
+        "Portfolio Manager (supervisor)",
+    ]:
         st.markdown(f"- {item}")
 
 with c3:
     st.markdown("**Infrastructure**")
-    for item in ["FastAPI 0.136", "LangGraph 1.1 (stable)", "OpenTelemetry + Grafana LGTM", "Docker + K3s", "LangSmith tracing"]:
+    for item in [
+        "FastAPI 0.136",
+        "LangGraph 1.1 (stable)",
+        "OpenTelemetry + Grafana LGTM",
+        "Docker + K3s",
+        "LangSmith tracing",
+    ]:
         st.markdown(f"- {item}")
 
 st.divider()
 st.markdown(
     '<div style="text-align:center;font-size:12px;color:#555;">'
-    'Built with Python 3.13 · LangGraph · FastAPI · PostgreSQL · Redis · Streamlit'
-    '</div>',
+    "Built with Python 3.13 · LangGraph · FastAPI · PostgreSQL · Redis · Streamlit"
+    "</div>",
     unsafe_allow_html=True,
 )

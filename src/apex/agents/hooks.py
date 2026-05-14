@@ -43,11 +43,11 @@ def post_analysis_hook(state: AgentState) -> AgentState:
         # Agent pipeline failed (e.g. missing API key in test/degraded env).
         # Apply rule-based fallback rather than crashing the workflow.
         from apex.agents.fallback import rule_based_fallback  # avoid circular import
+
         fallback = rule_based_fallback(state)
         errors = list(state.get("errors") or [])
         errors.append("post_hook: portfolio_decision missing — rule-based fallback applied")
         return {**state, **fallback, "errors": errors}
-
 
     risk = state.get("risk_assessment")
     risk_score = float(risk.get("risk_score", 0.0)) if isinstance(risk, Mapping) else 0.0

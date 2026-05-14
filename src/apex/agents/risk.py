@@ -17,8 +17,7 @@ async def risk_agent(state: AgentState) -> AgentState:
     try:
         metrics = calculate_risk_metrics(state["market_data"])
         prompt = (
-            f"Assess risk for {ticker}. Return risk_score 0-1, risk_factors, and concise reasoning. "
-            f"Metrics: {metrics}"
+            f"Assess risk for {ticker}. Return risk_score 0-1, risk_factors, and concise reasoning. Metrics: {metrics}"
         )
         response = await OpenAIClient().generate(
             prompt,
