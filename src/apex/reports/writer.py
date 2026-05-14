@@ -32,14 +32,14 @@ class ReportWriter:
     def __init__(self, base_dir: str | Path = "reports") -> None:
         self.base_dir = Path(base_dir)
 
-    def save(self, result: dict[str, Any], state: dict[str, Any] | None = None) -> Path:
+    def save(self, result: dict[str, Any], state: dict[str, Any] | None = None, *, language: str = "English") -> Path:
         """Persist an analysis result to disk and return the report directory."""
         ticker = result.get("ticker", "UNKNOWN")
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         report_dir = self.base_dir / ticker / timestamp
         report_dir.mkdir(parents=True, exist_ok=True)
 
-        complete = generate_report_markdown(result)
+        complete = generate_report_markdown(result, language=language)
         (report_dir / "complete_report.md").write_text(complete, encoding="utf-8")
 
         if state is not None:
@@ -73,7 +73,7 @@ class ReportWriter:
             section_path.mkdir(exist_ok=True)
             output = agent_outputs.get(agent_key)
             aname = agent_name_map.get(agent_key, agent_key)
-            section_md = generate_section_markdown(aname, output)
+            section_md = generate_section_markdown(aname, output, language=language)
             fname = section_filename_map.get(agent_key, f"{agent_key}.md")
             section_path.joinpath(fname).write_text(section_md, encoding="utf-8")
 
@@ -94,6 +94,7 @@ class ReportWriter:
             "confidence": result.get("confidence"),
             "created_at": timestamp,
             "request_hash": result.get("request_hash"),
+            "language": result.get("language", "English"),
             "usage": {
                 "tokens_in": usage.get("tokens_in", 0),
                 "tokens_out": usage.get("tokens_out", 0),

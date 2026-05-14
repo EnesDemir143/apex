@@ -355,7 +355,7 @@ async def test_setup_panel_shows_default_language() -> None:
         await pilot.pause()
         content = app.screen.query_one("#setup-content", Static).content
 
-    assert "Language: English (default)" in str(content)
+    assert "Language: English" in str(content)
 
 
 def test_command_palette_includes_exit() -> None:

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 TICKERS_WHITELIST: tuple[str, ...] = ("AAPL", "MSFT", "NVDA", "TSLA", "SPY")
 
+SUPPORTED_LANGUAGES: tuple[str, ...] = ("English", "Turkish")
+
 MAX_CONFIDENCE = 1.0
 MIN_CONFIDENCE = 0.0
 DEFAULT_TIMEOUT = 120

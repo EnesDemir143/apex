@@ -31,6 +31,7 @@ COMMAND_HELP: dict[str, str] = {
     "cost": "/cost — alias for /usage",
     "agents": "/agents — show enabled agents",
     "events": "/events — show event log",
+    "lang": "/lang — show or switch report language (English / Turkish)",
     "help": "/help — list all commands",
     "history": "/history — list previous runs (Phase 15)",
     "report": "/report — view latest report (Phase 15)",
@@ -189,6 +190,29 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
 
     if cmd == "events":
         return CommandResult(action="screen", message="team")
+
+    if cmd == "lang":
+        if not args:
+            current = state.setup.language
+            return CommandResult(
+                action="info",
+                title="Language",
+                message=f"Current report language: {current}\n"
+                        f"Usage: /lang English  or  /lang Turkish",
+            )
+        lang = args[0].capitalize()
+        if lang not in ("English", "Turkish"):
+            return CommandResult(
+                action="error",
+                title="Command Error",
+                message=f"Unsupported language: {lang}. Choose English or Turkish.",
+            )
+        state.setup.language = lang
+        return CommandResult(
+            action="info",
+            title="Language",
+            message=f"Report language set to {lang}. Next analysis will use {lang}.",
+        )
 
     if cmd in _PLANNED:
         phase = _PLANNED[cmd]

@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: — MVP Trading Analysis System + Bet 5 Local-First TUI Pivot
 status: active
-last_updated: "2026-05-15T14:30:00.000Z"
+last_updated: "2026-05-15T16:30:00.000Z"
 progress:
   total_phases: 20
-  completed_phases: 18
+  completed_phases: 19
   total_plans: 32
-  completed_plans: 28
+  completed_plans: 29
 ---
 
 # Project State: Apex (MABA-TS)
@@ -22,15 +22,15 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 
 ## Current Phase
 
-- **Phase:** 17
-- **Name:** Local RAG Lite + Provider Options
+- **Phase:** 18
+- **Name:** Turkish Output / Localization
 - **Status:** Complete
 - **Plans:** 1/1
 
 ## Progress
 
 - **Milestone:** v1.0 complete; Bet 5 TUI pivot in progress
-- **Phases complete:** 18/20
+- **Phases complete:** 19/20
 - **Phases planned:** 20/20
 - **Requirements complete:** 86/97
 
@@ -56,7 +56,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 15. Reports, History, Replay | 1 | 1 | ✅ Complete |
 | 16. Web Stack Freeze + Revival Docs | 1 | 1 | ✅ Complete |
 | 17. Local RAG Lite + Provider Options | 1 | 1 | ✅ Complete |
-| 18. Turkish Output / Localization | 1 | 1 | 📋 Planned |
+| 18. Turkish Output / Localization | 1 | 1 | ✅ Complete |
 | 19. Optional Quant ML Agent + Device Selection | 1 | 1 | 📋 Planned |
 
 **Total:** 32 plans across 20 phases — 28/32 complete, Phase 17 done
@@ -90,6 +90,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 - 2026-05-15: Phase 15 complete — markdown report generation with sectioned layout (technical, fundamental, risk, portfolio), JSONL history store with append/list/latest/find_by_hash, deterministic request hashing for cache-first duplicate analysis detection, --save-report/--force flags on analyze CLI command, `apex history`/`apex report`/`apex replay` commands, 43 new unit tests; ruff clean, mypy clean, 134 total tests passing
 - 2026-05-15: Phase 16 complete — web stack frozen as optional/legacy; docs/WEB_STACK_REVIVAL_GUIDE.md created covering Streamlit, FastAPI, PostgreSQL/Redis, Docker Compose, K3s, and observability stack; app.py and __init__.py docstrings updated with LEGACY/OPTIONAL warning; all content preserved, no deletions
 - 2026-05-15: Phase 17 complete — local knowledge retrieval from ~/.apex/knowledge/{TICKER}/*.md, Ollama client and create_llm_client factory, llm_provider/ollama config settings, apex config --show command; knowledge location: ~/.apex/knowledge/; provider priority: Ollama
+- 2026-05-15: Phase 18 complete — Turkish output/localization: output_language param on run_local_analysis, Turkish report markdown sections + labels + disclaimer, /lang TUI command to switch between English/Turkish, 18 new tests on feat/turkish-localization branch
 
 ## Decisions Log
 

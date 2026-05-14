@@ -829,6 +829,7 @@ class ApexTuiApp(App[None]):
                 analysis_date=setup.analysis_date,
                 extra_instructions=setup.global_instructions or None,
                 agent_instructions=setup.agent_instructions or None,
+                output_language=setup.language,
             )
         except Exception as exc:
             self._state.analysis.status = "error"

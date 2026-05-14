@@ -83,6 +83,7 @@ async def run_local_analysis(
     agent_instructions: dict[str, str] | None = None,
     save_report: bool = False,
     force: bool = False,
+    output_language: str = "English",
 ) -> dict[str, Any]:
     """Run the LangGraph workflow locally without FastAPI/Postgres/Redis.
 
@@ -92,6 +93,7 @@ async def run_local_analysis(
         analysis_date: As-of date for the analysis; defaults to today; future dates rejected.
         extra_instructions: Optional global prompt note surfaced to all agents.
         agent_instructions: Optional per-agent prompt notes, e.g. {"risk": "focus on VIX"}.
+        output_language: Report language — "English" (default) or "Turkish".
 
     Returns:
         Dict with keys: ticker, signal, confidence, errors, usage, agent_outputs, analysis_date.
@@ -167,11 +169,12 @@ async def run_local_analysis(
         "mode": mode,
         "request_hash": request_hash,
         "cached": False,
+        "language": output_language,
     }
 
     if save_report:
         writer = ReportWriter()
-        report_dir = writer.save(result=output, state=dict(result))
+        report_dir = writer.save(result=output, state=dict(result), language=output_language)
         history.append(output, report_dir=str(report_dir))
         output["report_path"] = str(report_dir)
 
@@ -186,6 +189,7 @@ def run_local_analysis_sync(
     agent_instructions: dict[str, str] | None = None,
     save_report: bool = False,
     force: bool = False,
+    output_language: str = "English",
 ) -> dict[str, Any]:
     """Synchronous wrapper around run_local_analysis for CLI use."""
     return asyncio.run(
@@ -197,5 +201,6 @@ def run_local_analysis_sync(
             agent_instructions=agent_instructions,
             save_report=save_report,
             force=force,
+            output_language=output_language,
         )
     )
