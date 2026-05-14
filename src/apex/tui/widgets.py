@@ -457,6 +457,8 @@ class SetupPanel(Widget):
             f"  Provider: OpenAI  Model: {s.llm_model}\n"
             f"  LangSmith: {ls_status}  Project: {s.langchain_project}\n"
             f"  Agents: technical, fundamental, risk, portfolio (portfolio always on)\n"
+            f"  Quant ML: disabled (use [/bold]#58a6ff/quant[/bold #58a6ff] to toggle)\n"
+            f"  ML Device: auto\n"
             f"  Global instructions: (none)  Per-agent: (none)",
             id="setup-content",
         )
@@ -543,7 +545,7 @@ class ReportPanel(Widget):
 
 
 class FooterStats(Widget):
-    """Footer: agents done, tokens, cost, elapsed, LangSmith hint."""
+    """Footer: agents done, tokens, cost, elapsed, LangSmith hint, Quant status."""
 
     DEFAULT_CSS = """
     FooterStats {
@@ -563,12 +565,16 @@ class FooterStats(Widget):
         tokens: int,
         cost: float,
         elapsed: float,
+        quant_info: str = "",
     ) -> str:
-        return (
+        base = (
             f"Agents: {done}/{total}  |  Tokens: {tokens}  |  "
-            f"Cost: ${cost:.4f}  |  Elapsed: {elapsed:.1f}s  |  "
-            f"[dim]/langsmith for tracing status[/dim]"
+            f"Cost: ${cost:.4f}  |  Elapsed: {elapsed:.1f}s"
         )
+        if quant_info:
+            base += f"  |  {quant_info}"
+        base += "  |  [dim]/langsmith for tracing status[/dim]"
+        return base
 
     def update_stats(
         self,
@@ -577,10 +583,11 @@ class FooterStats(Widget):
         tokens: int = 0,
         cost: float = 0.0,
         elapsed: float = 0.0,
+        quant_info: str = "",
     ) -> None:
         try:
             self.query_one("#footer-content", Static).update(
-                self._footer_text(done, total, tokens, cost, elapsed)
+                self._footer_text(done, total, tokens, cost, elapsed, quant_info)
             )
         except Exception:
             pass

@@ -969,6 +969,12 @@ class ApexTuiApp(App[None]):
         except Exception:
             pass
 
+    def _quant_footer_info(self) -> str:
+        """Build quant status string for the footer."""
+        if self._state.setup.quant_enabled:
+            return f"[bold #58a6ff]Quant: on[/bold #58a6ff] ({self._state.setup.ml_device})"
+        return ""
+
     def _update_footer(
         self,
         done: int = 0,
@@ -979,7 +985,8 @@ class ApexTuiApp(App[None]):
         try:
             screen = self.screen
             screen.query_one("#footer-stats", FooterStats).update_stats(
-                done=done, total=4, tokens=tokens, cost=cost, elapsed=elapsed
+                done=done, total=4, tokens=tokens, cost=cost, elapsed=elapsed,
+                quant_info=self._quant_footer_info(),
             )
         except Exception:
             pass
