@@ -4,8 +4,8 @@ Training pipeline lives in Snakefile_train / scripts/train_models.sh.
 Inference-time modules are here.
 """
 
-from apex.ml.features import compute_features, FEATURE_COLUMNS
 from apex.ml.device import DeviceResolver, resolve_device
+from apex.ml.features import FEATURE_COLUMNS, compute_features
 from apex.ml.model_registry import ModelRegistry, QuantPrediction
 
 __all__ = [

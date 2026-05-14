@@ -81,14 +81,16 @@ def ensure_market_news(
 
     articles_data: list[dict[str, Any]] = []
     for entry in getattr(result, "data", {}).get("news", []):
-        articles_data.append({
-            "headline": getattr(entry, "headline", ""),
-            "source": getattr(entry, "source", ""),
-            "summary": getattr(entry, "summary", ""),
-            "content": getattr(entry, "content", ""),
-            "url": getattr(entry, "url", ""),
-            "created_at": str(getattr(entry, "created_at", "")),
-        })
+        articles_data.append(
+            {
+                "headline": getattr(entry, "headline", ""),
+                "source": getattr(entry, "source", ""),
+                "summary": getattr(entry, "summary", ""),
+                "content": getattr(entry, "content", ""),
+                "url": getattr(entry, "url", ""),
+                "created_at": str(getattr(entry, "created_at", "")),
+            }
+        )
 
     if not articles_data:
         return None
