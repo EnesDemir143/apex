@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import json
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 
 from apex.ml.device import DeviceResolver
-from apex.ml.features import FEATURE_COLUMNS, N_FEATURES, compute_features
+from apex.ml.features import FEATURE_COLUMNS, compute_features
 
 
 @dataclass
@@ -81,7 +81,7 @@ class ModelRegistry:
     @property
     def model_version(self) -> str:
         if self._metadata:
-            return self._metadata.get("model_version", "unknown")
+            return str(self._metadata.get("model_version", "unknown"))
         return "not_loaded"
 
     @property
@@ -130,32 +130,46 @@ class ModelRegistry:
             )
 
         # Use the latest bar's feature vector
-        X = features[-1:, :]  # (1, N_FEATURES)
+        x = features[-1:, :]  # (1, N_FEATURES)
+
+        if not np.all(np.isfinite(x)):
+            return QuantPrediction(
+                signal="HOLD",
+                confidence=0.0,
+                reasoning="Non-finite values in feature vector",
+                top_features={},
+                model_version=self.model_version,
+                device=self.device,
+                latency_ms=0.0,
+            )
 
         # Scale
-        X_scaled = self._scaler.transform(X)
+        x_scaled = self._scaler.transform(x)
 
         # Individual model predictions
         probs: dict[str, float] = {}
         for name in ("random_forest", "xgboost", "lightgbm", "catboost"):
             model = self._models.get(name)
             if model is not None:
-                prob = float(model.predict_proba(X_scaled)[0, 1])
+                prob = float(model.predict_proba(x_scaled)[0, 1])
                 probs[name] = prob
 
         # Ensemble: use RidgeCV voter if available, otherwise soft vote
         if self._voter is not None:
-            meta = np.array([[probs.get("random_forest", 0.5),
-                              probs.get("xgboost", 0.5),
-                              probs.get("lightgbm", 0.5),
-                              probs.get("catboost", 0.5)]])
+            meta = np.array(
+                [
+                    [
+                        probs.get("random_forest", 0.5),
+                        probs.get("xgboost", 0.5),
+                        probs.get("lightgbm", 0.5),
+                        probs.get("catboost", 0.5),
+                    ]
+                ]
+            )
             ensemble_prob = float(self._voter.predict(meta))
         else:
             # Fallback: weighted soft voting
-            ensemble_prob = sum(
-                probs.get(name, 0.5) * weight
-                for name, weight in DEFAULT_WEIGHTS.items()
-            )
+            ensemble_prob = sum(probs.get(name, 0.5) * weight for name, weight in DEFAULT_WEIGHTS.items())
 
         elapsed = (time.monotonic() - start) * 1000
 

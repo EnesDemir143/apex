@@ -71,6 +71,12 @@ def compute_features(bars: list[Any]) -> np.ndarray:
     low = np.array([_to_float(b.low) for b in bars], dtype=np.float64)
     vol = np.array([_to_float(b.volume) for b in bars], dtype=np.float64)
 
+    # Guard against NaN/Inf in input
+    close = np.nan_to_num(close, nan=0.0, posinf=0.0, neginf=0.0)
+    high = np.nan_to_num(high, nan=0.0, posinf=0.0, neginf=0.0)
+    low = np.nan_to_num(low, nan=0.0, posinf=0.0, neginf=0.0)
+    vol = np.nan_to_num(vol, nan=0.0, posinf=0.0, neginf=0.0)
+
     features = np.zeros((n, N_FEATURES), dtype=np.float64)
 
     for i in range(n):
@@ -204,11 +210,16 @@ def _ema(data: np.ndarray, span: int) -> np.ndarray:
 
 
 def _compute_macd(prices: np.ndarray) -> tuple[float, float, float]:
-    """Return (macd, signal, histogram) for the latest value."""
+    """Return (macd, signal, histogram) for the latest value.
+
+    Signal uses only the last 9 MACD values to match the training pipeline
+    (Snakefile_train / scripts/train_models.sh) exactly.
+    """
     ema12 = _ema(prices, 12)
     ema26 = _ema(prices, 26)
     macd_series = ema12 - ema26
-    signal_series = _ema(macd_series, 9)
     latest_macd = float(macd_series[-1])
+    signal_window = macd_series[-9:]
+    signal_series = _ema(signal_window, 9)
     latest_signal = float(signal_series[-1])
     return latest_macd, latest_signal, latest_macd - latest_signal

@@ -6,11 +6,9 @@ models/quant/ and produces a BUY/SELL/HOLD signal alongside the LLM agents.
 
 from __future__ import annotations
 
-import time
 from typing import Any
 
 from apex.agents.state import AgentState
-from apex.ml.device import DeviceResolver
 from apex.ml.model_registry import ModelRegistry
 
 
@@ -24,7 +22,6 @@ async def quant_agent(state: AgentState) -> AgentState:
         Partial state update with ``quant_analysis`` key or empty dict
         if disabled / unavailable.
     """
-    agent_name = "quant_agent"
     enabled = state.get("quant_enabled", False)
 
     if not enabled:
@@ -62,9 +59,7 @@ async def quant_agent(state: AgentState) -> AgentState:
             }
 
         registry = ModelRegistry()
-        start = time.monotonic()
         prediction = registry.predict(bars)
-        elapsed_ms = (time.monotonic() - start) * 1000
 
         analysis: dict[str, Any] = {
             "signal": prediction.signal,
