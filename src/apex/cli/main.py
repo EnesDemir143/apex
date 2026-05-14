@@ -207,6 +207,42 @@ def replay(
     console.print(report_md)
 
 
+@app.command()
+def config(
+    show: Annotated[
+        bool,
+        typer.Option("--show", help="Show current configuration."),
+    ] = False,
+) -> None:
+    """Show or manage Apex configuration."""
+    if show:
+        from apex.core.config import get_settings
+
+        cfg = get_settings()
+        console = Console()
+        table = Table(title="Apex Configuration")
+        table.add_column("Key", style="bold")
+        table.add_column("Value")
+        table.add_row("LLM Provider", cfg.llm_provider)
+        table.add_row("LLM Model", cfg.llm_model)
+        if cfg.llm_provider == "ollama":
+            table.add_row("Ollama Base URL", cfg.ollama_base_url)
+            table.add_row("Ollama Model", cfg.ollama_model)
+        table.add_row("Temperature", str(cfg.llm_temperature))
+        table.add_row("Max Tokens", str(cfg.llm_max_tokens))
+        table.add_row("Daily Budget", f"${cfg.llm_daily_budget_usd:.2f}")
+        table.add_row("Knowledge Base", _knowledge_path_display())
+        console.print(table)
+    else:
+        console = Console()
+        console.print("[yellow]Usage:[/yellow] apex config --show")
+
+
+def _knowledge_path_display() -> str:
+    from apex.services.local_knowledge import knowledge_base_path
+    return knowledge_base_path()
+
+
 def main() -> None:
     """Package entrypoint called by `apex` script."""
     app()
