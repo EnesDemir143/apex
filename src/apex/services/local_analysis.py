@@ -34,7 +34,7 @@ def _default_market_data(ticker: str) -> list[Any]:
             volume=1_000_000 + i * 1000,
             source="local_fallback",
         )
-        for i in range(35)
+        for i in range(80)
     ]
 
 
@@ -45,7 +45,7 @@ async def _fetch_market_data(ticker: str) -> list[Any]:
     from apex.ingestion.market_data_fetcher import MarketDataFetcher
 
     end = date.today()
-    start = end - timedelta(days=60)
+    start = end - timedelta(days=120)
     try:
         fetcher = MarketDataFetcher()
         response = await fetcher.fetch_bars(ticker, start, end)
@@ -195,6 +195,7 @@ def run_local_analysis_sync(
     save_report: bool = False,
     force: bool = False,
     output_language: str = "English",
+    quant_enabled: bool = False,
 ) -> dict[str, Any]:
     """Synchronous wrapper around run_local_analysis for CLI use."""
     return asyncio.run(
@@ -207,5 +208,6 @@ def run_local_analysis_sync(
             save_report=save_report,
             force=force,
             output_language=output_language,
+            quant_enabled=quant_enabled,
         )
     )
