@@ -458,7 +458,7 @@ class SetupPanel(Widget):
             f"  Agents: technical, fundamental, risk, portfolio (portfolio always on)\n"
             f"  Quant ML: disabled  (type /quant to enable)\n"
             f"  ML Device: auto\n"
-            f"  Global instructions: (none)  Per-agent: (none)",
+            f"  Prompts: see /prompt to view or set agent instructions",
             id="setup-content",
         )
 

@@ -8,14 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from apex.tui.state import TuiState
 
-# Commands that are deferred to a later phase
-_PLANNED: dict[str, str] = {
-    "history": "Phase 15",
-    "report": "Phase 15",
-    "replay": "Phase 15",
-    "provider": "Phase 17 (read-only display available via /model)",
-    "model": "Phase 17 (read-only display available)",
-}
+VALID_AGENT_KEYS = {"technical", "fundamental", "risk"}
 
 COMMAND_HELP: dict[str, str] = {
     "chat": "/chat — return to main screen",
@@ -32,11 +25,11 @@ COMMAND_HELP: dict[str, str] = {
     "agents": "/agents — show enabled agents",
     "events": "/events — show event log",
     "lang": "/lang — show or switch report language (English / Turkish)",
+    "prompt": "/prompt — show or set agent prompts",
     "quant": "/quant — show or toggle Quant ML agent (requires trained models)",
     "help": "/help — list all commands",
-    "history": "/history — list previous runs (Phase 15)",
-    "report": "/report — view latest report (Phase 15)",
-    "provider": "/provider — show/switch LLM provider (Phase 17)",
+    "history": "/history — list previous runs",
+    "report": "/report — view latest report",
     "model": "/model — show current LLM model",
 }
 
@@ -263,13 +256,56 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
                 action="error", title="Command Error", message=f"Unknown quant option: {sub}. Try: on, off, device."
             )
 
-    if cmd in _PLANNED:
-        phase = _PLANNED[cmd]
+    if cmd == "prompt":
+        if not args:
+            global_inst = state.setup.global_instructions or "(none)"
+            agent_lines = []
+            for name in ("technical", "fundamental", "risk"):
+                val = state.setup.agent_instructions.get(name)
+                agent_lines.append(f"  {name}: {val or '(none)'}")
+            return CommandResult(
+                action="info",
+                title="Agent Prompts",
+                message=(
+                    f"Global: {global_inst}\n"
+                    f"{chr(10).join(agent_lines)}\n\n"
+                    f"Usage:\n"
+                    f"  /prompt global \"text\"\n"
+                    f"  /prompt technical \"text\"\n"
+                    f"  /prompt fundamental \"text\"\n"
+                    f"  /prompt risk \"text\"\n"
+                    f"  /prompt clear"
+                ),
+            )
+
+        sub = args[0].lower()
+        rest = " ".join(args[1:]) if len(args) > 1 else ""
+
+        if sub == "clear":
+            state.setup.global_instructions = ""
+            state.setup.agent_instructions = {}
+            return CommandResult(action="info", title="Agent Prompts", message="All agent prompts cleared.")
+
+        if sub == "global":
+            state.setup.global_instructions = rest
+            return CommandResult(
+                action="info", title="Agent Prompts",
+                message=f"Global instruction set: {rest}" if rest else "Global instruction cleared.",
+            )
+
+        if sub in VALID_AGENT_KEYS:
+            if rest:
+                state.setup.agent_instructions[sub] = rest
+            else:
+                state.setup.agent_instructions.pop(sub, None)
+            return CommandResult(
+                action="info", title="Agent Prompts",
+                message=f"Prompt for {sub}: {rest}" if rest else f"Prompt for {sub} cleared.",
+            )
+
         return CommandResult(
-            action="info",
-            title=f"/{cmd}",
-            planned_phase=phase,
-            message=f"/{cmd} is planned for {phase}.",
+            action="error", title="Command Error",
+            message=f"Unknown agent: {sub}. Valid: global, technical, fundamental, risk.",
         )
 
     return CommandResult(action="error", title="Command Error", message=f"Unknown command: /{cmd}. Type /help.")

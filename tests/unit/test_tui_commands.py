@@ -244,14 +244,39 @@ def test_events_switches_to_team_screen(state: TuiState) -> None:
     assert result.message == "team"
 
 
-# Planned commands return info, not error
+# /prompt
 
 
-@pytest.mark.parametrize("cmd", ["/history", "/report"])
-def test_planned_commands_return_info(cmd: str, state: TuiState) -> None:
-    result = dispatch(cmd, state)
+def test_prompt_shows_status(state: TuiState) -> None:
+    result = dispatch("/prompt", state)
     assert result.action == "info"
-    assert "Phase" in result.message
+    assert "Agent Prompts" in result.title or "Global" in result.message
+
+
+def test_prompt_set_global(state: TuiState) -> None:
+    result = dispatch("/prompt global be conservative", state)
+    assert result.action == "info"
+    assert state.setup.global_instructions == "be conservative"
+
+
+def test_prompt_set_agent(state: TuiState) -> None:
+    result = dispatch("/prompt technical focus on momentum", state)
+    assert result.action == "info"
+    assert state.setup.agent_instructions.get("technical") == "focus on momentum"
+
+
+def test_prompt_clear(state: TuiState) -> None:
+    state.setup.global_instructions = "old"
+    state.setup.agent_instructions["technical"] = "old"
+    result = dispatch("/prompt clear", state)
+    assert result.action == "info"
+    assert state.setup.global_instructions == ""
+    assert state.setup.agent_instructions == {}
+
+
+def test_prompt_invalid_agent(state: TuiState) -> None:
+    result = dispatch('/prompt invalid "text"', state)
+    assert result.action == "error"
 
 
 # Unknown command
