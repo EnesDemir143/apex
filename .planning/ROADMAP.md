@@ -318,13 +318,13 @@
 | 14 | Textual Terminal Cockpit | 5 | ✅ | 1/1 | 100% |
 | 14.1 | TUI Market Panel + Terminal Chart | 5 | ✅ | 1/1 | 100% |
 | 15 | Reports, History, Replay | 5 | ✅ | 1/1 | 100% |
-| 16 | Web Stack Freeze + Revival Docs | 5 | 📋 | 1/1 | 0% |
-| 17 | Local RAG Lite + Provider Options | 5 | 📋 | 1/1 | 0% |
+| 16 | Web Stack Freeze + Revival Docs | 5 | ✅ | 1/1 | 100% |
+| 17 | Local RAG Lite + Provider Options | 5 | ✅ | 1/1 | 100% |
 | 18 | Turkish Output / Localization | 5 | 📋 | 1/1 | 0% |
 | 19 | Optional Quant ML Agent + Device Selection | 5+ | 📋 | 1/1 | 0% |
 
-**Total:** 20 phases | 32 plans | 16 phases complete, 4 Bet 5/5+ pivot phases remaining
+**Total:** 20 phases | 32 plans | 18 phases complete, 2 Bet 5 pivot phases remaining
 
 ---
 *Roadmap created: 2026-04-28*
-*Last updated: 2026-05-15 — Phase 15 complete: reports, history, replay.*
+*Last updated: 2026-05-15 — Phase 17 complete: local RAG lite + provider options.*
