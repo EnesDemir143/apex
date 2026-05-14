@@ -1,14 +1,17 @@
-"""Apex CLI entrypoint — app launcher and classic analyze command."""
+"""Apex CLI entrypoint — app launcher, analyze, history, report, replay commands."""
 
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 from typing import Annotated
 
 import typer
 from rich.console import Console
 from rich.table import Table
 
+from apex.reports.writer import ReportWriter
+from apex.services.history_store import HistoryStore
 from apex.services.local_analysis import run_local_analysis_sync
 
 app = typer.Typer(
@@ -53,10 +56,24 @@ def analyze(
         str | None,
         typer.Option("--instructions", "-i", help="Extra instructions for all agents."),
     ] = None,
+    save_report: Annotated[
+        bool,
+        typer.Option("--save-report", "-s", help="Save analysis as markdown report and add to history."),
+    ] = False,
+    force: Annotated[
+        bool,
+        typer.Option("--force", "-f", help="Force re-run even if an identical cached report exists."),
+    ] = False,
 ) -> None:
     """Run a one-shot local analysis for TICKER and print the result."""
     try:
-        result = run_local_analysis_sync(ticker, analysis_date=date, extra_instructions=instructions)
+        result = run_local_analysis_sync(
+            ticker,
+            analysis_date=date,
+            extra_instructions=instructions,
+            save_report=save_report,
+            force=force,
+        )
     except ValueError as exc:
         console.print(f"[red]Error:[/red] {exc}")
         raise typer.Exit(code=1) from exc
@@ -64,6 +81,7 @@ def analyze(
     signal = result["signal"]
     confidence = result["confidence"]
     errors = result["errors"]
+    cached = result.get("cached", False)
 
     color = {"BUY": "green", "SELL": "red", "HOLD": "yellow"}.get(signal, "white")
 
@@ -72,6 +90,8 @@ def analyze(
     table.add_column("Value")
     table.add_row("Signal", f"[{color}]{signal}[/{color}]")
     table.add_row("Confidence", f"{confidence:.2%}")
+    if cached:
+        table.add_row("Cache", "[yellow]reused from saved report[/yellow]")
     if errors:
         table.add_row("Errors", "\n".join(errors))
 
@@ -81,8 +101,110 @@ def analyze(
 
     console.print(table)
 
+    report_path = result.get("report_path")
+    if report_path:
+        console.print(f"\n[dim]Report saved to:[/dim] {report_path}")
+
     if errors:
         sys.exit(2)
+
+
+@app.command()
+def history(
+    ticker: Annotated[
+        str | None,
+        typer.Option("--ticker", "-t", help="Filter by ticker symbol."),
+    ] = None,
+    limit: Annotated[
+        int,
+        typer.Option("--limit", "-l", help="Maximum number of entries to show."),
+    ] = 20,
+) -> None:
+    """Show saved analysis history."""
+    store = HistoryStore()
+    entries = store.list(limit=limit, ticker=ticker)
+    if not entries:
+        console.print("[yellow]No history entries found.[/yellow]")
+        return
+
+    table = Table(title="Apex Analysis History")
+    table.add_column("Date", style="dim")
+    table.add_column("Ticker", style="bold")
+    table.add_column("Signal")
+    table.add_column("Confidence")
+    table.add_column("Report")
+
+    for entry in entries:
+        sig = entry.get("signal", "?")
+        color = {"BUY": "green", "SELL": "red", "HOLD": "yellow"}.get(sig, "white")
+        conf = entry.get("confidence") or 0.0
+        report_dir = entry.get("report_dir") or ""
+        table.add_row(
+            (entry.get("created_at") or "?")[:19],
+            entry.get("ticker", "?"),
+            f"[{color}]{sig}[/{color}]",
+            f"{conf:.2%}",
+            report_dir,
+        )
+    console.print(table)
+
+
+@app.command()
+def report(
+    ticker: Annotated[str, typer.Argument(help="Ticker symbol.")],
+    latest: Annotated[
+        bool,
+        typer.Option("--latest", "-l", help="Show the most recent report for the ticker."),
+    ] = False,
+) -> None:
+    """Display a saved analysis report."""
+    store = HistoryStore()
+    if latest:
+        entry = store.latest(ticker=ticker)
+        if not entry:
+            console.print(f"[yellow]No saved report found for {ticker}.[/yellow]")
+            raise typer.Exit(code=1)
+        report_dir = entry.get("report_dir")
+        if not report_dir:
+            console.print("[yellow]Entry has no report directory.[/yellow]")
+            raise typer.Exit(code=1)
+    else:
+        entries = store.list(ticker=ticker, limit=1)
+        if not entries:
+            console.print(f"[yellow]No history entries found for {ticker}.[/yellow]")
+            raise typer.Exit(code=1)
+        report_dir = entries[0].get("report_dir")
+
+    report_path = Path(str(report_dir))
+    if not report_path.exists():
+        console.print(f"[red]Report directory not found:[/red] {report_path}")
+        raise typer.Exit(code=1)
+
+    loaded = ReportWriter.load_report(report_path)
+    report_md = loaded.get("report_md", "")
+    console.print(report_md)
+
+
+@app.command()
+def replay(
+    path: Annotated[str, typer.Argument(help="Path to saved report directory.")],
+) -> None:
+    """Re-render a saved report from a local directory without rerunning LLM."""
+    report_path = Path(path)
+    if not report_path.exists():
+        console.print(f"[red]Report directory not found:[/red] {report_path}")
+        raise typer.Exit(code=1)
+
+    loaded = ReportWriter.load_report(report_path)
+    report_md = loaded.get("report_md", "")
+    metadata = loaded.get("metadata", {})
+
+    console.print(f"[bold]Replay:[/bold] {metadata.get('ticker', '?')} "
+                  f"({metadata.get('analysis_date', '?')})")
+    console.print(f"[dim]Signal:[/dim] {metadata.get('signal', '?')}  "
+                  f"[dim]Confidence:[/dim] {metadata.get('confidence', 0.0):.2%}")
+    console.print()
+    console.print(report_md)
 
 
 def main() -> None:

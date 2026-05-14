@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: — MVP Trading Analysis System + Bet 5 Local-First TUI Pivot
 status: active
-last_updated: "2026-05-06T17:00:00.000Z"
+last_updated: "2026-05-15T00:55:00.000Z"
 progress:
   total_phases: 20
-  completed_phases: 15
+  completed_phases: 16
   total_plans: 32
-  completed_plans: 25
+  completed_plans: 26
 ---
 
 # Project State: Apex (MABA-TS)
@@ -24,15 +24,15 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 
 - **Phase:** 15
 - **Name:** Reports, History, Replay
-- **Status:** Planned
+- **Status:** Complete
 - **Plans:** 1/1
 
 ## Progress
 
 - **Milestone:** v1.0 complete; Bet 5 TUI pivot in progress
-- **Phases complete:** 15/20
+- **Phases complete:** 16/20
 - **Phases planned:** 20/20
-- **Requirements complete:** 82/97
+- **Requirements complete:** 84/97
 
 ## Phase Planning Summary
 
@@ -53,7 +53,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 | 13. Local Analysis + CLI Foundation | 1 | 1 | ✅ Complete |
 | 14. Textual Terminal Cockpit | 1 | 1 | ✅ Complete |
 | 14.1. TUI Market Panel + Terminal Chart | 1 | 1 | ✅ Complete |
-| 15. Reports, History, Replay | 1 | 1 | 📋 Planned |
+| 15. Reports, History, Replay | 1 | 1 | ✅ Complete |
 | 16. Web Stack Freeze + Revival Docs | 1 | 1 | 📋 Planned |
 | 17. Local RAG Lite + Provider Options | 1 | 1 | 📋 Planned |
 | 18. Turkish Output / Localization | 1 | 1 | 📋 Planned |
@@ -87,6 +87,7 @@ See: .planning/PROJECT.md (updated 2026-04-29)
 
 - 2026-05-06: Phase 14.1 inserted before Phase 15 — TUI market panel wiring and terminal-native `/chart` screen planned so real/local OHLCV, volume, and indicators are visible before report/history work.
 - 2026-05-06: Phase 14.1 complete — market_snapshot service (fallback + indicators), MarketPanel wired to live snapshot, ChartPanel (candles/volume/RSI-MACD/crosshair/bar-inspect), ChartScreen (/chart command, timeframe 1m/5m/1h/1d, zoom, pan, bar-inspect with Tab wrap), /x renamed to /inspect, chart-only slash dropdown, 50 tests passing
+- 2026-05-15: Phase 15 complete — markdown report generation with sectioned layout (technical, fundamental, risk, portfolio), JSONL history store with append/list/latest/find_by_hash, deterministic request hashing for cache-first duplicate analysis detection, --save-report/--force flags on analyze CLI command, `apex history`/`apex report`/`apex replay` commands, 43 new unit tests; ruff clean, mypy clean, 134 total tests passing
 
 ## Decisions Log
 
