@@ -1,4 +1,4 @@
-"""Fundamental-analysis LangGraph node with an MVP RAG stub."""
+"""Fundamental-analysis LangGraph node with an MVP RAG stub and local knowledge."""
 
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ from apex.agents._common import (
 )
 from apex.agents.state import AgentState
 from apex.services.llm_client import OpenAIClient
+from apex.services.local_knowledge import find_knowledge, format_knowledge_context
 
 
 async def fundamental_agent(state: AgentState) -> AgentState:
@@ -22,11 +23,25 @@ async def fundamental_agent(state: AgentState) -> AgentState:
     ticker = state["ticker"]
     try:
         context = retrieve_fundamental_context(ticker)
-        prompt = (
-            f"Analyze fundamentals for {ticker}. "
-            "Return BUY, SELL, or HOLD with confidence 0-1 and concise reasoning. "
-            f"Context: {context}"
-        )
+        local_items = find_knowledge(ticker)
+        local_context = format_knowledge_context(local_items)
+
+        if local_context:
+            context["local_knowledge_sources"] = [item["path"] for item in local_items]
+            context["summary"] = local_context[:3000]
+            prompt = (
+                f"Analyze fundamentals for {ticker} incorporating the user's local knowledge. "
+                "Return BUY, SELL, or HOLD with confidence 0-1 and concise reasoning. "
+                f"Local knowledge:\n{local_context}"
+            )
+        else:
+            context["summary"] = "No local knowledge found; use market-data context and conservative uncertainty."
+            prompt = (
+                f"Analyze fundamentals for {ticker}. "
+                "Return BUY, SELL, or HOLD with confidence 0-1 and concise reasoning. "
+                "No local knowledge available — use general market context and conservative uncertainty."
+            )
+
         response = await OpenAIClient().generate(
             prompt,
             system="You are a conservative fundamental equity analyst.",
