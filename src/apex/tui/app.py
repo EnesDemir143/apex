@@ -828,6 +828,18 @@ class ApexTuiApp(App[None]):
         from apex.services.local_analysis import run_local_analysis
 
         setup = self._state.setup
+
+        def _on_progress(label: str) -> None:
+            self._push_event(f"[bold #58a6ff]{label}[/bold #58a6ff] complete")
+            self._state.analysis.status = f"running: {label}"
+            self._update_footer()
+            # Update the report panel to show current progress
+            self._show_report(
+                f"[bold #58a6ff]Analyzing {ticker}…[/bold #58a6ff]\n\n"
+                f"  [green]✓[/green] {label}\n"
+                f"  [dim]Waiting for remaining agents…[/dim]"
+            )
+
         try:
             result: dict[str, Any] = await run_local_analysis(
                 ticker,
@@ -836,6 +848,7 @@ class ApexTuiApp(App[None]):
                 agent_instructions=setup.agent_instructions or None,
                 output_language=setup.language,
                 quant_enabled=setup.quant_enabled,
+                progress=_on_progress,
             )
         except Exception as exc:
             self._state.analysis.status = "error"

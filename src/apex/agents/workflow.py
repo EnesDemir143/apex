@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from typing import Any, cast
 
 from langchain_core.runnables import RunnableConfig
@@ -84,6 +84,51 @@ async def analyze_with_workflow(state: AgentState) -> AgentState:
     workflow = create_workflow()
     async with asyncio.timeout(WORKFLOW_TIMEOUT_SECONDS):
         return cast(AgentState, await workflow.ainvoke(state, config=workflow_run_config(state["ticker"])))
+
+
+async def analyze_with_workflow_streaming(
+    state: AgentState,
+    progress: Callable[[str], None] | None = None,
+) -> AgentState:
+    """Run the compiled workflow with per-node progress callbacks (single pass).
+
+    Uses ``astream(stream_mode="values")`` to emit the full accumulated state
+    after each step. Calls ``progress(agent_label)`` as each agent node
+    completes. The last yielded state IS the final workflow output.
+
+    Args:
+        state: Initial AgentState.
+        progress: Optional callback called with the display name of each
+                  agent as it finishes.
+
+    Returns:
+        Final AgentState after all nodes complete.
+    """
+    workflow = create_workflow()
+    config = workflow_run_config(state["ticker"])
+
+    node_to_key: dict[str, tuple[str, str]] = {
+        "technical": ("technical_analysis", "Technical Agent"),
+        "fundamental": ("fundamental_analysis", "Fundamental Agent"),
+        "risk": ("risk_assessment", "Risk Agent"),
+        "quant": ("quant_analysis", "Quant Agent"),
+        "portfolio_manager": ("portfolio_decision", "Portfolio Manager"),
+        "compact_context": ("compaction_applied", "Context Compactor"),
+    }
+
+    seen: set[str] = set()
+    final: AgentState = state
+
+    async with asyncio.timeout(WORKFLOW_TIMEOUT_SECONDS):
+        async for step in workflow.astream(state, config=config, stream_mode="values"):
+            final = step
+            for node, (state_key, label) in node_to_key.items():
+                if node not in seen and step.get(state_key) is not None:
+                    seen.add(node)
+                    if progress:
+                        progress(label)
+
+    return final
 
 
 async def persist_workflow_results(session: AsyncSession, *, stock_id: int, state: AgentState) -> Any:

@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
 from apex.agents.state import AgentState
-from apex.agents.workflow import analyze_with_workflow
+from apex.agents.workflow import analyze_with_workflow, analyze_with_workflow_streaming
 from apex.core.constants import TICKERS_WHITELIST
 from apex.reports.writer import ReportWriter
 from apex.services.history_store import HistoryStore, _compute_request_hash
@@ -85,6 +86,7 @@ async def run_local_analysis(
     force: bool = False,
     output_language: str = "English",
     quant_enabled: bool = False,
+    progress: Callable[[str], None] | None = None,
 ) -> dict[str, Any]:
     """Run the LangGraph workflow locally without FastAPI/Postgres/Redis.
 
@@ -96,6 +98,7 @@ async def run_local_analysis(
         agent_instructions: Optional per-agent prompt notes, e.g. {"risk": "focus on VIX"}.
         output_language: Report language — "English" (default) or "Turkish".
         quant_enabled: Enable optional quant ML agent (requires trained models).
+        progress: Optional callback called with agent label as each finishes.
 
     Returns:
         Dict with keys: ticker, signal, confidence, errors, usage, agent_outputs, analysis_date.
@@ -153,7 +156,10 @@ async def run_local_analysis(
             "_agent_instructions": agent_instructions or {},
         }
 
-    result = await analyze_with_workflow(state)
+    if progress:
+        result = await analyze_with_workflow_streaming(state, progress=progress)
+    else:
+        result = await analyze_with_workflow(state)
 
     decision = result.get("portfolio_decision") or {}
     output = {
