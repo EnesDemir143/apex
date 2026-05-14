@@ -5,6 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
+import httpx
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
@@ -75,6 +76,60 @@ class OpenAIClient(LLMClient):
             output_tokens=output_tokens,
             cost_usd=_estimate_cost_usd(input_tokens=input_tokens, output_tokens=output_tokens),
         )
+
+
+class OllamaClient(LLMClient):
+    """Ollama-backed LLM client for local inference."""
+
+    def __init__(self, settings: Settings | None = None) -> None:
+        self.settings = settings or get_settings()
+
+    async def generate(
+        self,
+        prompt: str,
+        system: str = "",
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        config: RunnableConfig | None = None,
+    ) -> LLMResponse:
+        """Generate a response using Ollama REST API."""
+        del config
+        url = f"{self.settings.ollama_base_url.rstrip('/')}/api/chat"
+        payload: dict[str, Any] = {
+            "model": self.settings.ollama_model,
+            "messages": [],
+            "options": {
+                "temperature": temperature if temperature is not None else self.settings.llm_temperature,
+                "num_predict": max_tokens if max_tokens is not None else self.settings.llm_max_tokens,
+            },
+            "stream": False,
+        }
+        if system:
+            payload["messages"].append({"role": "system", "content": system})
+        payload["messages"].append({"role": "user", "content": prompt})
+
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            resp = await client.post(url, json=payload)
+            resp.raise_for_status()
+            data = resp.json()
+
+        content = data.get("message", {}).get("content", "")
+        usage = data.get("eval_count", 0)
+        return LLMResponse(
+            content=content,
+            model=self.settings.ollama_model,
+            input_tokens=data.get("prompt_eval_count", 0),
+            output_tokens=int(usage) if usage else 0,
+            cost_usd=0.0,
+        )
+
+
+def create_llm_client(settings: Settings | None = None) -> LLMClient:
+    """Factory: return the correct client for the configured provider."""
+    cfg = settings or get_settings()
+    if cfg.llm_provider == "ollama":
+        return OllamaClient(settings=cfg)
+    return OpenAIClient(settings=cfg)
 
 
 class FakeLLMClient(LLMClient):
