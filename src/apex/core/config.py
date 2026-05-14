@@ -60,10 +60,13 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr = SecretStr("")
 
     # --- LLM ---
+    llm_provider: str = Field(default="openai", description="openai | ollama")
     llm_model: str = "gpt-4o-mini"
     llm_temperature: float = 0.1
     llm_daily_budget_usd: float = 5.0
     llm_max_tokens: int = 4096
+    ollama_base_url: str = Field(default="http://localhost:11434", description="Ollama server URL")
+    ollama_model: str = Field(default="llama3.2", description="Ollama model name")
 
     # --- Embeddings ---
     embedding_model: str = "nomic-embed-text-v2"
