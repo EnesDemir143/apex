@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import shutil
 from pathlib import Path
 from typing import Any
 
@@ -32,15 +31,32 @@ def _sample_result(**overrides: Any) -> dict[str, Any]:
             "tokens_out": 800,
             "cost_usd": 0.015,
             "turns": [
-                {"agent_name": "technical_agent", "tokens_in": 500, "tokens_out": 200, "cost_usd": 0.005},
-                {"agent_name": "portfolio_manager", "tokens_in": 300, "tokens_out": 400, "cost_usd": 0.004},
+                {"agent_name": "technical_agent", "tokens_in": 500,
+                 "tokens_out": 200, "cost_usd": 0.005},
+                {"agent_name": "portfolio_manager", "tokens_in": 300,
+                 "tokens_out": 400, "cost_usd": 0.004},
             ],
         },
         "agent_outputs": {
-            "technical": {"signal": "BUY", "confidence": 0.8, "indicators": {"RSI": 45.2, "MACD": "bullish"}, "reasoning": "RSI neutral, MACD bullish crossover."},
-            "fundamental": {"signal": "HOLD", "confidence": 0.6, "reasoning": "PE ratio elevated but earnings growth solid."},
-            "risk": {"signal": "BUY", "confidence": 0.7, "risk_score": 0.25, "reasoning": "Low volatility environment."},
-            "portfolio": {"signal": "BUY", "confidence": 0.85, "reasoning": "Technical and risk align; fundamental caution noted.", "source": "llm"},
+            "technical": {
+                "signal": "BUY", "confidence": 0.8,
+                "indicators": {"RSI": 45.2, "MACD": "bullish"},
+                "reasoning": "RSI neutral, MACD bullish crossover.",
+            },
+            "fundamental": {
+                "signal": "HOLD", "confidence": 0.6,
+                "reasoning": "PE ratio elevated but earnings growth solid.",
+            },
+            "risk": {
+                "signal": "BUY", "confidence": 0.7,
+                "risk_score": 0.25,
+                "reasoning": "Low volatility environment.",
+            },
+            "portfolio": {
+                "signal": "BUY", "confidence": 0.85,
+                "reasoning": "Technical and risk align; fundamental caution noted.",
+                "source": "llm",
+            },
         },
     }
     data.update(overrides)

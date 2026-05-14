@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
 import pytest
 
 from apex.services.history_store import HistoryStore, _compute_request_hash
-
 
 # ---------------------------------------------------------------------------
 # _compute_request_hash
