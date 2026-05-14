@@ -84,6 +84,7 @@ async def run_local_analysis(
     save_report: bool = False,
     force: bool = False,
     output_language: str = "English",
+    quant_enabled: bool = False,
 ) -> dict[str, Any]:
     """Run the LangGraph workflow locally without FastAPI/Postgres/Redis.
 
@@ -94,6 +95,7 @@ async def run_local_analysis(
         extra_instructions: Optional global prompt note surfaced to all agents.
         agent_instructions: Optional per-agent prompt notes, e.g. {"risk": "focus on VIX"}.
         output_language: Report language — "English" (default) or "Turkish".
+        quant_enabled: Enable optional quant ML agent (requires trained models).
 
     Returns:
         Dict with keys: ticker, signal, confidence, errors, usage, agent_outputs, analysis_date.
@@ -141,6 +143,7 @@ async def run_local_analysis(
         "market_data": market_data,
         "errors": [],
         "usage": {},
+        "quant_enabled": quant_enabled,
     }
 
     if extra_instructions or agent_instructions:
@@ -163,8 +166,10 @@ async def run_local_analysis(
             "technical": result.get("technical_analysis"),
             "fundamental": result.get("fundamental_analysis"),
             "risk": result.get("risk_assessment"),
+            "quant": result.get("quant_analysis"),
             "portfolio": decision,
         },
+        "quant_analysis": result.get("quant_analysis"),
         "analysis_date": as_of_str,
         "mode": mode,
         "request_hash": request_hash,

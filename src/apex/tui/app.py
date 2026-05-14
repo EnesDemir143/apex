@@ -830,6 +830,7 @@ class ApexTuiApp(App[None]):
                 extra_instructions=setup.global_instructions or None,
                 agent_instructions=setup.agent_instructions or None,
                 output_language=setup.language,
+                quant_enabled=setup.quant_enabled,
             )
         except Exception as exc:
             self._state.analysis.status = "error"
@@ -846,6 +847,11 @@ class ApexTuiApp(App[None]):
         self._state.analysis.agent_outputs = result.get("agent_outputs") or {}
         self._state.analysis.analysis_date = result.get("analysis_date", "")
 
+        # Track quant output for report
+        quant = result.get("quant_analysis") or {}
+        if quant.get("model_available"):
+            self._state.analysis.quant_output = quant
+
         elapsed = time.monotonic() - self._analysis_start
         signal = result["signal"]
         conf = result["confidence"]
@@ -860,6 +866,20 @@ class ApexTuiApp(App[None]):
             f"Date: {result.get('analysis_date', '')}  "
             f"Tokens: {tokens}  Cost: ${cost:.4f}  Elapsed: {elapsed:.1f}s"
         )
+
+        # Append quant ML info if available
+        quant = result.get("quant_analysis") or {}
+        if quant.get("model_available"):
+            quant_signal = quant.get("signal", "HOLD")
+            quant_conf = quant.get("confidence", 0.0)
+            quant_model = quant.get("model_version", "?")
+            quant_device = quant.get("device", "?")
+            report += (
+                f"\n[bold #58a6ff]Quant ML:[/bold #58a6ff] "
+                f"{quant_signal} ({quant_conf:.0%})  "
+                f"model={quant_model}  device={quant_device}"
+            )
+
         if self._state.analysis.errors:
             report += "\n[red]Errors:[/red] " + "; ".join(self._state.analysis.errors)
 

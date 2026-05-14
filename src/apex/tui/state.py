@@ -19,6 +19,7 @@ class AnalysisState:
     usage: dict[str, Any] = field(default_factory=dict)
     agent_outputs: dict[str, Any] = field(default_factory=dict)
     analysis_date: str = ""
+    quant_output: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -34,6 +35,8 @@ class SetupState:
     enabled_agents: set[str] = field(
         default_factory=lambda: {"technical", "fundamental", "risk", "portfolio"}
     )
+    quant_enabled: bool = False
+    ml_device: str = "auto"  # auto | cpu | mps | cuda
 
 
 @dataclass

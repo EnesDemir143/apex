@@ -39,6 +39,8 @@ class AgentState(TypedDict, total=False):
     fundamental_analysis: dict[str, Any] | None
     risk_assessment: dict[str, Any] | None
     portfolio_decision: dict[str, Any] | None
+    quant_analysis: dict[str, Any] | None
+    quant_enabled: bool
     errors: Annotated[list[str], merge_errors]
     compaction_applied: Annotated[bool, merge_compaction]
     usage: Annotated[dict[str, Any], merge_usage]

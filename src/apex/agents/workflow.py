@@ -14,6 +14,7 @@ from apex.agents.compaction import compact_agent_context
 from apex.agents.fundamental import fundamental_agent
 from apex.agents.hooks import post_analysis_hook, pre_analysis_hook
 from apex.agents.portfolio_manager import portfolio_manager
+from apex.agents.quant import quant_agent
 from apex.agents.risk import risk_agent
 from apex.agents.state import AgentState
 from apex.agents.technical import technical_agent
@@ -32,6 +33,7 @@ def _build_graph() -> Any:
     graph.add_node("technical", technical_agent)
     graph.add_node("fundamental", fundamental_agent)
     graph.add_node("risk", risk_agent)
+    graph.add_node("quant", quant_agent)
     graph.add_node("compact_context", compact_agent_context)
     graph.add_node("portfolio_manager", portfolio_manager)
     graph.add_node("post_hook", post_analysis_hook)
@@ -40,9 +42,11 @@ def _build_graph() -> Any:
     graph.add_edge("pre_hook", "technical")
     graph.add_edge("pre_hook", "fundamental")
     graph.add_edge("pre_hook", "risk")
+    graph.add_edge("pre_hook", "quant")
     graph.add_edge("technical", "compact_context")
     graph.add_edge("fundamental", "compact_context")
     graph.add_edge("risk", "compact_context")
+    graph.add_edge("quant", "compact_context")
     graph.add_edge("compact_context", "portfolio_manager")
     graph.add_edge("portfolio_manager", "post_hook")
     graph.add_edge("post_hook", END)
@@ -130,6 +134,7 @@ def _agent_outputs(state: AgentState) -> dict[str, dict[str, Any]]:
         ("technical_analysis", "technical_agent"),
         ("fundamental_analysis", "fundamental_agent"),
         ("risk_assessment", "risk_agent"),
+        ("quant_analysis", "quant_agent"),
         ("portfolio_decision", "portfolio_manager"),
     ):
         value = state.get(key)
