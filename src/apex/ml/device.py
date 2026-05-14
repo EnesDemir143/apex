@@ -26,7 +26,7 @@ class DeviceResolver:
         if preference == "cuda":
             try:
                 # Lazy import so core installs without torch don't fail
-                import torch  # type: ignore[import-untyped]
+                import torch
 
                 if torch.cuda.is_available():
                     return "cuda"
@@ -36,7 +36,7 @@ class DeviceResolver:
         if preference == "mps":
             if platform.system() == "Darwin":
                 try:
-                    import torch  # type: ignore[import-untyped]
+                    import torch
 
                     if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
                         return "mps"
@@ -45,7 +45,7 @@ class DeviceResolver:
             return "cpu"
         # auto: try cuda -> mps -> cpu
         try:
-            import torch  # type: ignore[import-untyped]
+            import torch
 
             if torch.cuda.is_available():
                 return "cuda"

@@ -270,10 +270,10 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
                     f"Global: {global_inst}\n"
                     f"{chr(10).join(agent_lines)}\n\n"
                     f"Usage:\n"
-                    f"  /prompt global \"text\"\n"
-                    f"  /prompt technical \"text\"\n"
-                    f"  /prompt fundamental \"text\"\n"
-                    f"  /prompt risk \"text\"\n"
+                    f'  /prompt global "text"\n'
+                    f'  /prompt technical "text"\n'
+                    f'  /prompt fundamental "text"\n'
+                    f'  /prompt risk "text"\n'
                     f"  /prompt clear"
                 ),
             )
@@ -289,7 +289,8 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
         if sub == "global":
             state.setup.global_instructions = rest
             return CommandResult(
-                action="info", title="Agent Prompts",
+                action="info",
+                title="Agent Prompts",
                 message=f"Global instruction set: {rest}" if rest else "Global instruction cleared.",
             )
 
@@ -299,12 +300,14 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
             else:
                 state.setup.agent_instructions.pop(sub, None)
             return CommandResult(
-                action="info", title="Agent Prompts",
+                action="info",
+                title="Agent Prompts",
                 message=f"Prompt for {sub}: {rest}" if rest else f"Prompt for {sub} cleared.",
             )
 
         return CommandResult(
-            action="error", title="Command Error",
+            action="error",
+            title="Command Error",
             message=f"Unknown agent: {sub}. Valid: global, technical, fundamental, risk.",
         )
 
