@@ -316,16 +316,15 @@
 | 12 | TUI Pivot Product Cleanup | 5 | ✅ | 1/1 | 100% |
 | 13 | Local Analysis + CLI Foundation | 5 | ✅ | 1/1 | 100% |
 | 14 | Textual Terminal Cockpit | 5 | ✅ | 1/1 | 100% |
-| 14.1 | TUI Market Panel + Terminal Chart | 5 | 📋 | 1/1 | 0% |
-| 15 | Reports, History, Replay | 5 | 📋 | 1/1 | 0% |
+| 14.1 | TUI Market Panel + Terminal Chart | 5 | ✅ | 1/1 | 100% |
+| 15 | Reports, History, Replay | 5 | ✅ | 1/1 | 100% |
 | 16 | Web Stack Freeze + Revival Docs | 5 | 📋 | 1/1 | 0% |
 | 17 | Local RAG Lite + Provider Options | 5 | 📋 | 1/1 | 0% |
 | 18 | Turkish Output / Localization | 5 | 📋 | 1/1 | 0% |
 | 19 | Optional Quant ML Agent + Device Selection | 5+ | 📋 | 1/1 | 0% |
 
-**Total:** 20 phases | 32 plans | 14 phases complete, 6 Bet 5/5+ pivot phases remaining
-
+**Total:** 20 phases | 32 plans | 16 phases complete, 4 Bet 5/5+ pivot phases remaining
 
 ---
 *Roadmap created: 2026-04-28*
-*Last updated: 2026-05-06 — Phase 14.1 inserted for TUI market panel + terminal chart before Phase 15.*
+*Last updated: 2026-05-15 — Phase 15 complete: reports, history, replay.*
