@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import asyncio
 from datetime import UTC, date, datetime
+from pathlib import Path
 from typing import Any
 
 from apex.agents.state import AgentState
 from apex.agents.workflow import analyze_with_workflow
 from apex.core.constants import TICKERS_WHITELIST
+from apex.reports.writer import ReportWriter
+from apex.services.history_store import HistoryStore, _compute_request_hash
 from apex.services.sanitizer import canonicalize_ticker
 
 
@@ -65,12 +68,21 @@ def _validate_analysis_date(analysis_date: date | str | None) -> date:
     return parsed
 
 
+def _build_enabled_agents(agent_instructions: dict[str, str] | None) -> list[str]:
+    default_agents = ["technical_agent", "fundamental_agent", "risk_agent", "portfolio_manager"]
+    if not agent_instructions:
+        return default_agents
+    return sorted(agent_instructions.keys()) if agent_instructions else default_agents
+
+
 async def run_local_analysis(
     ticker: str,
     mode: str = "full",
     analysis_date: date | str | None = None,
     extra_instructions: str | None = None,
     agent_instructions: dict[str, str] | None = None,
+    save_report: bool = False,
+    force: bool = False,
 ) -> dict[str, Any]:
     """Run the LangGraph workflow locally without FastAPI/Postgres/Redis.
 
@@ -89,6 +101,37 @@ async def run_local_analysis(
         raise ValueError(f"Ticker {canonical!r} is not in the whitelist: {TICKERS_WHITELIST}")
 
     as_of = _validate_analysis_date(analysis_date)
+    as_of_str = as_of.isoformat()
+
+    request_hash = _compute_request_hash(
+        ticker=canonical,
+        analysis_date=as_of_str,
+        mode=mode,
+        extra_instructions=extra_instructions,
+        agent_instructions=agent_instructions,
+        enabled_agents=_build_enabled_agents(agent_instructions),
+    )
+
+    history = HistoryStore()
+    if not force and save_report:
+        cached = history.find_by_hash(request_hash)
+        if cached and cached.get("report_dir"):
+            report_dir = Path(str(cached["report_dir"]))
+            if report_dir.exists() and (report_dir / "complete_report.md").exists():
+                return {
+                    "ticker": canonical,
+                    "signal": cached.get("signal", "HOLD"),
+                    "confidence": cached.get("confidence", 0.0),
+                    "errors": [],
+                    "usage": {"cached": True, "request_hash": request_hash},
+                    "agent_outputs": {},
+                    "analysis_date": as_of_str,
+                    "mode": mode,
+                    "request_hash": request_hash,
+                    "cached": True,
+                    "report_path": str(report_dir),
+                }
+
     market_data = await _fetch_market_data(canonical)
 
     state: AgentState = {
@@ -98,7 +141,6 @@ async def run_local_analysis(
         "usage": {},
     }
 
-    # Surface extra instructions via state for future agent consumption.
     if extra_instructions or agent_instructions:
         state["usage"] = {
             **state["usage"],
@@ -109,7 +151,7 @@ async def run_local_analysis(
     result = await analyze_with_workflow(state)
 
     decision = result.get("portfolio_decision") or {}
-    return {
+    output = {
         "ticker": canonical,
         "signal": decision.get("signal", "HOLD"),
         "confidence": decision.get("confidence", 0.0),
@@ -121,9 +163,19 @@ async def run_local_analysis(
             "risk": result.get("risk_assessment"),
             "portfolio": decision,
         },
-        "analysis_date": as_of.isoformat(),
+        "analysis_date": as_of_str,
         "mode": mode,
+        "request_hash": request_hash,
+        "cached": False,
     }
+
+    if save_report:
+        writer = ReportWriter()
+        report_dir = writer.save(result=output, state=dict(result))
+        history.append(output, report_dir=str(report_dir))
+        output["report_path"] = str(report_dir)
+
+    return output
 
 
 def run_local_analysis_sync(
@@ -132,6 +184,8 @@ def run_local_analysis_sync(
     analysis_date: date | str | None = None,
     extra_instructions: str | None = None,
     agent_instructions: dict[str, str] | None = None,
+    save_report: bool = False,
+    force: bool = False,
 ) -> dict[str, Any]:
     """Synchronous wrapper around run_local_analysis for CLI use."""
     return asyncio.run(
@@ -141,5 +195,7 @@ def run_local_analysis_sync(
             analysis_date=analysis_date,
             extra_instructions=extra_instructions,
             agent_instructions=agent_instructions,
+            save_report=save_report,
+            force=force,
         )
     )
