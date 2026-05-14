@@ -10,10 +10,7 @@ Verifies:
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, patch
-
 from datetime import UTC, datetime, timedelta
-
 from decimal import Decimal
 
 import pytest
@@ -157,7 +154,6 @@ class TestModelRegistry:
     def test_not_available_by_default(self):
         """Registry reports not available when no models exist."""
         import tempfile
-        from pathlib import Path
 
         with tempfile.TemporaryDirectory() as tmp:
             registry = ModelRegistry(models_dir=tmp)
