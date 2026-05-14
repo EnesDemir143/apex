@@ -456,6 +456,7 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
 
     def compose(self) -> ComposeResult:
         from textual.containers import Horizontal as HBox
+
         yield Header(show_clock=True)
         with HBox(id="chart-layout"):
             chart_panel = ChartPanel(id="chart-panel")
@@ -476,11 +477,16 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
     # ── chart-specific command handler ────────────────────────────────────
 
     _TF_ALIASES: dict[str, str] = {
-        "1m": "1m", "5m": "5m", "15m": "15m",
-        "1h": "1h", "h": "1h",
+        "1m": "1m",
+        "5m": "5m",
+        "15m": "15m",
+        "1h": "1h",
+        "h": "1h",
         "4h": "4h",
-        "1d": "1d", "d": "1d",
-        "1w": "1w", "w": "1w",
+        "1d": "1d",
+        "d": "1d",
+        "1w": "1w",
+        "w": "1w",
     }
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
@@ -498,13 +504,11 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
 
         # ── /set-tf-1d  or  /set-tf  (hyphenated format) ─────────────────
         if cmd.startswith("set-tf"):
-            remainder = cmd[len("set-tf"):]  # "" | "-1d" | "-1m" etc.
+            remainder = cmd[len("set-tf") :]  # "" | "-1d" | "-1m" etc.
             tf_token = remainder.lstrip("-") or (args[0].lower() if args else "")
             if not tf_token:
                 self._chart_notify(
-                    "Timeframe options:\n"
-                    "  /set-tf-1m   /set-tf-5m   /set-tf-1h\n"
-                    "  /set-tf-4h   /set-tf-1d   /set-tf-1w"
+                    "Timeframe options:\n  /set-tf-1m   /set-tf-5m   /set-tf-1h\n  /set-tf-4h   /set-tf-1d   /set-tf-1w"
                 )
                 return
             tf = self._TF_ALIASES.get(tf_token)
@@ -575,6 +579,7 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
 
         # Everything else → global dispatcher
         from apex.tui.commands import dispatch
+
         result = dispatch(raw, self.app._state)  # type: ignore[attr-defined]
         self.app._handle_result(result)  # type: ignore[attr-defined]
 
@@ -582,12 +587,10 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
         """Show a brief notification in the chart bar-info strip."""
         try:
             from textual.widgets import Static
-            self._panel().query_one("#chart-bar-info", Static).update(
-                f"[bold #58a6ff]ℹ[/bold #58a6ff]  {msg}"
-            )
+
+            self._panel().query_one("#chart-bar-info", Static).update(f"[bold #58a6ff]ℹ[/bold #58a6ff]  {msg}")
         except Exception:
             pass
-
 
     def action_crosshair_left(self) -> None:
         p = self._panel()
@@ -651,6 +654,7 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
 
     async def _fetch_for_timeframe(self, tf: str) -> None:
         from apex.services.market_snapshot import get_market_snapshot
+
         days_map = {"1m": 5, "5m": 10, "1h": 30, "1d": 120}
         days = days_map.get(tf, 60)
         try:
@@ -793,6 +797,7 @@ class ApexTuiApp(App[None]):
             # Activate bar-inspect mode on the current ChartScreen if open
             try:
                 from apex.tui.app import ChartScreen as _CS  # noqa: F401, N814
+
                 if isinstance(self.screen, ChartScreen):
                     self.screen.action_enter_bar_inspect()
                 else:
@@ -986,7 +991,11 @@ class ApexTuiApp(App[None]):
         try:
             screen = self.screen
             screen.query_one("#footer-stats", FooterStats).update_stats(
-                done=done, total=total, tokens=tokens, cost=cost, elapsed=elapsed,
+                done=done,
+                total=total,
+                tokens=tokens,
+                cost=cost,
+                elapsed=elapsed,
                 quant_info=self._quant_footer_info(),
             )
         except Exception:

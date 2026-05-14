@@ -9,23 +9,27 @@ import streamlit as st
 def market_regime_panel(regime: dict) -> None:
     """Donut chart + legend list matching the mockup."""
     breakdown = regime["breakdown"]
-    labels  = [r["label"] for r in breakdown]
-    values  = [r["pct"]   for r in breakdown]
-    colors  = [r["color"] for r in breakdown]
+    labels = [r["label"] for r in breakdown]
+    values = [r["pct"] for r in breakdown]
+    colors = [r["color"] for r in breakdown]
 
-    fig = go.Figure(go.Pie(
-        labels=labels,
-        values=values,
-        hole=0.65,
-        marker={"colors": colors, "line": {"color": "#0E1117", "width": 2}},
-        textinfo="none",
-        hovertemplate="%{label}: %{value}%<extra></extra>",
-    ))
+    fig = go.Figure(
+        go.Pie(
+            labels=labels,
+            values=values,
+            hole=0.65,
+            marker={"colors": colors, "line": {"color": "#0E1117", "width": 2}},
+            textinfo="none",
+            hovertemplate="%{label}: %{value}%<extra></extra>",
+        )
+    )
 
     # Centre annotation
     fig.add_annotation(
         text=f"<b>Current</b><br>{regime['current']}",
-        x=0.5, y=0.5, showarrow=False,
+        x=0.5,
+        y=0.5,
+        showarrow=False,
         font={"size": 12, "color": "#F0F0F0"},
         align="center",
     )
@@ -52,7 +56,7 @@ def market_regime_panel(regime: dict) -> None:
                 f'<span style="width:10px;height:10px;border-radius:50%;background:{r["color"]};display:inline-block;"></span>'
                 f'<span style="font-size:12px;color:#AAA;">{r["label"]}</span></span>'
                 f'<span style="font-size:12px;font-weight:600;color:#F0F0F0;">{r["pct"]}%</span>'
-                f'</div>',
+                f"</div>",
                 unsafe_allow_html=True,
             )
         st.markdown(

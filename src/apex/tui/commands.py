@@ -45,7 +45,7 @@ CHART_COMMAND_HELP: dict[str, str] = {
     "inspect": "/inspect — enter bar-inspect mode (Tab to move, Enter to inspect)",
     "refresh": "/refresh — reload chart data",
     "zoom": "/zoom + | - — zoom chart in or out",
-    "set-tf":    "/set-tf — show timeframe options",
+    "set-tf": "/set-tf — show timeframe options",
     "set-tf-1m": "/set-tf-1m — set timeframe to 1 minute",
     "set-tf-5m": "/set-tf-5m — set timeframe to 5 minutes",
     "set-tf-1h": "/set-tf-1h — set timeframe to 1 hour",
@@ -198,8 +198,7 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
             return CommandResult(
                 action="info",
                 title="Language",
-                message=f"Current report language: {current}\n"
-                        f"Usage: /lang English  or  /lang Turkish",
+                message=f"Current report language: {current}\nUsage: /lang English  or  /lang Turkish",
             )
         lang = args[0].capitalize()
         if lang not in ("English", "Turkish"):
@@ -221,6 +220,7 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
             device = state.setup.ml_device
             # Check if models exist
             from pathlib import Path
+
             models_path = Path("models/quant")
             models_ready = "yes" if models_path.exists() and any(models_path.glob("*.pkl")) else "no"
             return CommandResult(
@@ -238,23 +238,30 @@ def dispatch(raw: str, state: TuiState) -> CommandResult:
         sub = args[0].lower()
         if sub in ("on", "enable", "1", "true"):
             state.setup.quant_enabled = True
-            return CommandResult(action="info", title="Quant ML Agent",
-                                 message="Quant ML Agent enabled. Next analysis will include quant signal.")
+            return CommandResult(
+                action="info",
+                title="Quant ML Agent",
+                message="Quant ML Agent enabled. Next analysis will include quant signal.",
+            )
         elif sub in ("off", "disable", "0", "false"):
             state.setup.quant_enabled = False
-            return CommandResult(action="info", title="Quant ML Agent",
-                                 message="Quant ML Agent disabled. LLM-only analysis.")
+            return CommandResult(
+                action="info", title="Quant ML Agent", message="Quant ML Agent disabled. LLM-only analysis."
+            )
         elif sub == "device" and len(args) >= 2:
             device = args[1].lower()
             if device in ("auto", "cpu", "mps", "cuda"):
                 state.setup.ml_device = device
-                return CommandResult(action="info", title="Quant ML Agent",
-                                     message=f"ML device set to {device}.")
-            return CommandResult(action="error", title="Command Error",
-                                 message=f"Unsupported device: {device}. Options: auto, cpu, mps, cuda.")
+                return CommandResult(action="info", title="Quant ML Agent", message=f"ML device set to {device}.")
+            return CommandResult(
+                action="error",
+                title="Command Error",
+                message=f"Unsupported device: {device}. Options: auto, cpu, mps, cuda.",
+            )
         else:
-            return CommandResult(action="error", title="Command Error",
-                                 message=f"Unknown quant option: {sub}. Try: on, off, device.")
+            return CommandResult(
+                action="error", title="Command Error", message=f"Unknown quant option: {sub}. Try: on, off, device."
+            )
 
     if cmd in _PLANNED:
         phase = _PLANNED[cmd]

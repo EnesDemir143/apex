@@ -266,8 +266,10 @@ class ChartPanel(Widget):
         # price change vs previous bar
         bars = self._visible_bars()
         if len(bars) >= 2:
-            prev_close = float(bars[-2].close) if self.crosshair < 0 else (
-                float(bars[self.crosshair - 1].close) if self.crosshair > 0 else float(bars[0].close)
+            prev_close = (
+                float(bars[-2].close)
+                if self.crosshair < 0
+                else (float(bars[self.crosshair - 1].close) if self.crosshair > 0 else float(bars[0].close))
             )
         else:
             prev_close = float(latest.close)
@@ -355,22 +357,18 @@ class ChartPanel(Widget):
         except Exception:
             ts = str(bar.timestamp)
 
-        o   = float(bar.open)
-        h   = float(bar.high)
-        lo  = float(bar.low)
-        c   = float(bar.close)
+        o = float(bar.open)
+        h = float(bar.high)
+        lo = float(bar.low)
+        c = float(bar.close)
         vol = bar.volume
         chg = c - o
         pct = (chg / o * 100) if o else 0.0
         color = "green" if chg >= 0 else "red"
-        sign  = "+" if chg >= 0 else ""
+        sign = "+" if chg >= 0 else ""
         mode_hint = " [bold #58a6ff][inspect][/bold #58a6ff]  Tab ← →  Esc exit" if self.bar_select_mode else ""
 
-        line1 = (
-            f"  [dim]{ts}[/dim]  "
-            f"Bar [bold]{idx + 1}[/bold]/{len(bars)}"
-            f"{mode_hint}"
-        )
+        line1 = f"  [dim]{ts}[/dim]  Bar [bold]{idx + 1}[/bold]/{len(bars)}{mode_hint}"
         line2 = (
             f"  O [yellow]{o:.2f}[/yellow]"
             f"  H [green]{h:.2f}[/green]"
@@ -390,8 +388,8 @@ class ChartPanel(Widget):
         if not bars:
             return ""
         volumes = [b.volume for b in bars]
-        opens   = [float(b.open)  for b in bars]
-        closes  = [float(b.close) for b in bars]
+        opens = [float(b.open) for b in bars]
+        closes = [float(b.close) for b in bars]
         cx = self.crosshair
         return _render_volume_panel(volumes, opens, closes, crosshair=cx)
 
@@ -410,6 +408,7 @@ class ChartPanel(Widget):
         from decimal import Decimal
 
         from apex.agents.indicators import calculate_rsi
+
         try:
             rsi_raw = calculate_rsi([Decimal(str(c)) for c in closes])
             rsi_values = [float(v) for v in rsi_raw.dropna().tolist()]
@@ -567,10 +566,7 @@ class FooterStats(Widget):
         elapsed: float,
         quant_info: str = "",
     ) -> str:
-        base = (
-            f"Agents: {done}/{total}  |  Tokens: {tokens}  |  "
-            f"Cost: ${cost:.4f}  |  Elapsed: {elapsed:.1f}s"
-        )
+        base = f"Agents: {done}/{total}  |  Tokens: {tokens}  |  Cost: ${cost:.4f}  |  Elapsed: {elapsed:.1f}s"
         if quant_info:
             base += f"  |  {quant_info}"
         base += "  |  [dim]/langsmith for tracing status[/dim]"
@@ -643,7 +639,6 @@ class KeybindPanel(Widget):
         return "\n".join(lines)
 
 
-
 def _money(value: int | float | Decimal) -> str:
     return f"{float(value):.2f}"
 
@@ -682,6 +677,7 @@ def _volume_bars(values: list[int], *, width: int = 48) -> str:
 
 # ── ASCII candlestick renderer ────────────────────────────────────────────────
 
+
 def _render_candles(bars: list, *, chart_height: int = 22) -> str:  # type: ignore[type-arg]
     """Thin wrapper kept for backward compat."""
     return _render_candles_with_axes(bars, chart_height=chart_height)
@@ -692,13 +688,13 @@ def _render_candles_with_axes(bars: list, *, chart_height: int = 22, crosshair: 
     if not bars:
         return ""
 
-    highs  = [float(b.high)  for b in bars]
-    lows   = [float(b.low)   for b in bars]
-    opens  = [float(b.open)  for b in bars]
+    highs = [float(b.high) for b in bars]
+    lows = [float(b.low) for b in bars]
+    opens = [float(b.open) for b in bars]
     closes = [float(b.close) for b in bars]
 
     price_high = max(highs)
-    price_low  = min(lows)
+    price_low = min(lows)
     price_range = price_high - price_low or 1.0
     n = len(bars)
     # Each candle occupies 2 columns: body/wick + gap
@@ -773,7 +769,7 @@ def _build_date_axis(bars: list, *, width: int, candle_w: int = 2) -> str:  # ty
         try:
             d1 = bars[0].timestamp.date()
             d2 = bars[1].timestamp.date()
-            is_intraday = (d1 == d2)
+            is_intraday = d1 == d2
         except Exception:
             pass
 

@@ -110,8 +110,8 @@ def generate_report_markdown(result: dict[str, Any], *, language: str = "English
         "Yatırım tavsiyesi niteliği taşımaz. Geçmiş performans gelecek sonuçların "
         "göstergesi değildir. Yatırım kararlarınızı vermeden önce mutlaka kendi "
         "araştırmanızı yapın.*"
-        if is_tr else
-        "*This analysis is for informational and educational purposes only. "
+        if is_tr
+        else "*This analysis is for informational and educational purposes only. "
         "It does not constitute financial advice. Past performance is not indicative "
         "of future results. Always do your own research before making investment decisions.*"
     )
@@ -166,8 +166,9 @@ def generate_report_markdown(result: dict[str, Any], *, language: str = "English
     lines.append(_agent_output_markdown("technical_agent", aout.get("technical"), ta_title, language=language))
     lines.append("---\n")
     lines.append(
-        _agent_output_markdown("fundamental_agent", aout.get("fundamental"),
-                                titles["fundamental_agent"], language=language)
+        _agent_output_markdown(
+            "fundamental_agent", aout.get("fundamental"), titles["fundamental_agent"], language=language
+        )
     )
     lines.append("---\n")
     ri_title = titles["risk_agent"]

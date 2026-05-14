@@ -199,10 +199,11 @@ def replay(
     report_md = loaded.get("report_md", "")
     metadata = loaded.get("metadata", {})
 
-    console.print(f"[bold]Replay:[/bold] {metadata.get('ticker', '?')} "
-                  f"({metadata.get('analysis_date', '?')})")
-    console.print(f"[dim]Signal:[/dim] {metadata.get('signal', '?')}  "
-                  f"[dim]Confidence:[/dim] {metadata.get('confidence', 0.0):.2%}")
+    console.print(f"[bold]Replay:[/bold] {metadata.get('ticker', '?')} ({metadata.get('analysis_date', '?')})")
+    console.print(
+        f"[dim]Signal:[/dim] {metadata.get('signal', '?')}  "
+        f"[dim]Confidence:[/dim] {metadata.get('confidence', 0.0):.2%}"
+    )
     console.print()
     console.print(report_md)
 
@@ -240,6 +241,7 @@ def config(
 
 def _knowledge_path_display() -> str:
     from apex.services.local_knowledge import knowledge_base_path
+
     return knowledge_base_path()
 
 

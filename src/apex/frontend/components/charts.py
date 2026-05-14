@@ -26,41 +26,44 @@ def candlestick_chart(
     Upper panel: filled area line with OHLCV hover tooltip.
     Lower panel: volume bars (green=up day, red=down day).
     """
-    vol_colors = [
-        "#26a69a" if c >= o else "#ef5350"
-        for o, c in zip(opens, closes)
-    ]
+    vol_colors = ["#26a69a" if c >= o else "#ef5350" for o, c in zip(opens, closes)]
     vols = volumes or [0] * len(closes)
 
     fig = go.Figure()
 
     # Upper panel: mountain area
-    fig.add_trace(go.Scatter(
-        x=dates, y=closes,
-        mode="lines",
-        name=ticker,
-        line={"color": "#2962ff", "width": 1.5},
-        fill="tozeroy",
-        fillcolor="rgba(41,98,255,0.15)",
-        customdata=list(zip(opens, highs, lows, closes, vols)),
-        hovertemplate=(
-            "<b>%{x}</b><br>"
-            "O: %{customdata[0]:.2f}  H: %{customdata[1]:.2f}<br>"
-            "L: %{customdata[2]:.2f}  C: %{customdata[3]:.2f}<br>"
-            "V: %{customdata[4]:,.0f}<extra></extra>"
-        ),
-        yaxis="y",
-    ))
+    fig.add_trace(
+        go.Scatter(
+            x=dates,
+            y=closes,
+            mode="lines",
+            name=ticker,
+            line={"color": "#2962ff", "width": 1.5},
+            fill="tozeroy",
+            fillcolor="rgba(41,98,255,0.15)",
+            customdata=list(zip(opens, highs, lows, closes, vols)),
+            hovertemplate=(
+                "<b>%{x}</b><br>"
+                "O: %{customdata[0]:.2f}  H: %{customdata[1]:.2f}<br>"
+                "L: %{customdata[2]:.2f}  C: %{customdata[3]:.2f}<br>"
+                "V: %{customdata[4]:,.0f}<extra></extra>"
+            ),
+            yaxis="y",
+        )
+    )
 
     # Lower panel: volume bars
-    fig.add_trace(go.Bar(
-        x=dates, y=vols,
-        name="Volume",
-        marker_color=vol_colors,
-        opacity=0.8,
-        yaxis="y2",
-        hovertemplate="%{y:,.0f}<extra>Volume</extra>",
-    ))
+    fig.add_trace(
+        go.Bar(
+            x=dates,
+            y=vols,
+            name="Volume",
+            marker_color=vol_colors,
+            opacity=0.8,
+            yaxis="y2",
+            hovertemplate="%{y:,.0f}<extra>Volume</extra>",
+        )
+    )
 
     fig.update_layout(
         template=_TEMPLATE,
@@ -101,13 +104,21 @@ def price_band_chart(
 ) -> go.Figure:
     """Simple line chart for price history."""
     fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=dates, y=closes, mode="lines", name=ticker,
-        line={"color": "#00D4AA", "width": 2},
-        fill="tozeroy", fillcolor="rgba(0,212,170,0.08)",
-    ))
+    fig.add_trace(
+        go.Scatter(
+            x=dates,
+            y=closes,
+            mode="lines",
+            name=ticker,
+            line={"color": "#00D4AA", "width": 2},
+            fill="tozeroy",
+            fillcolor="rgba(0,212,170,0.08)",
+        )
+    )
     fig.update_layout(
-        template=_TEMPLATE, paper_bgcolor=_BG, plot_bgcolor=_BG,
+        template=_TEMPLATE,
+        paper_bgcolor=_BG,
+        plot_bgcolor=_BG,
         margin={"l": 0, "r": 0, "t": 30, "b": 0},
         title=f"{ticker} Close Price" if ticker else None,
     )
@@ -117,13 +128,21 @@ def price_band_chart(
 def backtest_equity_chart(dates: list[Any], equity: list[float]) -> go.Figure:
     """Equity curve for backtest results."""
     fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=dates, y=equity, mode="lines", name="Portfolio Value",
-        line={"color": "#00D4AA", "width": 2},
-        fill="tozeroy", fillcolor="rgba(0,212,170,0.08)",
-    ))
+    fig.add_trace(
+        go.Scatter(
+            x=dates,
+            y=equity,
+            mode="lines",
+            name="Portfolio Value",
+            line={"color": "#00D4AA", "width": 2},
+            fill="tozeroy",
+            fillcolor="rgba(0,212,170,0.08)",
+        )
+    )
     fig.update_layout(
-        template=_TEMPLATE, paper_bgcolor=_BG, plot_bgcolor=_BG,
+        template=_TEMPLATE,
+        paper_bgcolor=_BG,
+        plot_bgcolor=_BG,
         margin={"l": 0, "r": 0, "t": 30, "b": 0},
         title="Equity Curve",
     )

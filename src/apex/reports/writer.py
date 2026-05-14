@@ -45,9 +45,7 @@ class ReportWriter:
         if state is not None:
             state_safe = self._json_safe(state)
             if not (report_dir / "state.json").exists():
-                (report_dir / "state.json").write_text(
-                    json.dumps(state_safe, indent=2, default=str), encoding="utf-8"
-                )
+                (report_dir / "state.json").write_text(json.dumps(state_safe, indent=2, default=str), encoding="utf-8")
 
         agent_outputs = result.get("agent_outputs") or {}
         section_map = {
@@ -78,9 +76,7 @@ class ReportWriter:
             section_path.joinpath(fname).write_text(section_md, encoding="utf-8")
 
         metadata = self._build_metadata(result, timestamp)
-        (report_dir / "metadata.json").write_text(
-            json.dumps(metadata, indent=2, default=str), encoding="utf-8"
-        )
+        (report_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, default=str), encoding="utf-8")
 
         return cast(Path, report_dir)
 

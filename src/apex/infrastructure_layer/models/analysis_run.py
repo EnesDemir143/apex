@@ -24,9 +24,7 @@ if TYPE_CHECKING:
 class AnalysisRun(Base):
     __tablename__ = "analysis_runs"
 
-    id: Mapped[UUID] = mapped_column(
-        PG_UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid()
-    )
+    id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
     stock_id: Mapped[int] = mapped_column(ForeignKey("stocks.id"), nullable=False, index=True)
     final_signal: Mapped[str | None] = mapped_column(String(10))  # BUY/SELL/HOLD
     final_confidence: Mapped[float | None] = mapped_column(Numeric(5, 4))

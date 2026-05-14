@@ -1,6 +1,5 @@
 """Signals — full agent signal leaderboard."""
 
-
 from __future__ import annotations
 
 import sys as _sys
@@ -42,6 +41,7 @@ all_signals = live_signals if api_available else _MOCK_ALL_SIGNALS
 if not api_available:
     st.warning("⚠️ API unavailable — showing cached demo data.", icon="⚠️")
 
+
 # ── Consensus / latest analysis helpers ───────────────────────────────────
 def _get_consensus(symbol: str) -> dict:  # type: ignore[type-arg]
     if not api_available:
@@ -56,14 +56,10 @@ def _get_consensus(symbol: str) -> dict:  # type: ignore[type-arg]
     consensus: dict = {}  # type: ignore[type-arg]
     for agent_name in ("technical", "fundamental", "risk"):
         agent_data = agent_outputs.get(agent_name) or {}
-        summary = (
-            agent_data.get("reasoning")
-            or agent_data.get("risk_factors")
-            or "Analysis complete."
-        )
+        summary = agent_data.get("reasoning") or agent_data.get("risk_factors") or "Analysis complete."
         consensus[agent_name] = {
-            "stance":  agent_data.get("signal", signal),
-            "color":   color,
+            "stance": agent_data.get("signal", signal),
+            "color": color,
             "summary": summary,
         }
     consensus["portfolio"] = {"stance": signal, "color": color, "summary": "Synthesis complete."}
@@ -82,41 +78,50 @@ def _get_latest_analysis(symbol: str) -> dict:  # type: ignore[type-arg]
     pm_data = agent_outputs.get("portfolio_manager") or {}
     explanation = pm_data.get("reasoning") or f"{result.get('signal', 'HOLD')} signal with {confidence:.0%} confidence."
     return {
-        "signal":        result.get("signal", "HOLD"),
-        "confidence":    confidence,
-        "risk":          risk,
+        "signal": result.get("signal", "HOLD"),
+        "confidence": confidence,
+        "risk": risk,
         "last_analysis": "just now",
-        "explanation":   explanation,
+        "explanation": explanation,
     }
 
 
 # Filters
 f1, f2, f3 = st.columns([1, 1, 2])
-sig_filter  = f1.multiselect("Signal", ["BUY", "SELL", "HOLD"], default=["BUY", "SELL", "HOLD"])
-risk_filter = f2.multiselect("Risk",   ["Low", "Medium", "High"], default=["Low", "Medium", "High"])
+sig_filter = f1.multiselect("Signal", ["BUY", "SELL", "HOLD"], default=["BUY", "SELL", "HOLD"])
+risk_filter = f2.multiselect("Risk", ["Low", "Medium", "High"], default=["Low", "Medium", "High"])
 
-filtered = [
-    s for s in all_signals
-    if s["signal"] in sig_filter and s["risk"] in risk_filter
-]
+filtered = [s for s in all_signals if s["signal"] in sig_filter and s["risk"] in risk_filter]
 
 left, right = st.columns([1.2, 1])
 
 with left:
     with st.container(border=True):
-        st.markdown(f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:8px;">All Signals ({len(filtered)})</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:8px;">All Signals ({len(filtered)})</div>',
+            unsafe_allow_html=True,
+        )
         signal_leaderboard(filtered)
 
 with right:
     sym = st.session_state.selected_symbol
     with st.container(border=True):
-        st.markdown(f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:8px;">{sym} — Chart</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:8px;">{sym} — Chart</div>',
+            unsafe_allow_html=True,
+        )
         tradingview_chart(symbol=sym, height=320)
 
     with st.container(border=True):
-        st.markdown(f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:4px;">Agent Consensus ({sym})</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:4px;">Agent Consensus ({sym})</div>',
+            unsafe_allow_html=True,
+        )
         agent_consensus_panel(_get_consensus(sym))
 
     with st.container(border=True):
-        st.markdown(f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:4px;">Latest Analysis ({sym})</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div style="font-size:14px;font-weight:600;color:#F0F0F0;margin-bottom:4px;">Latest Analysis ({sym})</div>',
+            unsafe_allow_html=True,
+        )
         latest_analysis_card(sym, _get_latest_analysis(sym))

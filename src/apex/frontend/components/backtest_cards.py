@@ -13,24 +13,25 @@ def backtest_performance_panel(summary: dict, sparklines: dict) -> None:
         f'<div style="font-size:12px;color:#666;margin-bottom:8px;">'
         f'Strategy: <span style="color:#AAA;">{summary["strategy"]}</span>'
         f'&nbsp;&nbsp;Period: <span style="color:#AAA;">{summary["period"]}</span>'
-        f'</div>',
+        f"</div>",
         unsafe_allow_html=True,
     )
 
     metrics = [
-        ("Win Rate",                f'{summary["win_rate"]:.1%}',                "#00D4AA", sparklines.get("win_rate", [])),
-        ("Max Drawdown",            f'{summary["max_drawdown"]:.1%}',             "#FF4B4B", sparklines.get("drawdown", [])),
-        ("Sharpe-like",             f'{summary["sharpe"]:.2f}',                  "#7C3AED", sparklines.get("sharpe", [])),
-        ("Signals Tested",          f'{summary["signals_tested"]:,}',            "#3B82F6", []),
-        ("Avg Confidence (Winners)",f'{summary["avg_confidence_winners"]:.0%}',  "#FFD700", []),
-        ("Profit Factor",           f'{summary["profit_factor"]:.2f}',           "#00D4AA", sparklines.get("profit", [])),
+        ("Win Rate", f"{summary['win_rate']:.1%}", "#00D4AA", sparklines.get("win_rate", [])),
+        ("Max Drawdown", f"{summary['max_drawdown']:.1%}", "#FF4B4B", sparklines.get("drawdown", [])),
+        ("Sharpe-like", f"{summary['sharpe']:.2f}", "#7C3AED", sparklines.get("sharpe", [])),
+        ("Signals Tested", f"{summary['signals_tested']:,}", "#3B82F6", []),
+        ("Avg Confidence (Winners)", f"{summary['avg_confidence_winners']:.0%}", "#FFD700", []),
+        ("Profit Factor", f"{summary['profit_factor']:.2f}", "#00D4AA", sparklines.get("profit", [])),
     ]
 
     cols = st.columns(3)
     for i, (title, value, color, spark) in enumerate(metrics):
         spark_html = (
             f'<div style="margin-top:6px;">{_svg_sparkline(spark, color=color, width=90, height=28)}</div>'
-            if spark else ""
+            if spark
+            else ""
         )
         cols[i % 3].markdown(
             f"""

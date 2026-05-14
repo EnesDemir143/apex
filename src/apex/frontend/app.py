@@ -44,13 +44,13 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
-    st.page_link("app.py",                   label="🏠  Home")
-    st.page_link("pages/1_Dashboard.py",      label="📊  Dashboard")
-    st.page_link("pages/2_Signals.py",        label="⚡  Signals")
-    st.page_link("pages/3_Backtest.py",       label="⚗️  Backtest")
-    st.page_link("pages/4_Replay_Mode.py",    label="▶️  Replay Mode")
-    st.page_link("pages/5_Architecture.py",   label="🏗️  Architecture")
-    st.page_link("pages/6_Observability.py",  label="🔭  Observability")
+    st.page_link("app.py", label="🏠  Home")
+    st.page_link("pages/1_Dashboard.py", label="📊  Dashboard")
+    st.page_link("pages/2_Signals.py", label="⚡  Signals")
+    st.page_link("pages/3_Backtest.py", label="⚗️  Backtest")
+    st.page_link("pages/4_Replay_Mode.py", label="▶️  Replay Mode")
+    st.page_link("pages/5_Architecture.py", label="🏗️  Architecture")
+    st.page_link("pages/6_Observability.py", label="🔭  Observability")
 
     st.divider()
 

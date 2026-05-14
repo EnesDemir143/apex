@@ -22,9 +22,7 @@ class PredictionBandLog(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     stock_id: Mapped[int] = mapped_column(ForeignKey("stocks.id"), nullable=False, index=True)
-    analysis_run_id: Mapped[UUID] = mapped_column(
-        PG_UUID(as_uuid=True), ForeignKey("analysis_runs.id"), nullable=False
-    )
+    analysis_run_id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("analysis_runs.id"), nullable=False)
     predicted_for: Mapped[date] = mapped_column(Date, nullable=False)
     band_upper: Mapped[float | None] = mapped_column(Numeric(18, 8))
     band_lower: Mapped[float | None] = mapped_column(Numeric(18, 8))
