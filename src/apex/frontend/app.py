@@ -1,4 +1,11 @@
-"""Apex — Multi-Agent Market Intelligence · Streamlit entry point."""
+"""
+Apex — Multi-Agent Market Intelligence · Streamlit entry point.
+
+⚠️  LEGACY / OPTIONAL — the primary Bet 5 UX is the TUI/CLI (``uv run apex``).
+    This Streamlit dashboard is preserved for portfolio/CV demonstration.
+    See ``docs/WEB_STACK_REVIVAL_GUIDE.md`` for how to run and revive the full
+    web stack (FastAPI + PostgreSQL + Redis + Streamlit + K3s).
+"""
 
 from __future__ import annotations
 
