@@ -457,7 +457,7 @@ class SetupPanel(Widget):
             f"  Provider: OpenAI  Model: {s.llm_model}\n"
             f"  LangSmith: {ls_status}  Project: {s.langchain_project}\n"
             f"  Agents: technical, fundamental, risk, portfolio (portfolio always on)\n"
-            f"  Quant ML: disabled (use [/bold]#58a6ff/quant[/bold #58a6ff] to toggle)\n"
+            f"  Quant ML: disabled  (type /quant to enable)\n"
             f"  ML Device: auto\n"
             f"  Global instructions: (none)  Per-agent: (none)",
             id="setup-content",

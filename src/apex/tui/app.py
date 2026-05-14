@@ -982,10 +982,11 @@ class ApexTuiApp(App[None]):
         cost: float = 0.0,
         elapsed: float = 0.0,
     ) -> None:
+        total = 5 if self._state.setup.quant_enabled else 4
         try:
             screen = self.screen
             screen.query_one("#footer-stats", FooterStats).update_stats(
-                done=done, total=4, tokens=tokens, cost=cost, elapsed=elapsed,
+                done=done, total=total, tokens=tokens, cost=cost, elapsed=elapsed,
                 quant_info=self._quant_footer_info(),
             )
         except Exception:
