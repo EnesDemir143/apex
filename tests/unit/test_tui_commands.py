@@ -178,6 +178,43 @@ def test_usage_with_data(state: TuiState) -> None:
     assert "0.0025" in result.message
 
 
+# /quant
+
+
+def test_quant_shows_status(state: TuiState) -> None:
+    result = dispatch("/quant", state)
+    assert result.action == "info"
+    assert result.title == "Quant ML Agent"
+    assert "disabled" in result.message
+
+
+def test_quant_enable(state: TuiState) -> None:
+    result = dispatch("/quant on", state)
+    assert result.action == "info"
+    assert "enabled" in result.message
+    assert state.setup.quant_enabled is True
+
+
+def test_quant_disable(state: TuiState) -> None:
+    state.setup.quant_enabled = True
+    result = dispatch("/quant off", state)
+    assert result.action == "info"
+    assert "disabled" in result.message
+    assert state.setup.quant_enabled is False
+
+
+def test_quant_device(state: TuiState) -> None:
+    result = dispatch("/quant device cpu", state)
+    assert result.action == "info"
+    assert "cpu" in result.message
+    assert state.setup.ml_device == "cpu"
+
+
+def test_quant_unknown_option(state: TuiState) -> None:
+    result = dispatch("/quant foo", state)
+    assert result.action == "error"
+
+
 # /model
 
 
