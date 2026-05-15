@@ -373,7 +373,7 @@ See [docs/WEB_STACK_REVIVAL_GUIDE.md](docs/WEB_STACK_REVIVAL_GUIDE.md) for detai
 | `LANGCHAIN_API_KEY` | No | — | LangSmith tracing |
 | `LLM_PROVIDER` | No | `openai` | LLM provider (`openai` or `ollama`) |
 | `OLLAMA_BASE_URL` | No | `http://localhost:11434` | Ollama server URL |
-| `EMBEDDING_MODEL` | No | `nomic-embed-text-v2` | Embedding model for RAG |
+| `EMBEDDING_MODEL` | No | `nomic-embed-text-v2` | Embedding model — only needed for pgvector RAG (optional server mode) |
 
 ---
 

@@ -334,7 +334,7 @@ Detaylar: [docs/WEB_STACK_REVIVAL_GUIDE.md](docs/WEB_STACK_REVIVAL_GUIDE.md)
 | `LLM_DAILY_BUDGET_USD` | Hayır | `5.0` | Günlük LLM bütçe limiti |
 | `ALPACA_API_KEY` | Hayır | — | Alpaca piyasa verisi (yfinance çalışır) |
 | `LANGCHAIN_API_KEY` | Hayır | — | LangSmith tracing |
-| `EMBEDDING_MODEL` | Hayır | `nomic-embed-text-v2` | RAG embedding modeli |
+| `EMBEDDING_MODEL` | Hayır | `nomic-embed-text-v2` | Sadece pgvector RAG için gerekli (opsiyonel sunucu modu) |
 
 ---
 
