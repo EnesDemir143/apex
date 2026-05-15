@@ -105,6 +105,7 @@ async def analyze_with_workflow_streaming(
         Final AgentState after all nodes complete.
     """
     from copy import deepcopy
+    from typing import cast
 
     workflow = create_workflow()
     config = workflow_run_config(state["ticker"])
@@ -120,10 +121,9 @@ async def analyze_with_workflow_streaming(
         "post_hook": "Post-flight",
     }
 
-    final: AgentState = deepcopy(dict(state))
+    final: dict[str, Any] = deepcopy(dict(state))
 
-    async def _reduce(output: dict) -> None:
-        """Apply a partial state update using proper reducer functions."""
+    async def _reduce(output: dict[str, Any]) -> None:
         if "errors" in output:
             final["errors"] = merge_errors(final.get("errors"), output["errors"])
         if "usage" in output:
@@ -145,7 +145,7 @@ async def analyze_with_workflow_streaming(
                 if progress:
                     progress(label)
 
-    return final
+    return cast(AgentState, final)
 
 
 async def persist_workflow_results(session: AsyncSession, *, stock_id: int, state: AgentState) -> Any:
