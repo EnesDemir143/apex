@@ -198,7 +198,8 @@ async def test_chart_result_opens_chart_screen_and_syncs_ticker() -> None:
         app._handle_result(dispatch("/chart NVDA", app._state))
         await pilot.pause()
 
-        assert app.screen.id == "chart"
+        from apex.tui.app import ChartScreen
+        assert isinstance(app.screen, ChartScreen)
         assert app._state.setup.ticker == "NVDA"
         assert app.screen.query_one("#chart-panel", ChartPanel).ticker == "NVDA"
 
