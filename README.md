@@ -76,12 +76,19 @@ cd apex && uv sync
 ## Quickstart
 
 ```bash
-# One-line install
+# 1. Install (pick one)
 curl -sSL https://raw.githubusercontent.com/EnesDemir143/apex/main/scripts/install.sh | bash
+# or: uv tool install git+https://github.com/EnesDemir143/apex.git
+# or: git clone https://github.com/EnesDemir143/apex.git && cd apex && uv sync
 
-# Set your API key and launch
+# 2. Set your API key
+# (curl install method):
 cp ~/.apex/.env.example ~/.apex/.env
-# edit ~/.apex/.env → set OPENAI_API_KEY
+# (clone method):
+# cp .env.example .env
+# edit → set OPENAI_API_KEY
+
+# 3. Launch
 apex
 ```
 
