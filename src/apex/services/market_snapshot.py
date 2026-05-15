@@ -72,17 +72,17 @@ async def get_market_snapshot(
 
     end = date.today()
     start = end - timedelta(days=days)
-    source = "fallback"
+    source = "stub"
     try:
         response = await (fetcher or MarketDataFetcher()).fetch_bars(canonical, start, end)
         bars = list(response.bars)
-        source = response.source if not response.degraded else f"{response.source}_fallback"
+        source = response.source
     except Exception:
         bars = _default_snapshot_bars(canonical)
 
     if not bars:
         bars = _default_snapshot_bars(canonical)
-        source = "fallback"
+        source = "stub"
 
     return _snapshot_from_bars(canonical, bars[-days:], source=source)
 
