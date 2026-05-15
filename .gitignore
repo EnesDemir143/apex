@@ -272,8 +272,6 @@ skills-lock.json
 graphify-out/
 .planning/
 
-assets/
-
 
 .env.plane.local
 .env.plane.local.example

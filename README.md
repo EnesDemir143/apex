@@ -15,9 +15,7 @@
 </p>
 
 ---
-
-**Want this in Turkish?** [Türkçe README](README.tr.md)
-
+[![Türkçe](https://img.shields.io/badge/Türkçe-README-green)](README.tr.md)
 ---
 
 ## Overview
