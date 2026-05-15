@@ -59,23 +59,30 @@ Bulut yok, sunucu yok, Docker gerekmez. Sadece terminaliniz ve bir OpenAI API an
 ## Hızlı Başlangıç
 
 ```bash
-# 1. Kopyala ve kur
-git clone https://github.com/EnesDemir143/apex.git
-cd apex
-uv sync
+# Tek satır kurulum
+curl -sSL https://raw.githubusercontent.com/EnesDemir143/apex/main/scripts/install.sh | bash
 
-# 2. API anahtarlarını ayarla
-cp .env.example .env
-# .env dosyasını düzenle: OPENAI_API_KEY yaz
-
-# 3. Terminal kokpitini başlat
-uv run apex
-
-# — ya da tek-sefer analiz —
-uv run apex analyze AAPL
+# API anahtarını ayarla ve başlat
+cp ~/.apex/.env.example ~/.apex/.env
+# ~/.apex/.env dosyasını düzenle → OPENAI_API_KEY yaz
+apex
 ```
 
 PostgreSQL, Redis, Docker veya web sunucusu gerekmez. Apex tamamen local çalışır.
+
+### Alternatif Kurulum
+
+```bash
+# pip ile (GitHub üzerinden)
+pip install git+https://github.com/EnesDemir143/apex.git
+
+# Ya da uv tool ile
+uv tool install git+https://github.com/EnesDemir143/apex.git
+
+# Ya da manuel clone
+git clone https://github.com/EnesDemir143/apex.git
+cd apex && uv sync
+```
 
 ---
 
@@ -194,13 +201,13 @@ SEC dosyaları temiz markdown'a dönüştürülür ve local knowledge retrieval 
 ## CLI Referansı
 
 ```bash
-uv run apex                    # Terminal kokpitini başlat (varsayılan)
-uv run apex analyze AAPL       # Tek-sefer analiz
-uv run apex analyze AAPL --save-report  # Markdown rapor olarak kaydet
-uv run apex history            # Kayıtlı analizleri listele
-uv run apex report AAPL --latest # Son raporu görüntüle
-uv run apex sec-fetch AAPL     # SEC dosyalarını bilgi tabanına indir
-uv run apex sec-fetch all      # Tüm whitelist ticker'ları indir
+apex                           # Terminal kokpitini başlat (varsayılan)
+apex analyze AAPL              # Tek-sefer analiz
+apex analyze AAPL --save-report  # Markdown rapor olarak kaydet
+apex history                   # Kayıtlı analizleri listele
+apex report AAPL --latest      # Son raporu görüntüle
+apex sec-fetch AAPL            # SEC dosyalarını bilgi tabanına indir
+apex sec-fetch all             # Tüm whitelist ticker'ları indir
 ```
 
 ### TUI Slash Komutları

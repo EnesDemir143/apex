@@ -24,6 +24,23 @@ Apex is a **local-first, multi-agent market research cockpit** that runs entirel
 
 No cloud, no servers, no Docker required. Just your terminal and an OpenAI API key.
 
+### Install
+
+```bash
+# One-liner (curl)
+curl -sSL https://raw.githubusercontent.com/EnesDemir143/apex/main/scripts/install.sh | bash
+
+# Or via pip (from GitHub)
+pip install git+https://github.com/EnesDemir143/apex.git
+
+# Or via uv tool
+uv tool install git+https://github.com/EnesDemir143/apex.git
+
+# Or clone manually
+git clone https://github.com/EnesDemir143/apex.git
+cd apex && uv sync
+```
+
 ### Why Apex?
 
 | Capability | What it demonstrates |
@@ -59,20 +76,13 @@ No cloud, no servers, no Docker required. Just your terminal and an OpenAI API k
 ## Quickstart
 
 ```bash
-# 1. Clone and install
-git clone https://github.com/EnesDemir143/apex.git
-cd apex
-uv sync
+# One-line install
+curl -sSL https://raw.githubusercontent.com/EnesDemir143/apex/main/scripts/install.sh | bash
 
-# 2. Set your API keys
-cp .env.example .env
-# edit .env: set OPENAI_API_KEY
-
-# 3. Launch the terminal cockpit
-uv run apex
-
-# — or run a one-shot analysis —
-uv run apex analyze AAPL
+# Set your API key and launch
+cp ~/.apex/.env.example ~/.apex/.env
+# edit ~/.apex/.env → set OPENAI_API_KEY
+apex
 ```
 
 No PostgreSQL, Redis, Docker, or web server required. Apex runs entirely locally.
@@ -210,16 +220,16 @@ The Fundamental Agent automatically discovers all `.md` files in `~/.apex/knowle
 ## CLI Reference
 
 ```bash
-uv run apex                    # Launch the terminal cockpit (default)
-uv run apex tui                # Same — explicit TUI command
-uv run apex analyze AAPL       # One-shot analysis
-uv run apex analyze AAPL --save-report  # Save as markdown report
-uv run apex history            # List saved analyses
-uv run apex report AAPL --latest # View latest report
-uv run apex replay ~/.apex/reports/...  # Re-render a saved report
-uv run apex sec-fetch AAPL     # Download SEC filings to knowledge base
-uv run apex sec-fetch all      # Download for all whitelist tickers
-uv run apex config --show      # Show current configuration
+apex                           # Launch the terminal cockpit (default)
+apex tui                       # Same — explicit TUI command
+apex analyze AAPL              # One-shot analysis
+apex analyze AAPL --save-report  # Save as markdown report
+apex history                   # List saved analyses
+apex report AAPL --latest      # View latest report
+apex replay ~/.apex/reports/   # Re-render a saved report
+apex sec-fetch AAPL            # Download SEC filings to knowledge base
+apex sec-fetch all             # Download for all whitelist tickers
+apex config --show             # Show current configuration
 ```
 
 ### TUI Slash Commands
