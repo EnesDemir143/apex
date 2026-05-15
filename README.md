@@ -157,7 +157,7 @@ A **4-model stacking ensemble** with RidgeCV meta-learner:
 - **Training pipeline**: `snakemake -s Snakefile_train all --cores 4`
 - **Model persistence**: joblib → `models/quant/*.pkl`
 
-Enable via TUI: `/quant on` → `/analyze AAPL`. Portfolio Manager includes the quant signal when available.
+Enable via TUI: `/quant on` → `/analyze AAPL`. Configure device: `/quant device auto|cpu|mps|cuda`. Portfolio Manager includes the quant signal when available (ignores HOLD signals).
 
 ### RAG over SEC Filings
 
@@ -172,13 +172,23 @@ ls ~/.apex/knowledge/AAPL/
 
 Filings are converted to clean markdown and served through the local knowledge retrieval system. No database, no embedding server.
 
+You can also add your own research notes:
+
+```bash
+mkdir -p ~/.apex/knowledge/AAPL
+echo "AAPL services revenue growing 15% YoY." > ~/.apex/knowledge/AAPL/notes.md
+```
+
+The Fundamental Agent automatically discovers all `.md` files in `~/.apex/knowledge/{TICKER}/`.
+
 ### Terminal UI (Textual)
 
 - **Slash command palette**: `/select`, `/analyze`, `/chart`, `/quant`, `/lang`, `/prompt`, `/help`
 - **Real-time progress**: Each agent completion shown live in the event log
-- **Candlestick charts**: Terminal-native chart with RSI/MACD sub-panels, crosshair inspection, zoom/pan
-- **Market panel**: Live OHLCV, indicator summary, source tracking
+- **Candlestick charts**: `/chart AAPL` opens terminal-native chart with RSI/MACD sub-panels, crosshair inspection (`←` `→`), bar-inspect mode (`/inspect` or `Tab`), zoom (`+` `-`), pan (`Shift+←` `Shift+→`), timeframe switching (`1` `5` `h` `d`)
+- **Market panel**: Live OHLCV, indicator summary (RSI, MACD, Bollinger, SMA20/50), source tracking
 - **Agent prompts**: `/prompt technical "focus on momentum"` — per-agent instruction customization
+- **Keyboard shortcuts**: `Ctrl+R` run analysis, `Ctrl+C` quit, `Esc` clear input
 
 ### Resilience & Safety
 
@@ -201,12 +211,15 @@ Filings are converted to clean markdown and served through the local knowledge r
 
 ```bash
 uv run apex                    # Launch the terminal cockpit (default)
+uv run apex tui                # Same — explicit TUI command
 uv run apex analyze AAPL       # One-shot analysis
 uv run apex analyze AAPL --save-report  # Save as markdown report
 uv run apex history            # List saved analyses
 uv run apex report AAPL --latest # View latest report
+uv run apex replay ~/.apex/reports/...  # Re-render a saved report
 uv run apex sec-fetch AAPL     # Download SEC filings to knowledge base
 uv run apex sec-fetch all      # Download for all whitelist tickers
+uv run apex config --show      # Show current configuration
 ```
 
 ### TUI Slash Commands
@@ -346,8 +359,10 @@ See [docs/WEB_STACK_REVIVAL_GUIDE.md](docs/WEB_STACK_REVIVAL_GUIDE.md) for detai
 | `OPENAI_API_KEY` | Yes | — | OpenAI API key |
 | `LLM_MODEL` | No | `gpt-4o-mini` | LLM model name |
 | `LLM_DAILY_BUDGET_USD` | No | `5.0` | Daily LLM cost limit |
-| `ALPACA_API_KEY` | No | — | Alpaca market data (yfinance works without) |
+| `ALPACA_API_KEY` | No | — | Alpaca market data (yfinance fallback works without) |
 | `LANGCHAIN_API_KEY` | No | — | LangSmith tracing |
+| `LLM_PROVIDER` | No | `openai` | LLM provider (`openai` or `ollama`) |
+| `OLLAMA_BASE_URL` | No | `http://localhost:11434` | Ollama server URL |
 | `EMBEDDING_MODEL` | No | `nomic-embed-text-v2` | Embedding model for RAG |
 
 ---
