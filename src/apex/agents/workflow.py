@@ -16,7 +16,7 @@ from apex.agents.hooks import post_analysis_hook, pre_analysis_hook
 from apex.agents.portfolio_manager import portfolio_manager
 from apex.agents.quant import quant_agent
 from apex.agents.risk import risk_agent
-from apex.agents.state import AgentState
+from apex.agents.state import AgentState, merge_compaction, merge_errors, merge_usage
 from apex.agents.technical import technical_agent
 from apex.infrastructure_layer.models import AgentDecision
 from apex.services.analysis_repository import AnalysisRepository
@@ -92,9 +92,9 @@ async def analyze_with_workflow_streaming(
 ) -> AgentState:
     """Run the compiled workflow with per-node progress callbacks (single pass).
 
-    Uses ``astream(stream_mode="values")`` to emit the full accumulated state
-    after each step. Calls ``progress(agent_label)`` as each agent node
-    completes. The last yielded state IS the final workflow output.
+    Uses ``astream(stream_mode="updates")`` which emits individual node outputs
+    as they complete — so progress fires for EACH agent separately.
+    Manually accumulates state using reducer functions for correctness.
 
     Args:
         state: Initial AgentState.
@@ -104,29 +104,46 @@ async def analyze_with_workflow_streaming(
     Returns:
         Final AgentState after all nodes complete.
     """
+    from copy import deepcopy
+
     workflow = create_workflow()
     config = workflow_run_config(state["ticker"])
 
-    node_to_key: dict[str, tuple[str, str]] = {
-        "technical": ("technical_analysis", "Technical Agent"),
-        "fundamental": ("fundamental_analysis", "Fundamental Agent"),
-        "risk": ("risk_assessment", "Risk Agent"),
-        "quant": ("quant_analysis", "Quant Agent"),
-        "portfolio_manager": ("portfolio_decision", "Portfolio Manager"),
-        "compact_context": ("compaction_applied", "Context Compactor"),
+    node_names = {
+        "pre_hook": "Pre-flight",
+        "technical": "Technical Agent",
+        "fundamental": "Fundamental Agent",
+        "risk": "Risk Agent",
+        "quant": "Quant Agent",
+        "compact_context": "Context Compactor",
+        "portfolio_manager": "Portfolio Manager",
+        "post_hook": "Post-flight",
     }
 
-    seen: set[str] = set()
-    final: AgentState = state
+    final: AgentState = deepcopy(dict(state))
+
+    async def _reduce(output: dict) -> None:
+        """Apply a partial state update using proper reducer functions."""
+        if "errors" in output:
+            final["errors"] = merge_errors(final.get("errors"), output["errors"])
+        if "usage" in output:
+            final["usage"] = merge_usage(final.get("usage"), output["usage"])
+        if "compaction_applied" in output:
+            final["compaction_applied"] = merge_compaction(
+                final.get("compaction_applied"), output["compaction_applied"]
+            )
+        for k, v in output.items():
+            if k not in ("errors", "usage", "compaction_applied"):
+                final[k] = v
 
     async with asyncio.timeout(WORKFLOW_TIMEOUT_SECONDS):
-        async for step in workflow.astream(state, config=config, stream_mode="values"):
-            final = step
-            for node, (state_key, label) in node_to_key.items():
-                if node not in seen and step.get(state_key) is not None:
-                    seen.add(node)
-                    if progress:
-                        progress(label)
+        async for update in workflow.astream(state, config=config, stream_mode="updates"):
+            for node_name, output in update.items():
+                if isinstance(output, dict):
+                    await _reduce(output)
+                label = node_names.get(node_name, node_name)
+                if progress:
+                    progress(label)
 
     return final
 
