@@ -451,7 +451,7 @@ class ChartScreen(CommandPaletteScreenMixin, Screen[None]):
     """
 
     def __init__(self, ticker: str) -> None:
-        super().__init__(id="chart")
+        super().__init__()
         self.ticker = ticker
 
     def compose(self) -> ComposeResult:

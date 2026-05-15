@@ -4,9 +4,11 @@
 
 4 specialized LangGraph agents (Technical, Fundamental, Risk, Portfolio Manager) analyze stocks and produce BUY/SELL/HOLD signals with confidence scores — all running locally, no server required.
 
-[![CI](https://github.com/your-org/apex/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/apex/actions/workflows/ci.yml)
-[![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/EnesDemir143/apex/actions/workflows/ci.yml/badge.svg)](https://github.com/EnesDemir143/apex/actions/workflows/ci.yml)
+[![Python 3.13](https://img.shields.io/badge/python-3.13-blue?logo=python)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+[![LangGraph](https://img.shields.io/badge/LangGraph-1.1-purple)](https://langchain-ai.github.io/langgraph/)
+[![Textual](https://img.shields.io/badge/Textual-TUI-1eaedb)](https://textual.textualize.io/)
 
 ---
 
