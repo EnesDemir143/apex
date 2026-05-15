@@ -13,6 +13,7 @@ from rich.table import Table
 from apex.reports.writer import ReportWriter
 from apex.services.history_store import HistoryStore
 from apex.services.local_analysis import run_local_analysis_sync
+from apex.services.sec_filings import fetch_sec_filings
 
 app = typer.Typer(
     name="apex",
@@ -206,6 +207,44 @@ def replay(
     )
     console.print()
     console.print(report_md)
+
+
+@app.command()
+def sec_fetch(
+    ticker: Annotated[str, typer.Argument(help="Ticker symbol (or 'all' for all whitelist tickers).")],
+    max_filings: Annotated[
+        int,
+        typer.Option("--max", "-m", help="Max filings per ticker (default: 2 = latest 10-Q + 10-K)."),
+    ] = 2,
+) -> None:
+    """Download SEC filings (10-K/10-Q) via yfinance and save as markdown to knowledge base."""
+    from apex.core.constants import TICKERS_WHITELIST
+
+    if ticker.lower() == "all":
+        from apex.services.sec_filings import fetch_all_whitelist
+
+        results = fetch_all_whitelist(max_filings=max_filings)
+        total = sum(len(v) for v in results.values())
+        console.print(f"[green]Saved {total} SEC filings across {len(results)} tickers.[/green]")
+        for t, paths in results.items():
+            for p in paths:
+                console.print(f"  [dim]{t}:[/dim] {p}")
+        return
+
+    ticker_upper = ticker.upper()
+    if ticker_upper not in TICKERS_WHITELIST:
+        console.print(f"[red]Ticker {ticker_upper!r} not in whitelist: {list(TICKERS_WHITELIST)}[/red]")
+        raise typer.Exit(code=1)
+
+    paths = fetch_sec_filings(ticker_upper, max_filings=max_filings)
+    if not paths:
+        console.print(f"[yellow]No SEC filings found for {ticker_upper}.[/yellow]")
+        return
+    for p in paths:
+        size = p.stat().st_size
+        console.print(f"[green]✓[/green] {p} ({size:,} bytes)")
+
+    console.print(f"\n[dim]Saved to ~/.apex/knowledge/{ticker_upper}/ — RAG will use them automatically.[/dim]")
 
 
 @app.command()
