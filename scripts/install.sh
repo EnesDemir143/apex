@@ -2,6 +2,9 @@
 # ────────────────────────────────────────────────────────────────────────────
 # Apex Terminal — one-line installer
 # Usage:  curl -sSL https://raw.githubusercontent.com/EnesDemir143/apex/main/scripts/install.sh | bash
+#
+# Supports: macOS (Intel + Apple Silicon), Linux (x86_64 + ARM64)
+# Windows: use WSL2 (Ubuntu) — run this script inside WSL
 # ────────────────────────────────────────────────────────────────────────────
 
 set -euo pipefail
@@ -10,6 +13,14 @@ REPO="EnesDemir143/apex"
 BRANCH="main"
 INSTALL_DIR="${HOME}/.apex"
 BIN_DIR="${HOME}/.local/bin"
+
+# Detect OS
+OS="$(uname -s)"
+case "${OS}" in
+    Linux)  OS="linux" ;;
+    Darwin) OS="macos" ;;
+    *)      echo "Unsupported OS: ${OS} — try WSL2 on Windows"; exit 1 ;;
+esac
 
 GREEN='\033[0;32m'
 CYAN='\033[0;36m'
@@ -53,15 +64,33 @@ echo "Installing Python dependencies..."
 uv sync
 
 # ── Symlink to PATH ──────────────────────────────────────────────────────
-mkdir -p "${BIN_DIR}"
-ln -sf "${INSTALL_DIR}/.venv/bin/apex" "${BIN_DIR}/apex"
+VENV_APEX="${INSTALL_DIR}/.venv/bin/apex"
+if [ -f "${VENV_APEX}" ]; then
+    mkdir -p "${BIN_DIR}"
+    ln -sf "${VENV_APEX}" "${BIN_DIR}/apex"
+fi
+
+# Detect if BIN_DIR is in PATH
+IN_PATH=0
+case ":${PATH}:" in
+    *:"${BIN_DIR}":*) IN_PATH=1 ;;
+esac
 
 echo ""
 echo -e "${GREEN}═══ Installation complete ═══${NC}"
 echo ""
-echo "Add to your PATH (if not already):"
-echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
-echo ""
+
+if [ "${IN_PATH}" -eq 0 ]; then
+    SHELL_CONFIG="${HOME}/.bashrc"
+    if [ "${OS}" = "macos" ]; then
+        SHELL_CONFIG="${HOME}/.zshrc"
+    fi
+    echo "Add to your PATH (auto-detected shell config: ${SHELL_CONFIG}):"
+    echo "  echo 'export PATH=\"\$HOME/.local/bin:\$PATH\"' >> ${SHELL_CONFIG}"
+    echo "  source ${SHELL_CONFIG}"
+    echo ""
+fi
+
 echo "Then set your API key and launch:"
 echo "  cp ${INSTALL_DIR}/.env.example ${INSTALL_DIR}/.env"
 echo "  # edit ${INSTALL_DIR}/.env → set OPENAI_API_KEY"
