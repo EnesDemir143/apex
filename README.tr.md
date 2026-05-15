@@ -15,7 +15,7 @@
 </p>
 
 ---
-[![English](https://img.shields.io/badge/English-README-blue)](README.md)
+<p align="center"><a href="README.md"><u>English</u> →</a></p>
 ---
 
 ## Genel Bakış

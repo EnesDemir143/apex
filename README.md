@@ -15,7 +15,7 @@
 </p>
 
 ---
-[![Türkçe](https://img.shields.io/badge/Türkçe-README-green)](README.tr.md)
+<p align="center"><a href="README.tr.md"><u>Türkçe</u> →</a></p>
 ---
 
 ## Overview
